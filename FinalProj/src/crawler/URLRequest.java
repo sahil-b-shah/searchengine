@@ -23,6 +23,8 @@ import java.util.regex.Pattern;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import crawler.storage.RobotsDBWrapper;
+import crawler.storage.RobotsTxtData;
 import edu.upenn.cis455.crawler.info.RobotsTxtInfo;
 import edu.upenn.cis455.crawler.info.URLInfo;
 
@@ -105,15 +107,59 @@ public class URLRequest {
 	}
 	
 	public void checkRobots() {
+		RobotsDBWrapper robotsDB = new RobotsDBWrapper("/home/cis455/storage");
 		
+		RobotsTxtData robotsTxtData = robotsDB.getRobotsTxtData(this.hostName);
+		if (robotsTxtData == null) {
+			constructRobotsTxt(this.hostName); 
+		} else {
+			
+		}
+	}
+	
+	private void constructRobotsTxt(String hostName) {
+		HttpURLConnection con = sendRequest(hostName, "/robots.txt");
+		
+		
+		if(con.getResponseCode() != 200) {
+			return;
+		}
+		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+		String string;
+		String userAgent = "*";
+		while ((string = br.readLine()) != null) {
+			 
+			//Extract key-values of robot
+			Pattern p = Pattern.compile(KEY_VALUE_REGEX);
+			Matcher m = p.matcher(string);
+			if (m.find()) {
+				String key = m.group(1);
+				String value = m.group(2);
+				if (key.equalsIgnoreCase("User-Agent")) {
+					userAgent = value;
+					robotsTxt.addUserAgent(value);
+				} else if (key.equalsIgnoreCase("Disallow")) {
+					robotsTxt.addDisallowedLink(userAgent, value);
+				} else if (key.equalsIgnoreCase("Allow")) {
+					robotsTxt.addAllowedLink(userAgent, value);
+				} else if (key.equalsIgnoreCase("Crawl-delay")) {
+					robotsTxt.addCrawlDelay(userAgent, Integer.valueOf(value));
+				}
+			}
+			
+		}
 	}
 	
 	private HttpURLConnection sendRequest(String hostName, String filepath) {
+		return sendRequest(hostName, filepath, "GET");
+	}
+	
+	private HttpURLConnection sendRequest(String hostName, String filepath, String method) {
 		
 		if (!filepath.startsWith("/")) {
 			filepath = "/"+filepath;
 		}
-		String requestString = hostName + filepath;
+		String requestString = this.protocol+"://"+hostName + filepath;
 		
 		HttpURLConnection con = null;
 		URL url = null;
@@ -139,7 +185,9 @@ public class URLRequest {
 				e1.printStackTrace();
 			}
 		}
-		
+		con.setRequestMethod(method);
+		con.addRequestProperty("Host", hostName);
+		con.addRequestProperty("User-Agent", "cis455crawler");
 		return con;
 	}
 	
