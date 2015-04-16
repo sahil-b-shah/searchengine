@@ -75,11 +75,11 @@ public class RobotsDBWrapper {
 	}
 	
 	/**
-	 * Get RobotsTxtData from url
+	 * Get RobotsTxtData from host
 	 * @param hostName - host to get robots.txt for
 	 * @return RobotsTxtData
 	 */
-	public RobotsTxtData getURL(String hostName){
+	public RobotsTxtData getRobotsTxtData(String hostName){
 		return robotsIndex.get(hostName);
 	}
 	
