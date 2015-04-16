@@ -35,7 +35,7 @@ public class RobotsTxtData{
 	}
 	
 	public final ArrayList<String> getDisallowedLinks(){
-		return allowedLinks;	
+		return disallowedLinks;	
 	}
 	
 	public final long getCrawlDelay(){

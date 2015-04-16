@@ -31,7 +31,7 @@ public class RobotsDBWrapperTest extends TestCase {
 		
 		RobotsTxtData data = db.getRobotsTxtData("host");
 		assertTrue(data.getAllowedLinks().contains("allowed1"));
-		assertFalse(data.getAllowedLinks().contains("allowed1000"));
+		assertFalse(data.getAllowedLinks().contains("allowed100Q0"));
 	}
 	
 	protected void tearDown(){
