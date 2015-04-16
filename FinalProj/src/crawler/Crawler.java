@@ -27,7 +27,7 @@ import edu.upenn.cis455.storage.DBWrapper;
 import edu.upenn.cis455.storage.QueueEntity;
 
 
-public class XPathCrawler {
+public class Crawler {
 	
 	private static String urlString;
 	private static String envDirectory;
