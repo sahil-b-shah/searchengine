@@ -75,7 +75,7 @@ public class RobotsDBWrapper {
 	}
 	
 	/**
-	 * Get RobotsTxtData from host
+	 * Get RobotsTxtData from url
 	 * @param hostName - host to get robots.txt for
 	 * @return RobotsTxtData
 	 */

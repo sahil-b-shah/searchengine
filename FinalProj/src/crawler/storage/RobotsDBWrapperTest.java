@@ -1,0 +1,41 @@
+package crawler.storage;
+
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+
+import junit.framework.TestCase;
+
+import com.sleepycat.je.DatabaseException;
+
+
+public class RobotsDBWrapperTest extends TestCase {
+
+	private RobotsDBWrapper db;
+	protected void setUp(){
+		try {
+			db = new RobotsDBWrapper("/robotdb");
+		} catch (DatabaseException | FileNotFoundException e) {}
+	}
+	
+	
+	public void test1(){
+		ArrayList<String> allowedLinks = new ArrayList<String>();
+		allowedLinks.add("allowed1");
+		allowedLinks.add("allowed2");
+		ArrayList<String> disallowedLinks = new ArrayList<String>();
+		disallowedLinks.add("disallowed1");
+		disallowedLinks.add("disallowed2");
+		
+		db.addRobotsTxt("host", allowedLinks, disallowedLinks, 10);
+		
+		
+		RobotsTxtData data = db.getRobotsTxtData("host");
+		assertTrue(data.getAllowedLinks().contains("allowed1"));
+		assertFalse(data.getAllowedLinks().contains("allowed1000"));
+	}
+	
+	protected void tearDown(){
+		db.close();
+	}
+	
+}

@@ -14,6 +14,10 @@ public class RobotsTxtData{
 	private ArrayList<String> disallowedLinks;
 	private long crawlDelay;
 	
+	public RobotsTxtData(){
+		
+	}
+	
 	public RobotsTxtData(String hostName, ArrayList<String> allowedLinks,  ArrayList<String> disallowedLinks, long crawlDelay)
 	{
 		this.hostName = hostName;
