@@ -1,30 +1,8 @@
 package crawler;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map.Entry;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.tidy.Tidy;
-
-import edu.upenn.cis455.crawler.info.RobotsTxtInfo;
-import edu.upenn.cis455.storage.ContentEntity;
-import edu.upenn.cis455.storage.DBWrapper;
-import edu.upenn.cis455.storage.QueueEntity;
+import crawler.storage.DocumentDBWrapper;
+import crawler.storage.URLFrontierDBWrapper;
 
 
 public class Crawler {
@@ -55,10 +33,13 @@ public class Crawler {
 		if (args.length == 4) {
 			maxFiles = Integer.parseInt(args[3]);
 		}
-		DBWrapper db = DBWrapper.getInstance(envDirectory);
-		db.addUrl(urlString);
-		db.getAllContent();
-		db.close();
+		DocumentDBWrapper documentDB = DocumentDBWrapper.getInstance(envDirectory);
+		URLFrontierDBWrapper frontierDB = URLFrontierDBWrapper.getInstance(envDirectory);
+
+		frontierDB.addUrl(urlString);
+		documentDB.getAllContent();
+		frontierDB.close();
+		documentDB.close();
 		setup();
 	}
 }
