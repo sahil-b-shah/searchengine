@@ -1,4 +1,4 @@
-package crawler;
+package crawler.storage;
 
 import java.util.ArrayList;
 

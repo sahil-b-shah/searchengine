@@ -1,4 +1,4 @@
-package crawler;
+package crawler.storage;
 
 import java.io.File;
 import java.io.FileNotFoundException;
