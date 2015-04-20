@@ -10,21 +10,13 @@ public class ShuffleURLReduceThread implements Runnable {
 	private Job job;
 	private ShuffleURLInputReduceReader reader;
 	private Context context;
-	
-	@SuppressWarnings("rawtypes")
-	public ShuffleURLReduceThread(Class jobClass, ShuffleURLInputReduceReader reader, Context context) {
-		try {
-			if(jobClass != null)
-				job = (Job) jobClass.newInstance();
-			else
-				job = null;
-			this.reader = reader;
-			this.context = context;
-		} catch (InstantiationException | IllegalAccessException e) {
-			System.err.println("Can't instantiate this class");
-		}
+
+	public ShuffleURLReduceThread(ShuffleURLInputReduceReader reader, Context context) {
+		job = new ShuffleURLJob();
+		this.reader = reader;
+		this.context = context;
 	}
-	
+
 	@Override
 	public void run() {
 		String line;
@@ -36,9 +28,9 @@ public class ShuffleURLReduceThread implements Runnable {
 				String key = line.split("\\t")[0];
 				String value = line.split("\\t")[1];
 				String[] valueArray = value.split(",");
-				
+
 				job.reduce(key, valueArray, context);
-				
+
 				line = reader.readLine();
 			}
 		} catch (IOException e) {

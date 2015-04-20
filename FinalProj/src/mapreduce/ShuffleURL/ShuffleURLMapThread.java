@@ -12,19 +12,12 @@ public class ShuffleURLMapThread implements Runnable {
 	private ShuffleURLInputMapReader reader;
 	private Context context;
 
-	@SuppressWarnings("rawtypes")
-	public ShuffleURLMapThread(Class jobClass, ShuffleURLInputMapReader reader, Context context){
-		try {
-			if(jobClass != null)
-				job = (Job) jobClass.newInstance();
-			else
-				job = null;
-			this.reader = reader;
-			this.context = context;
-			
-		} catch (InstantiationException | IllegalAccessException e) {
-			System.err.println("Can't instantiate this class");
-		}
+	public ShuffleURLMapThread(ShuffleURLInputMapReader reader, Context context){
+
+		job = new ShuffleURLJob();
+		this.reader = reader;
+		this.context = context;
+
 	}
 
 	@Override

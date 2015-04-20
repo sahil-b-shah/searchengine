@@ -8,52 +8,26 @@ import java.io.PrintWriter;
 
 import mapreduce.Context;
 
+
+
 public class ShuffleURLReduceContext implements Context {
 
-	private static String directory;
-
-	public ShuffleURLReduceContext(String d){
-		directory =d;
-		
-		File wfile = new File(directory);
-		if (wfile.exists()){
-			System.out.println("FILE ALREADY HERE -- DELETING IT");
-			wfile.delete();
-		}
-		try {
-			wfile.createNewFile();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-
+	private File output;
+	
+	public ShuffleURLReduceContext(File output) {
+		this.output = output;	
 	}
 
-	@Override
-	public void write(String key, String value) {
-
-		//System.out.println("FIlanem: " + filename);
-		File wfile = new File(directory);
-
-		PrintWriter out = null;
-
+	public synchronized void write(String key, String value) {
 		try {
-
-			
-			//System.out.println("Created a new file");
-			FileWriter f = new FileWriter(wfile, true);
-			out = new PrintWriter(new BufferedWriter(f));
-			out.println(key + "\t" + value);
-
-		}catch (IOException e) {
-			System.out.println("Error  whie trying write to file in CONTEXT");
-			e.printStackTrace();
-		}finally{
+			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(output,true)));
+			out.println(key + "\t"+value);
 			out.close();
+		} catch (IOException e) {
+			System.err.println("Error in emitting reduce");
+			e.printStackTrace();
 		}
 
 	}
-
-
-
+	
 }

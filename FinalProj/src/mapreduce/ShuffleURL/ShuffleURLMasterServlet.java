@@ -15,11 +15,13 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 
 	static final long serialVersionUID = 455555001;
 	private static Map<String, ArrayList<String>> statusMap; 
-	private static Map<String, ArrayList<String>> jobMap; 
+	private static String numMapThreads;
+	private static String numReduceThreads;
+	private static String outputDir;
+	private static String inputDir;
 
 	public void init(ServletConfig config) throws ServletException {
 		statusMap = new HashMap<String, ArrayList<String>>();
-		jobMap = new HashMap<String, ArrayList<String>>();
 		System.out.println("Master init");
 
 	}
@@ -38,9 +40,6 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 			out.println("<tr>");
 			out.println("<td>IP:port</td>");
 			out.println("<td>Status</td>");
-			out.println("<td>Job</td>");
-			out.println("<td>Keys Read</td>");
-			out.println("<td>Keys Written</td>");
 			out.println("</tr>");
 
 			Map<String, ArrayList<String>> localStatusMap =  getStatusMap();
@@ -66,7 +65,6 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 
 			//Post to itself first
 			out.println("<form style='text-align:center;'  method='post'>");
-			out.println("<p align='center'>Class Name of Job: </p><input type='text' name='job'></br>");
 			out.println("<p align='center'>Input directory: </p><input type='text' name='input'></br>");
 			out.println("<p align='center'>Output directory: </p><input type='text' name='output'></br>");
 			out.println("<p align='center'>Number of map threads: </p><input type='text' name='numMapThreads'></br>");
@@ -92,9 +90,6 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 		if(request.getRequestURI().contains("/workerstatus")){
 			//Get query string params
 			String status = request.getParameter("status");
-			String job = request.getParameter("job");
-			String keysRead = request.getParameter("keysRead");
-			String keysWritten = request.getParameter("keysWritten");
 			String port = request.getParameter("port");
 			String IPPort = request.getLocalAddr() + ":" + port;
 			String timeLastReceived = System.currentTimeMillis() + "";			
@@ -102,9 +97,6 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 			Map<String, ArrayList<String>> localStatusMap =  getStatusMap();
 			ArrayList<String> params = new ArrayList<String>();
 			params.add(status);
-			params.add(job);
-			params.add(keysRead);
-			params.add(keysWritten);
 			params.add(timeLastReceived);
 			localStatusMap.put(IPPort, params);
 
@@ -122,46 +114,28 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 
 			if(allWaiting){
 				System.out.println("All workers waiting");
-				Map<String, ArrayList<String>> localJobsMap =  getJobMap();
 				for(String iport: localStatusMap.keySet()){
 					if((System.currentTimeMillis() - Long.parseLong(params.get(4))) < 30000){
 						MyHttpClient client = new MyHttpClient(iport, "/worker/runreduce");
-						String jobValue = localStatusMap.get(iport).get(1);
-						client.addParams("job", jobValue);
-						String outputValue = localJobsMap.get(job).get(1);
-						client.addParams("output", outputValue);
-						String threadValue = localJobsMap.get(job).get(3);
-						client.addParams("numThreads", threadValue);						
+						client.addParams("output", outputDir);
+						client.addParams("numThreads", numReduceThreads);						
 						client.sendPost();
 					}
 				}
 			}
 		}
 		else{
-			String job = request.getParameter("job");
-			String input = request.getParameter("input");
-			String output = request.getParameter("output");
-			String numMapThreads = request.getParameter("numMapThreads");
-			String numReduceThreads = request.getParameter("numReduceThreads");
 
-
-			Map<String, ArrayList<String>> localJobMap =  getJobMap();
-			ArrayList<String> params = new ArrayList<String>();
-			params.add(input);
-			params.add(output);
-			params.add(numMapThreads);
-			params.add(numReduceThreads);
-			localJobMap.put(job, params);
-
-			updateJobMap(job, params);
-
+			inputDir = request.getParameter("input");
+		    outputDir = request.getParameter("output");
+			numMapThreads = request.getParameter("numMapThreads");
+			numReduceThreads = request.getParameter("numReduceThreads");
 			Map<String, ArrayList<String>> localStatusMap =  getStatusMap();
 
 			//Post to /runmap on every active worker
 			for(String worker: localStatusMap.keySet()){
 				MyHttpClient client = new MyHttpClient(worker, "/worker/runmap");
-				client.addParams("job", job);
-				client.addParams("input", input);
+				client.addParams("input", inputDir);
 				client.addParams("numThreads", numMapThreads);
 				client.addParams("numWorkers", localStatusMap.size() + "");
 				int counter = 1;
@@ -201,33 +175,5 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 			statusMap.put(key, value);
 		}
 	}
-
-	/**
-	 * Gets the current job map synchronously and copies it to a new one
-	 * @return a copy of the map
-	 */
-	private Map<String, ArrayList<String>> getJobMap(){
-		Map<String, ArrayList<String>> copyMap =  new HashMap<String, ArrayList<String>>();
-		synchronized(jobMap){
-			for(String key: jobMap.keySet()){
-				copyMap.put(key, jobMap.get(key));
-			}
-		}
-		return copyMap;
-	}
-
-	/**
-	 * Updates the job map synchronously
-	 * @param key to add
-	 * @param value to add 
-	 */
-	private void updateJobMap(String key, ArrayList<String> value){
-		synchronized(jobMap){
-			System.out.println("Adding " + key + "to job map");
-			jobMap.put(key, value);
-		}
-	}
-
-
 
 }

@@ -14,18 +14,16 @@ import java.util.HashMap;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-import edu.upenn.cis455.mapreduce.master.MyHttpClient;
+import mapreduce.MyHttpClient;
+
 
 
 public class ShuffleURLWorkerServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 455555002;
 	private static ShuffleURLInputMapReader reader;
-	private static EmitMap emit;
+	private static ShuffleURLMapContext mapContext;
 	private static String status;
-	private static String lastMapKeysRead;
-	private static String lastMapKeysWritten;
-	private static String lastReduceKeysWritten;
 	private static String storageDirectory;
 	private static String port;
 	private static String job;
@@ -38,16 +36,14 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 		job = "none";
 
 
-		lastMapKeysRead = "0";
-		lastMapKeysWritten = "0";
-		emit = null;
+		mapContext = null;
 		reader = null;
 		storageDirectory = config.getInitParameter("storagedir");
 
 		System.out.println("Worker init");
 
 		//Create thread that issues GET every 10 seconds
-		StatusThread statusObj = new StatusThread(master, this);
+		ShuffleURLStatusThread statusObj = new ShuffleURLStatusThread(master, this);
 		statusThread = new Thread(statusObj);
 		statusThread.start();
 	}
@@ -71,21 +67,10 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 		if(request.getRequestURI().contains("/runmap")){
 			status = "mapping";
 			String input = request.getParameter("input");
-			job = request.getParameter("job");
 			int numThreads = Integer.parseInt(request.getParameter("numThreads"));
 			int numWorkers = Integer.parseInt(request.getParameter("numWorkers"));
 
 			String workers[] = new String[numWorkers];
-
-
-			Class jobClass = null;
-			try {
-				jobClass = Class.forName(job);
-			} catch (ClassNotFoundException e) {
-				System.err.println("Invalid job, not a java class");
-				e.printStackTrace();
-
-			}
 
 			File spoolin = new File(storageDirectory,"spool-in");
 			File spoolout = new File(storageDirectory, "spool-out");
@@ -119,7 +104,7 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 			reader = new ShuffleURLInputMapReader(fileList);
 
 			//Create emit from Map function implementing context
-			emit = new EmitMap(spoolout, workers);
+			mapContext = new ShuffleURLMapContext(spoolout, workers);
 
 
 			System.out.println(IPPort + ": starting threads mapping"); 
@@ -127,7 +112,7 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 			//Create numThread threads to run map
 			Thread threads[] = new Thread[numThreads];
 			for(int i = 0; i < numThreads; i++){
-				WorkerMapThread workerObj = new WorkerMapThread(jobClass, reader, emit);
+				ShuffleURLMapThread workerObj = new ShuffleURLMapThread(reader, mapContext);
 				threads[i] = new Thread(workerObj);
 				threads[i].start();
 			}
@@ -146,7 +131,7 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 			System.out.println(IPPort + ": threads done mapping"); 
 
 			//Get files from emit
-			File workerFiles[] = emit.getWorkerFiles();
+			File workerFiles[] = mapContext.getWorkerFiles();
 
 			//once all keys read, send a POST to /pushdata for appropriate workers	
 			for(File curWorker: workerFiles){
@@ -166,10 +151,8 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 
 			status = "waiting";
 
-			lastMapKeysRead = reader.getKeysRead();
-			lastMapKeysWritten = emit.getKeysWritten();
 			reader= null;
-			emit  =null;
+			mapContext  =null;
 
 			//Issue /workerstatus
 			MyHttpClient client = new MyHttpClient(IPPort, "/master/workerstatus");
@@ -179,9 +162,6 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 				client.addParams("port", params.get("port"));
 				client.addParams("status", params.get("status"));
 				client.addParams("job", params.get("job"));
-				client.addParams("keysRead", params.get("keysRead"));
-				client.addParams("keysWritten", params.get("keysWritten"));
-
 				client.sendPost();
 
 			}
@@ -219,7 +199,7 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 
 			}
 
-			InputReduceReader reader = new InputReduceReader(storeFile);
+			ShuffleURLInputReduceReader reader = new ShuffleURLInputReduceReader(storeFile);
 
 			File outputDir = new File(storageDirectory, output);
 
@@ -236,12 +216,12 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 
 			File outputFile = new File(outputDir, "output.txt");
 
-			EmitReduce emit = new EmitReduce(outputFile);
+			ShuffleURLReduceContext reduceContext = new ShuffleURLReduceContext(outputFile);
 
 			//Create numThread threads to run map
 			Thread threads[] = new Thread[numThreads];
 			for(int i = 0; i < numThreads; i++){
-				WorkerReduceThread workerObj = new WorkerReduceThread(jobClass, reader, emit);
+				ShuffleURLReduceThread workerObj = new ShuffleURLReduceThread(reader, reduceContext);
 				threads[i] = new Thread(workerObj);
 				threads[i].start();
 			}
@@ -258,7 +238,6 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 			System.out.println(IPPort + ": threads done reducing"); 
 
 			status = "idle";
-			lastReduceKeysWritten = emit.getKeysWritten();
 
 
 			//Issue workerstatus
@@ -284,46 +263,6 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 	public HashMap<String, String> getStatusParameters(){
 
 		HashMap<String, String> statusMap = new HashMap<String, String>();
-
-		if(status != null){
-			if(reader != null){
-				String keysRead = reader.getKeysRead();
-				if(status.equals("mapping") || status.equals("reducing")){
-					statusMap.put("keysRead", keysRead);
-				}
-			}
-			if(status.equals("waiting")){
-				statusMap.put("keysRead", lastMapKeysRead);
-			}
-			else{
-				statusMap.put("keysRead", "0");
-			}
-		}
-		else{
-			statusMap.put("keysRead", "0");
-		}
-
-		if(status != null){
-			if(emit != null){
-				String keysWritten = emit.getKeysWritten();
-				if(status.equals("mapping") || status.equals("reducing")){
-					statusMap.put("keysWritten", keysWritten);
-				}
-			}
-			if(status.equals("waiting")){
-				statusMap.put("keysWritten", lastMapKeysWritten);
-			}
-			else if(status.equals("idle")){
-				statusMap.put("keysWritten", lastReduceKeysWritten);
-			}
-			else{
-				statusMap.put("keysWritten", "0");
-			}
-
-		}
-		else{
-			statusMap.put("keysWritten", "0");
-		}
 
 		statusMap.put("status", status);
 		statusMap.put("port", port);

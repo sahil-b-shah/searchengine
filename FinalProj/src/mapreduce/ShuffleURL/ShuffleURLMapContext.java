@@ -2,96 +2,83 @@ package mapreduce.ShuffleURL;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.math.*;
+import java.math.BigInteger;
 
 import mapreduce.Context;
 
+import org.apache.commons.codec.digest.DigestUtils;
 
-public class ShuffleURLMapContext implements Context {
 
-	private static int numworkers;
-	private static String directory;
+public class ShuffleURLMapContext implements Context{
+	
+	private File workerFiles[];
+	private int numWorkers;
+	private File spoolout;
 
-	public ShuffleURLMapContext(int i, String d, int kw){
-		numworkers = i;
-		directory =d;
+	public ShuffleURLMapContext(File spoolout, String workers[]) throws IOException{
+		this.spoolout = spoolout;
+		workerFiles = new File[workers.length];
+		for(int i = 1; i <= workers.length; i++){
+			String currentWorker = "worker" + i;
+			File tempFile = new File(spoolout, currentWorker);
+			workerFiles[i-1] = tempFile;
+		}
+		numWorkers = workerFiles.length;
 	}
 
 	@Override
-	public void write(String key, String value) {
-	
-		String sha = hash(key);
-		BigInteger bigsha = new BigInteger(sha, 16);
-		BigInteger workers = new BigInteger(String.valueOf(numworkers));
-
-		BigInteger base = new BigInteger("2");
+	public synchronized void write(String key, String value) {
 		
-		BigInteger bucket = base.pow(160).divide(workers);
-		BigInteger one = new BigInteger("1");
+		//Hash key using SHA-1
+		String hashedValue = DigestUtils.sha1Hex(key);
 		
-		BigInteger workerfile = bigsha.divide(bucket);
+		int fileNumber = pickNumberBucket(numWorkers, hashedValue);
 		
-
-		//System.out.println("Bucket to go into: " + workerfile);
+		//Pick file based on hash
+		File selectedFile = new File(spoolout, "worker" +fileNumber);
 		
-		String filename = directory + "spool-out/" + workerfile.add(one) + ".txt";
-
-		//System.out.println("FIlanem: " + filename);
-		File wfile = new File(filename);
-
-		PrintWriter out = null;
-
+		
 		try {
-			if (wfile.exists()){
-				out = new PrintWriter(new FileOutputStream(new File(filename), true));
-				out.append(key + "\t" + value + "\n");
-				//WorkerServlet.keyswritten++;
-			}else{
-				wfile.createNewFile();
-				System.out.println("Created a new file");
-				FileWriter f = new FileWriter(filename, true);
-				out = new PrintWriter(new BufferedWriter(f));
-				out.println(key + "\t" + value);
-				//WorkerServlet.keyswritten++;
-				}
-		}catch (IOException e) {
-			System.out.println("Error  whie trying write to file in CONTEXT");
-			e.printStackTrace();
-		}finally{
+			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(selectedFile,true)));
+			out.println(key + "\t"+value);
 			out.close();
+			
+		} catch (IOException e) {
+			System.err.println("Error in emitting to worker files in map");
 		}
-
+		
+	}
+	
+	/**
+	 * Picks which bucket hash value goes in
+	 * @param numWorkers - number of ranges to split
+	 * @param hashedValue - value to place
+	 * @return
+	 */
+	private int pickNumberBucket(int numWorkers, String hashedValue) {
+		String maxValue = "";
+		for(int i = 0; i < 40; i++){
+			maxValue += "f";
+		}
+		BigInteger hash = new BigInteger(hashedValue, 16);
+		BigInteger bigMax = new BigInteger(maxValue, 16).add(BigInteger.ONE);
+		
+		BigInteger rangeSize = bigMax.divide(BigInteger.valueOf(numWorkers));
+		
+		int bucket = hash.divide(rangeSize).intValue() + 1;
+		return bucket;
 	}
 
-	private static String hash(String key){
-		String sha1 = "";
-		try{
-			MessageDigest crypt = MessageDigest.getInstance("SHA-1");
-			crypt.reset();
-			crypt.update(key.getBytes("UTF-8"));
-			sha1 = byteArrayToHexString(crypt.digest());
-		}
-		catch(NoSuchAlgorithmException | UnsupportedEncodingException e1){
-			e1.printStackTrace();
-		}
-		return sha1;
+	/**
+	 * Gets worker file list
+	 * @return worker files
+	 */
+	public File[] getWorkerFiles(){
+		return workerFiles;
 	}
-
-	public static String byteArrayToHexString(byte[] b) {
-		String result = "";
-		for (int i=0; i < b.length; i++) {
-			result +=
-					Integer.toString( ( b[i] & 0xff ) + 0x100, 16).substring( 1 );
-		}
-		return result;
-	}
-
-
+	
+	
 }
