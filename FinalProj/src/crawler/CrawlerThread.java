@@ -104,6 +104,7 @@ public class CrawlerThread extends Thread {
 		} else {
 			System.out.println("content is not null");
 			//Date lastSeen = new Date(Long.valueOf(ce.getLastSeen()));
+			//TODO: give me last seen data
 			boolean modified = request.checkModified();
 			//System.out.println(request.getHost()+request.getFilePath()+ " last modified"+lastModified);
 			//Check if last seen is less than last modified
