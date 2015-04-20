@@ -23,29 +23,36 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.tidy.Tidy;
 
-import crawler.storage.DBWrapper;
+import crawler.storage.DocumentDBWrapper;
+import crawler.storage.DocumentData;
+import crawler.storage.RobotsTxtData;
+import crawler.storage.URLFrontierDBWrapper;
+import crawler.storage.URLFrontierData;
 
 public class CrawlerThread extends Thread {
 
 	private boolean isStopped = false;
-	private DBWrapper db;
+	private DocumentDBWrapper docDB;
+	private URLFrontierDBWrapper frontierDB;
 	private URLRequest request;
 	private int maxLength = -1; //in bytes
 	private String urlString;
 	
-	public CrawlerThread(DBWrapper db) {
-		this.db = db;
+	public CrawlerThread(DocumentDBWrapper docDB, URLFrontierDBWrapper frontierDB) {
+		this.docDB = docDB;
+		this.frontierDB = frontierDB;
 	}
 	
-	public CrawlerThread(DBWrapper db, int maxLength) {
-		this.db = db;
+	public CrawlerThread(DocumentDBWrapper docDB, URLFrontierDBWrapper frontierDB, int maxLength) {
+		this.docDB = docDB;
+		this.frontierDB = frontierDB;
 		this.maxLength = maxLength*1000000;
 	}
 	
 	@Override
 	public void run() {
 		while(!isStopped) {
-			Entry<Integer, QueueEntity> entry = db.getNextUrl();
+			Entry<Integer, URLFrontierData> entry = frontierDB.getNextUrl();
 			if (entry != null) {
 				//System.out.println("not null");
 				urlString = entry.getValue().getUrl();
@@ -62,7 +69,8 @@ public class CrawlerThread extends Thread {
 				}
 			} else {
 				System.out.println("DB closing");
-				db.close();
+				frontierDB.close();
+				docDB.close();
 				isStopped = true;
 			}
 			//db.close();
@@ -71,15 +79,11 @@ public class CrawlerThread extends Thread {
 	
 	private boolean checkRequest(){
 		boolean makeRequest = true;
-		RobotsTxtInfo robots = request.getRobots();
+		RobotsTxtData robots = request.checkRobots();
 		
 		//Get set of disallowed paths from robots.txt
 		List<String> disallowed = null;
-		if (robots.containsUserAgent("cis455crawler")) {
-			disallowed = robots.getDisallowedLinks("cis455crawler");
-		} else if (robots.containsUserAgent("*")) {
-			disallowed = robots.getDisallowedLinks("*");
-		}
+		disallowed = robots.getDisallowedLinks();
 		
 		System.out.println(disallowed);
 		//Check if the request filepath is in the disallowed set
@@ -92,7 +96,7 @@ public class CrawlerThread extends Thread {
 		}
 		System.out.println("filepath is not disallowed");
 		
-		ContentEntity ce = db.getContentById(request.getHost()+request.getFilePath());
+		DocumentData ce = docDB.getContentById(request.getHost()+request.getFilePath());
 		//Date lastSeen = checkModifiedDate(ce.getLastSeen());
 		
 		if (ce == null) {
@@ -197,36 +201,11 @@ public class CrawlerThread extends Thread {
 				System.exit(-1);
 			}
 			addContent(is3);
-			addXml(document, new String(b));
-			//db.addXML(request.getHost()+request.getFilePath(), new String(b), System.currentTimeMillis());
 		}
 	}
 	
-	private void addXml(Document document, String content) {
-		System.out.println("in add xml");
-		Set<Entry<Integer, ChannelEntity>> channels = db.getAllChannels().entrySet();
-		//xpe.setXPaths(s);
-		XPathEngineImpl xpe = (XPathEngineImpl) XPathEngineFactory.getXPathEngine();
+	
 
-		for (Entry<Integer, ChannelEntity> e : channels) {
-			ChannelEntity channel = e.getValue();
-			Set<String> xpathSet = channel.getXpaths();
-			String[] xpaths = xpathSet.toArray(new String[xpathSet.size()]);
-			System.out.println(xpaths[0]);
-			xpe.setXPaths(xpaths);
-			boolean[] evals = xpe.evaluate(document);
-			System.out.println(xpe.isValid(0));
-			for (boolean b : evals) {
-				System.out.println(b);
-				if(b) {
-					db.addXML(e.getKey(), request.getHost()+request.getFilePath(),
-							content, System.currentTimeMillis());
-					break;
-				}
-			}
-		}
-	}
-	
 	private void addContent(InputStream is) {
 		byte b[] = new byte[request.getContentLength()];
 		try {
@@ -236,7 +215,7 @@ public class CrawlerThread extends Thread {
 			e.printStackTrace();
 			System.exit(-1);
 		}
-		db.addContent(request.getHost()+request.getFilePath(),
+		docDB.addContent(request.getHost()+request.getFilePath(),
 				new String(b), System.currentTimeMillis());
 	}
 	
@@ -255,9 +234,9 @@ public class CrawlerThread extends Thread {
 				System.out.println("Link : " + eElement.getAttribute("href"));
 				String urlString = eElement.getAttribute("href");
 				URL url = makeAbsolute(urlString);
-				if (!db.checkUrlSeen(url.getHost()+url.getFile())) {
+				if (!docDB.checkUrlSeen(url.getHost()+url.getFile())) {
 					//add to queue
-					db.addUrl(url.getProtocol()+"://"+url.getHost()+url.getFile());
+					frontierDB.addUrl(url.getProtocol()+"://"+url.getHost()+url.getFile());
 				}
 			}
 		}

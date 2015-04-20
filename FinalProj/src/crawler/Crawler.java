@@ -8,33 +8,36 @@ import crawler.storage.URLFrontierDBWrapper;
 public class Crawler {
 	
 	private static String urlString;
-	private static String envDirectory;
+	private static String documentDirectory;
+	private static String frontierDirectory;
 	private static int maxSize;
 	private static int maxFiles;
 	
 	private static ThreadPool pool;
 	
 	private static void setup() {
-		pool = new ThreadPool(1, envDirectory, maxSize);
+		pool = new ThreadPool(1, documentDirectory, frontierDirectory, maxSize);
 	}
 	
 	public static void main(String [] args) {
-		if((args.length != 4) && (args.length != 3)) {
+		if((args.length != 6) && (args.length != 5)) {
 			System.err.println("Incorrect number of arguments");
 			System.exit(-1);
 		}
 		
 		urlString = args[0];
-		//Directory for store
-		envDirectory = args[1];
-		urlString = "https://dbappserv.cis.upenn.edu/crawltest/marie/tpc/part.xml";
+		//Directory for stores
+		documentDirectory = args[1];
+		frontierDirectory = args[2];
+		//urlString = "https://dbappserv.cis.upenn.edu/crawltest/marie/tpc/part.xml";
+		urlString = args[3];
 		
-		maxSize = Integer.parseInt(args[2]);
-		if (args.length == 4) {
-			maxFiles = Integer.parseInt(args[3]);
+		maxSize = Integer.parseInt(args[4]);
+		if (args.length == 6) {
+			maxFiles = Integer.parseInt(args[5]);
 		}
-		DocumentDBWrapper documentDB = DocumentDBWrapper.getInstance(envDirectory);
-		URLFrontierDBWrapper frontierDB = URLFrontierDBWrapper.getInstance(envDirectory);
+		DocumentDBWrapper documentDB = DocumentDBWrapper.getInstance(documentDirectory);
+		URLFrontierDBWrapper frontierDB = URLFrontierDBWrapper.getInstance(frontierDirectory);
 
 		frontierDB.addUrl(urlString);
 		documentDB.getAllContent();

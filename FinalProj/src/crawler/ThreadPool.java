@@ -6,8 +6,9 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import edu.upenn.cis455.storage.DBWrapper;
-import edu.upenn.cis455.storage.QueueEntity;
+import crawler.storage.DocumentDBWrapper;
+import crawler.storage.URLFrontierDBWrapper;
+
 
 public class ThreadPool {
 
@@ -15,16 +16,17 @@ public class ThreadPool {
     private List<Thread> threads = new ArrayList<Thread>();
     private boolean isStopped = false;
 
-    public ThreadPool(int noOfThreads, String envDirectory, int maxSize){
+    public ThreadPool(int noOfThreads, String documentDirectory, String frontierDirectory, int maxSize){
         //bq = new BlockingQueue();
-    	DBWrapper db = DBWrapper.getInstance(envDirectory);
+    	DocumentDBWrapper docDB = DocumentDBWrapper.getInstance(documentDirectory);
+    	URLFrontierDBWrapper frontierDB = URLFrontierDBWrapper.getInstance(frontierDirectory);
     	/*while (!db.isEmpty()) {
 			Entry<Integer, QueueEntity> entry1 = db.getNextUrl();
 			System.out.println(entry1.getKey()+": " + entry1.getValue().getUrl());
 		}*/
     	
         for(int i=0; i<noOfThreads; i++){
-            threads.add(new CrawlerThread(db, maxSize));
+            threads.add(new CrawlerThread(docDB, frontierDB, maxSize));
         }
         for(Thread thread : threads){
             thread.start();
@@ -48,7 +50,7 @@ public class ThreadPool {
         this.isStopped = true;
         notifyAll();
         for(Thread thread : threads){
-           ((WorkerThread) thread).doStop();
+           ((CrawlerThread) thread).doStop();
         }
     }
     
