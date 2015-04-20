@@ -1,6 +1,7 @@
 package crawler;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -23,10 +24,10 @@ import java.util.regex.Pattern;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import com.sleepycat.je.DatabaseException;
+
 import crawler.storage.RobotsDBWrapper;
 import crawler.storage.RobotsTxtData;
-import edu.upenn.cis455.crawler.info.RobotsTxtInfo;
-import edu.upenn.cis455.crawler.info.URLInfo;
 
 public class URLRequest {
 	
@@ -40,9 +41,7 @@ public class URLRequest {
 	private String contentType;
 	private int contentLength = -1;
 	private Date lastModified;
-	private RobotsTxtInfo robotsTxt;
 	
-	private URL urlObj;
 	
 	private int delay = 0;
 	
@@ -74,15 +73,15 @@ public class URLRequest {
 		return (lastModified == null) ? new Date(System.currentTimeMillis()) : lastModified;
 	}
 	
-	public RobotsTxtInfo getRobots() {
+	/*public RobotsTxtInfo getRobots() {
 		return robotsTxt;
-	}
+	}*/
 	
 	public URLRequest(String urlString) {
-		robotsTxt = new RobotsTxtInfo();
 		this.urlString = urlString;
 		System.out.println(urlString);
 		
+		URL urlObj = null;
 		try {
 			urlObj = new URL(urlString);
 		} catch (MalformedURLException e) {
@@ -106,20 +105,40 @@ public class URLRequest {
 		System.out.println(port);
 	}
 	
-	public void checkRobots() {
-		RobotsDBWrapper robotsDB = new RobotsDBWrapper("/home/cis455/storage");
+	/***
+	 * 
+	 * @param date
+	 * @return true if modified since last modified date, false otherwise 
+	 * @throws ProtocolException 
+	 */
+	public synchronized boolean checkModified(long date) throws ProtocolException {
+		HttpURLConnection con = sendRequest(hostName, filePath, "HEAD");
+		SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+		String dateString = format.format((new Date(date)));
+		
+		con.addRequestProperty("If-Modified-Since", dateString);
+		
+		return (con.getResponseCode()==200) ? true : false;
+	}
+	
+	public RobotsTxtData checkRobots() throws IOException {
+		RobotsDBWrapper robotsDB = null;
+		robotsDB = RobotsDBWrapper.getInstance("/home/cis455/storage");
+
 		
 		RobotsTxtData robotsTxtData = robotsDB.getRobotsTxtData(this.hostName);
 		if (robotsTxtData == null) {
-			constructRobotsTxt(this.hostName); 
-		} else {
-			
+			constructRobotsTxt(this.hostName);
+			robotsTxtData = robotsDB.getRobotsTxtData(this.hostName);
 		}
+		
+		return robotsTxtData;
 	}
 	
-	private void constructRobotsTxt(String hostName) {
+	
+	private void constructRobotsTxt(String hostName) throws IOException {
 		HttpURLConnection con = sendRequest(hostName, "/robots.txt");
-		
+		RobotsTxtInfo robotsTxt = new RobotsTxtInfo();
 		
 		if(con.getResponseCode() != 200) {
 			return;
@@ -146,15 +165,18 @@ public class URLRequest {
 					robotsTxt.addCrawlDelay(userAgent, Integer.valueOf(value));
 				}
 			}
+			RobotsDBWrapper robotsDB = RobotsDBWrapper.getInstance("/home/cis455/storage");
+			robotsDB.addRobotsTxt(hostName, robotsTxt.getAllowedLinks("cis455crawler"),
+					robotsTxt.getDisallowedLinks("cis455crawler"), robotsTxt.getCrawlDelay("cis455crawler"));
 			
 		}
 	}
 	
-	private HttpURLConnection sendRequest(String hostName, String filepath) {
+	private HttpURLConnection sendRequest(String hostName, String filepath) throws ProtocolException {
 		return sendRequest(hostName, filepath, "GET");
 	}
 	
-	private HttpURLConnection sendRequest(String hostName, String filepath, String method) {
+	private HttpURLConnection sendRequest(String hostName, String filepath, String method) throws ProtocolException {
 		
 		if (!filepath.startsWith("/")) {
 			filepath = "/"+filepath;
@@ -189,144 +211,6 @@ public class URLRequest {
 		con.addRequestProperty("Host", hostName);
 		con.addRequestProperty("User-Agent", "cis455crawler");
 		return con;
-	}
-	
-	private void checkRobotsHttp() throws IOException {
-		System.out.println("Check robots http");
-
-		Socket s = null;
-		try {
-			s = new Socket(InetAddress.getByName(hostName), port);
-		} catch (UnknownHostException e) {
-			System.err.println("Host could not be resolved");
-			e.printStackTrace();
-			System.exit(-1);
-		} catch (IOException e) {
-			System.err.println("Could not create stream socket");
-			e.printStackTrace();
-			System.exit(-1);
-		}
-		
-		PrintWriter pw = new PrintWriter(s.getOutputStream());
-		pw.println("GET /robots.txt HTTP/1.1");
-		pw.println("Host: " + hostName);
-		pw.println("User-Agent: cis455crawler");
-		//pw.println("Host: sahil");
-		pw.println();
-		pw.flush();
-		
-		InputStream is = s.getInputStream();
-		BufferedReader br = new BufferedReader(new InputStreamReader(is));
-		
-		try {
-			String string;
-			boolean isFirstLine = true;
-			boolean isRobots = false;
-			String userAgent = "*";
-			while((string = br.readLine()) != null) {
-				if (isFirstLine) {
-					String[] firstLine = string.split("\\s");
-					if (!firstLine[1].equals("200") || !firstLine[2].equalsIgnoreCase("OK")) {
-						return;
-					}
-					isFirstLine = false;
-				} else if (isRobots) {
-					//Extract key-values of robot
-					Pattern p = Pattern.compile(KEY_VALUE_REGEX);
-					Matcher m = p.matcher(string);
-					if (m.find()) {
-						String key = m.group(1);
-						key = key.trim();
-						String value = m.group(2);
-						value = value.trim();
-						if (key.equalsIgnoreCase("User-Agent")) {
-							userAgent = value;
-							robotsTxt.addUserAgent(value);
-						} else if (key.equalsIgnoreCase("Disallow")) {
-							robotsTxt.addDisallowedLink(userAgent, value);
-						} else if (key.equalsIgnoreCase("Allow")) {
-							robotsTxt.addAllowedLink(userAgent, value);
-						} else if (key.equalsIgnoreCase("Crawl-delay")) {
-							robotsTxt.addCrawlDelay(userAgent, Integer.valueOf(value));
-						}
-					}
-				} else if (string.isEmpty()) {
-					if (!isRobots) {
-						//break;
-						isRobots = true;
-					}
-				}
-			}
-		} catch (IOException e) {
-			System.err.println("Error reading from input stream");
-			e.printStackTrace();
-			System.exit(-1);
-		}
-	}
-	
-	private void checkRobotsHttps(URL url) throws IOException {
-		System.out.println("Check robots https");
-
-		HttpURLConnection con = (HttpsURLConnection) url.openConnection();
-		con.setDoOutput(true);
-		con.setRequestMethod("GET");
-		con.addRequestProperty("Host", hostName);
-		con.addRequestProperty("User-Agent", "cis455crawler");
-		
-		//If connection not accepted, exit
-		if(con.getResponseCode() != 200) {
-			return;
-		}
-		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-		String string;
-		String userAgent = "*";
-		while ((string = br.readLine()) != null) {
-			 
-			//Extract key-values of robot
-			Pattern p = Pattern.compile(KEY_VALUE_REGEX);
-			Matcher m = p.matcher(string);
-			if (m.find()) {
-				String key = m.group(1);
-				String value = m.group(2);
-				if (key.equalsIgnoreCase("User-Agent")) {
-					userAgent = value;
-					robotsTxt.addUserAgent(value);
-				} else if (key.equalsIgnoreCase("Disallow")) {
-					robotsTxt.addDisallowedLink(userAgent, value);
-				} else if (key.equalsIgnoreCase("Allow")) {
-					robotsTxt.addAllowedLink(userAgent, value);
-				} else if (key.equalsIgnoreCase("Crawl-delay")) {
-					robotsTxt.addCrawlDelay(userAgent, Integer.valueOf(value));
-				}
-			}
-			
-		}
-	}
-	
-	private void sendHttpHeadRequest() throws IOException {
-		System.out.println("send HEAD http");
-
-		Socket s = null;
-		try {
-			s = new Socket(InetAddress.getByName(hostName), port);
-		} catch (UnknownHostException e) {
-			System.err.println("Host could not be resolved");
-			e.printStackTrace();
-			System.exit(-1);
-		} catch (IOException e) {
-			System.err.println("Could not create stream socket");
-			e.printStackTrace();
-			System.exit(-1);
-		}
-		
-		PrintWriter pw = new PrintWriter(s.getOutputStream());
-		pw.println("HEAD " + filePath + " HTTP/1.1");
-		pw.println("Host: " + hostName);
-		pw.println("User-Agent: cis455crawler");
-		//pw.println("Host: sahil");
-		pw.println();
-		pw.flush();
-		parseHeadResponse(s.getInputStream());
 	}
 	
 	private void parseHeadResponse(InputStream is) {
