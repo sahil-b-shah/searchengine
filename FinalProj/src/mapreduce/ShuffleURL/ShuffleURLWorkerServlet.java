@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.util.HashMap;
@@ -57,8 +56,8 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 		out.println("<body>Hi, I am the worker!</body></html>");
 		out.flush();
 	}
-
-	@SuppressWarnings("rawtypes")
+	
+	
 	public void doPost(HttpServletRequest request, HttpServletResponse response) 
 			throws java.io.IOException
 	{
@@ -171,33 +170,10 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 			status = "reducing";
 			int numThreads = Integer.parseInt(request.getParameter("numThreads"));
 			String output = request.getParameter("output");
-			Class jobClass = null;
-			try {
-				jobClass = Class.forName(job);
-			} catch (ClassNotFoundException e) {
-				System.err.println("Invalid job, not a java class");
-			}
-
 
 			//Sort file
 			File spoolin = new File(storageDirectory,"spool-in");
 			File storeFile = new File(spoolin, "store.txt");
-
-			if(storeFile.exists()){
-				System.out.println(IPPort + ": starting sort command"); 
-				Process proc = Runtime.getRuntime().exec("sort store.txt", null, spoolin);
-				BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(storeFile,false)));
-				String line = in.readLine();
-				while(line != null){
-					out.println(line);
-					line = in.readLine();
-				}
-
-				in.close();
-				out.close();
-
-			}
 
 			ShuffleURLInputReduceReader reader = new ShuffleURLInputReduceReader(storeFile);
 

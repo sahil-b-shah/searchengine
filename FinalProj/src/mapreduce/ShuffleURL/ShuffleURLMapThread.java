@@ -28,8 +28,7 @@ public class ShuffleURLMapThread implements Runnable {
 		try {
 			String line = reader.readLine();
 			while(line != null){
-				String params[] = line.split("\\t");
-				job.map(params[0], params[1], context);
+				job.map(line, "", context);
 				line = reader.readLine();
 			}
 		} catch (IOException e) {

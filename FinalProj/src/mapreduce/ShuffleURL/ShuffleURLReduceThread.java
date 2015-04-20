@@ -25,12 +25,7 @@ public class ShuffleURLReduceThread implements Runnable {
 		try {
 			line = reader.readLine();
 			while(line != null){
-				String key = line.split("\\t")[0];
-				String value = line.split("\\t")[1];
-				String[] valueArray = value.split(",");
-
-				job.reduce(key, valueArray, context);
-
+				job.reduce(line, null, context);
 				line = reader.readLine();
 			}
 		} catch (IOException e) {

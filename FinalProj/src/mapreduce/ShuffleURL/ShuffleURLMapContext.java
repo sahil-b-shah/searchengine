@@ -43,7 +43,7 @@ public class ShuffleURLMapContext implements Context{
 		
 		try {
 			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(selectedFile,true)));
-			out.println(key + "\t"+value);
+			out.println(key);
 			out.close();
 			
 		} catch (IOException e) {

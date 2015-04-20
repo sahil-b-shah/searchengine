@@ -11,7 +11,6 @@ public class ShuffleURLInputMapReader {
 	File files[];
 	private int fileIndex;
 	private BufferedReader in;
-	private int keysRead;
 	private boolean done;
 	
 	
@@ -23,7 +22,6 @@ public class ShuffleURLInputMapReader {
 			in = new BufferedReader(new FileReader(files[0]));
 		else
 			done = true;
-		this.keysRead = 0;
 	}
 	
 	/**
@@ -49,19 +47,10 @@ public class ShuffleURLInputMapReader {
 			else{
 				in = new BufferedReader(new FileReader(files[fileIndex]));
 				line = in.readLine();  //get first line here
-				keysRead++;
 			}
 		}
 		
 		return line;
-	}
-	
-	/**
-	 * Gets current number of keys read
-	 * @return keys read
-	 */
-	public String getKeysRead(){
-		return keysRead + "";
 	}
 	
 }

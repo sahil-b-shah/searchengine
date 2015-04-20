@@ -21,7 +21,7 @@ public class ShuffleURLReduceContext implements Context {
 	public synchronized void write(String key, String value) {
 		try {
 			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(output,true)));
-			out.println(key + "\t"+value);
+			out.println(key);
 			out.close();
 		} catch (IOException e) {
 			System.err.println("Error in emitting reduce");
