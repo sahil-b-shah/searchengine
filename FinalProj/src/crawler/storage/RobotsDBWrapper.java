@@ -14,14 +14,15 @@ import com.sleepycat.persist.StoreConfig;
 public class RobotsDBWrapper {
 	private static String envDirectory = null;
 
-	private static Environment myEnv;
-	private static EntityStore robotStore;
+	private Environment myEnv;
+	private EntityStore robotStore;
 	
-	private static PrimaryIndex<String, RobotsTxtData> robotsIndex;
+	private PrimaryIndex<String, RobotsTxtData> robotsIndex;
+	
+	private static RobotsDBWrapper wrapper = null;
 
-	public RobotsDBWrapper(String directory) throws DatabaseException, FileNotFoundException {
+	private RobotsDBWrapper(String directory) throws DatabaseException, FileNotFoundException {
 		envDirectory = directory;
-		
 		
 		File file = new File(System.getProperty("user.dir"), envDirectory);
 		if (!file.exists()) {
@@ -54,12 +55,28 @@ public class RobotsDBWrapper {
 	}
 
 
-	public void close() throws DatabaseException{
-		robotStore.close();
-		myEnv.close();
+	public synchronized void close() throws DatabaseException{
+		if (robotStore != null) {
+			try {
+				robotStore.close();
+			} catch (DatabaseException dbe) {
+				System.err.println("Error closing store: " + dbe.toString());
+				System.exit(-1);
+			}
+		}
+		
+		if (myEnv != null) {
+			try {
+				myEnv.close();
+			} catch (DatabaseException dbe) {
+				System.err.println("Error closing environment: " + dbe.toString());
+				System.exit(-1);
+			}
+		}
+		wrapper = null;
 	}
 	
-	public Environment getEnvironment(){
+	public synchronized Environment getEnvironment(){
 		return myEnv;
 	}
 	
@@ -70,7 +87,7 @@ public class RobotsDBWrapper {
 	 * @param disallowedLinks - links disallowed for this host
 	 * @param crawlDelay - delay for this host
 	 */
-	public void addRobotsTxt(String hostName, ArrayList<String> allowedLinks,  ArrayList<String> disallowedLinks, long crawlDelay){
+	public synchronized void addRobotsTxt(String hostName, ArrayList<String> allowedLinks,  ArrayList<String> disallowedLinks, long crawlDelay){
 		robotsIndex.put(new RobotsTxtData(hostName, allowedLinks, disallowedLinks, crawlDelay));
 	}
 	
@@ -79,7 +96,7 @@ public class RobotsDBWrapper {
 	 * @param hostName - host to get robots.txt for
 	 * @return RobotsTxtData
 	 */
-	public RobotsTxtData getRobotsTxtData(String hostName){
+	public synchronized RobotsTxtData getRobotsTxtData(String hostName){
 		return robotsIndex.get(hostName);
 	}
 	
@@ -87,7 +104,14 @@ public class RobotsDBWrapper {
 	 * Delete RobotsTxtData 
 	 * @param hostname - host to delete
 	 */
-	public void deleteRobotsTxtData(String hostName){
+	public synchronized void deleteRobotsTxtData(String hostName){
 		robotsIndex.delete(hostName);
+	}
+	
+	public static synchronized RobotsDBWrapper getInstance(String directory) throws DatabaseException, FileNotFoundException {
+		if(wrapper == null) {
+			wrapper = new RobotsDBWrapper(directory);
+		}
+		return wrapper;
 	}
 }

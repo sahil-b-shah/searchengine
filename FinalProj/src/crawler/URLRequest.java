@@ -1,30 +1,21 @@
 package crawler;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.HttpURLConnection;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
-import java.net.Socket;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.net.ssl.HttpsURLConnection;
-
-import com.sleepycat.je.DatabaseException;
 
 import crawler.storage.RobotsDBWrapper;
 import crawler.storage.RobotsTxtData;
@@ -109,18 +100,27 @@ public class URLRequest {
 	 * 
 	 * @param date
 	 * @return true if modified since last modified date, false otherwise 
-	 * @throws ProtocolException 
+	 * @throws IOException 
 	 */
-	public synchronized boolean checkModified(long date) throws ProtocolException {
+	public boolean checkModified(long date) throws IOException {
 		HttpURLConnection con = sendRequest(hostName, filePath, "HEAD");
 		SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
 		String dateString = format.format((new Date(date)));
 		
 		con.addRequestProperty("If-Modified-Since", dateString);
 		
-		return (con.getResponseCode()==200) ? true : false;
+		if (con.getResponseCode()==200){
+			this.contentLength = con.getContentLength();
+			return true;
+		}
+		return false;
 	}
 	
+	/***
+	 * 
+	 * @return the robots txt data to be checked by the client
+	 * @throws IOException
+	 */
 	public RobotsTxtData checkRobots() throws IOException {
 		RobotsDBWrapper robotsDB = null;
 		robotsDB = RobotsDBWrapper.getInstance("/home/cis455/storage");
@@ -213,37 +213,6 @@ public class URLRequest {
 		return con;
 	}
 	
-	private void parseHeadResponse(InputStream is) {
-		BufferedReader br = new BufferedReader(new InputStreamReader(is));
-		String s;
-		Pattern p = Pattern.compile(KEY_VALUE_REGEX);
-		
-		try {
-			while((s = br.readLine()) != null) {
-				System.out.println(s);
-				if (s.isEmpty()) {
-					break;
-				}
-				Matcher m = p.matcher(s);
-				if (m.find()) {
-					String key = m.group(1);
-					String value = m.group(2);
-					if (key.equalsIgnoreCase("Content-Type")) {
-						contentType = value;
-					} else if(key.equalsIgnoreCase("Content-Length")) {
-						contentLength = Integer.valueOf(value);
-					} else if(key.equalsIgnoreCase("Last-Modified")) {
-						this.lastModified = checkModifiedDate(value);
-					}
-				}
-			}
-		} catch (IOException e) {
-			System.err.println("Error reading from input stream");
-			e.printStackTrace();
-			System.exit(-1);
-		}
-	}
-	
 	private Date checkModifiedDate(String date) {
 		DateFormat df1 = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
 		DateFormat df2 = new SimpleDateFormat("EEEEE, dd-MMM-yy HH:mm:ss zzz");
@@ -272,31 +241,6 @@ public class URLRequest {
 		return modDate;
 	}
 	
-	private void sendHttpsHeadRequest(URL url) throws IOException {
-		System.out.println("send HEAD https");
-
-		HttpURLConnection con = (HttpsURLConnection) url.openConnection();
-		con.setDoOutput(true);
-		con.setRequestMethod("HEAD");
-		con.addRequestProperty("Host", hostName);
-		con.addRequestProperty("User-Agent", "cis455crawler");
-		/*PrintWriter pw = new PrintWriter(con.getOutputStream());
-		System.out.println("HEAD " + filePath + " HTTP/1.1");
-		pw.println("HEAD " + filePath + " HTTP/1.1");
-		pw.println("Host: " + hostName);
-		pw.println("User-Agent: cis455crawler");
-		pw.println();
-		pw.flush();*/
-		
-		//If connection accepted
-		if(con.getResponseCode() == 200) {
-			//System.out.println(con.getContentType());
-			contentType = con.getContentType();
-			contentLength = con.getContentLength();
-			this.lastModified = new Date(con.getLastModified());
-		}
-	}
-	
 	private void delay(int milli) {
 		milli = 0; //for testing
 		try {
@@ -308,63 +252,13 @@ public class URLRequest {
 	}
 	
 	public InputStream sendGetRequest() throws IOException {
-		delay(delay*1000);
-		InputStream is = null;
-		System.out.println("Making request to " + hostName + filePath);
-		if(protocol.equalsIgnoreCase("http")) {
-			Socket s = null;
-			try {
-				s = new Socket(InetAddress.getByName(hostName), port);
-			} catch (UnknownHostException e) {
-				System.err.println("Host could not be resolved");
-				e.printStackTrace();
-				System.exit(-1);
-			} catch (IOException e) {
-				System.err.println("Could not create stream socket");
-				e.printStackTrace();
-				System.exit(-1);
-			}
-			
-			PrintWriter pw = new PrintWriter(s.getOutputStream());
-			pw.println("GET " + filePath + " HTTP/1.1");
-			pw.println("Host: " + hostName);
-			pw.println("User-Agent: cis455crawler");
-			//pw.println("Host: sahil");
-			pw.println();
-			pw.flush();
-			System.out.println("Downloading content from " + hostName);
-			is = s.getInputStream();
-			
-			String str;
-			BufferedReader br = new BufferedReader(new InputStreamReader(is));
-			try {
-				while((str = br.readLine()) != null) {
-					System.out.println(str);
-					if (str.isEmpty()) {
-						break;
-					}
-				}
-			} catch (IOException e) {
-				System.err.println("Error reading from input stream");
-				e.printStackTrace();
-				System.exit(-1);
-			}
-			
-		} else if (protocol.equalsIgnoreCase("https")) {
-			URL url = new URL(this.urlString);
-			HttpURLConnection con = (HttpsURLConnection) url.openConnection();
-			con.setDoOutput(true);
-			con.setRequestMethod("GET");
-			con.addRequestProperty("Host", hostName);
-			con.addRequestProperty("User-Agent", "cis455crawler");
-			
-			//If connection accepted
-			if(con.getResponseCode() == 200) {
-				System.out.println("Downloading content from " + hostName);
-				is = con.getInputStream();
-			} 
+		HttpURLConnection con = sendRequest(hostName, filePath);
+		int responseCode = con.getResponseCode();
+		if (responseCode==200) {
+			return con.getInputStream();
 		}
-		return is;
+		System.err.println("Get request had response code of "+responseCode);
+		return null;
 	}
 }
 

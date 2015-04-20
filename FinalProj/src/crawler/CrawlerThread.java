@@ -12,8 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -79,7 +77,13 @@ public class CrawlerThread extends Thread {
 
 	private boolean checkRequest(){
 		boolean makeRequest = true;
-		RobotsTxtData robots = request.checkRobots();
+		RobotsTxtData robots = null;
+		try {
+			robots = request.checkRobots();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			return false;
+		}
 
 		//Get set of disallowed paths from robots.txt
 		List<String> disallowed = null;
@@ -104,12 +108,17 @@ public class CrawlerThread extends Thread {
 		} else {
 			System.out.println("content is not null");
 			//Date lastSeen = new Date(Long.valueOf(ce.getLastSeen()));
-			//TODO: give me last seen data
-			boolean modified = request.checkModified();
+			boolean modified = false;
+			
+			try {
+				modified = request.checkModified(Long.valueOf(ce.getLastSeen()));
+			} catch (NumberFormatException | IOException e) {
+				makeRequest = false;
+				e.printStackTrace();
+			}
 			//System.out.println(request.getHost()+request.getFilePath()+ " last modified"+lastModified);
 			//Check if last seen is less than last modified
 			if (!modified) {
-				//makeRequest = false;
 				System.out.println(request.getFilePath()+" Last modified is before last seen");
 				return false;
 			} else {

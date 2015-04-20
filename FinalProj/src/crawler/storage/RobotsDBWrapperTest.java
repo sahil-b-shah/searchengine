@@ -13,7 +13,7 @@ public class RobotsDBWrapperTest extends TestCase {
 	private RobotsDBWrapper db;
 	protected void setUp(){
 		try {
-			db = new RobotsDBWrapper("/robotdb");
+			db = RobotsDBWrapper.getInstance("/robotdb");
 		} catch (DatabaseException | FileNotFoundException e) {}
 	}
 	
