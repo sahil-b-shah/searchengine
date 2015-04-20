@@ -37,18 +37,18 @@ public class CrawlerThread extends Thread {
 	private URLRequest request;
 	private int maxLength = -1; //in bytes
 	private String urlString;
-	
+
 	public CrawlerThread(DocumentDBWrapper docDB, URLFrontierDBWrapper frontierDB) {
 		this.docDB = docDB;
 		this.frontierDB = frontierDB;
 	}
-	
+
 	public CrawlerThread(DocumentDBWrapper docDB, URLFrontierDBWrapper frontierDB, int maxLength) {
 		this.docDB = docDB;
 		this.frontierDB = frontierDB;
 		this.maxLength = maxLength*1000000;
 	}
-	
+
 	@Override
 	public void run() {
 		while(!isStopped) {
@@ -57,7 +57,7 @@ public class CrawlerThread extends Thread {
 				//System.out.println("not null");
 				urlString = entry.getValue().getUrl();
 				request = new URLRequest(urlString);
-			
+
 				if (checkRequest()) {
 					try {
 						parseRequest(request.sendGetRequest());
@@ -76,49 +76,47 @@ public class CrawlerThread extends Thread {
 			//db.close();
 		}
 	}
-	
+
 	private boolean checkRequest(){
 		boolean makeRequest = true;
 		RobotsTxtData robots = request.checkRobots();
-		
+
 		//Get set of disallowed paths from robots.txt
 		List<String> disallowed = null;
 		disallowed = robots.getDisallowedLinks();
-		
+
 		System.out.println(disallowed);
 		//Check if the request filepath is in the disallowed set
 		if (disallowed == null) {
-			 makeRequest = true;
+			makeRequest = true;
 		} else if (disallowed.contains(request.getFilePath())) {
 			//makeRequest = false;
 			System.out.println(request.getFilePath()+"filepath is disallowed");
 			return false;
 		}
 		System.out.println("filepath is not disallowed");
-		
+
 		DocumentData ce = docDB.getContentById(request.getHost()+request.getFilePath());
 		//Date lastSeen = checkModifiedDate(ce.getLastSeen());
-		
+
 		if (ce == null) {
 			makeRequest = true & makeRequest;
 		} else {
 			System.out.println("content is not null");
-			Date lastSeen = new Date(Long.valueOf(ce.getLastSeen()));
-			Date lastModified = request.getLastModified();
+			//Date lastSeen = new Date(Long.valueOf(ce.getLastSeen()));
+			boolean modified = request.checkModified();
 			//System.out.println(request.getHost()+request.getFilePath()+ " last modified"+lastModified);
 			//Check if last seen is less than last modified
-			if (lastModified.getTime()!= 0) {
-				if (lastModified.before(lastSeen)) {
-					//makeRequest = false;
-					System.out.println(request.getFilePath()+" Last modified is before last seen");
-					return false;
-				} else {
-					makeRequest = true & makeRequest;
-				}
+			if (!modified) {
+				//makeRequest = false;
+				System.out.println(request.getFilePath()+" Last modified is before last seen");
+				return false;
+			} else {
+				makeRequest = true & makeRequest;
 			}
 		}
 		System.out.println("Modified date is after last seen, or link has not been seen");
-		
+
 		//Check content length
 		if (maxLength == -1) {
 			makeRequest = true & makeRequest;
@@ -135,7 +133,7 @@ public class CrawlerThread extends Thread {
 		}
 		return makeRequest;
 	}
-	
+
 	private void parseRequest(InputStream is) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -143,7 +141,7 @@ public class CrawlerThread extends Thread {
 		int len;
 		try {
 			while ((len = is.read(buffer)) > -1 ) {
-			    baos.write(buffer, 0, len);
+				baos.write(buffer, 0, len);
 			}
 			baos.flush();
 		} catch (IOException e1) {
@@ -151,7 +149,7 @@ public class CrawlerThread extends Thread {
 			e1.printStackTrace();
 			System.exit(-1);
 		}
-		
+
 		InputStream is1 = new ByteArrayInputStream(baos.toByteArray()); 
 		InputStream is2 = new ByteArrayInputStream(baos.toByteArray()); 
 		InputStream is3 = new ByteArrayInputStream(baos.toByteArray()); 
@@ -164,10 +162,10 @@ public class CrawlerThread extends Thread {
 			ByteArrayOutputStream xhtmlOS = new ByteArrayOutputStream();
 			Tidy tidy = new Tidy();
 			tidy.setXHTML(true);
-			
+
 			//xhtml is tide output from parsing
 			tidy.parse(is1, xhtmlOS);
-			
+
 			Document document = null;
 			try {
 				DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -203,8 +201,8 @@ public class CrawlerThread extends Thread {
 			addContent(is3);
 		}
 	}
-	
-	
+
+
 
 	private void addContent(InputStream is) {
 		byte b[] = new byte[request.getContentLength()];
@@ -218,17 +216,17 @@ public class CrawlerThread extends Thread {
 		docDB.addContent(request.getHost()+request.getFilePath(),
 				new String(b), System.currentTimeMillis());
 	}
-	
+
 	private void extractUrls(Document doc) {
 		doc.getDocumentElement().normalize();
 		//System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
 		NodeList nList = doc.getElementsByTagName("a");
-	 	 
+
 		for (int temp = 0; temp < nList.getLength(); temp++) {
-	 
+
 			Node nNode = nList.item(temp);
 			System.out.println("\nCurrent Element :" + nNode.getNodeName());
-			
+
 			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 				Element eElement = (Element) nNode;
 				System.out.println("Link : " + eElement.getAttribute("href"));
@@ -241,7 +239,7 @@ public class CrawlerThread extends Thread {
 			}
 		}
 	}
-	
+
 	private URL makeAbsolute(String extractedString) {
 		URL base = null;
 		URL extracted = null;
@@ -277,7 +275,7 @@ public class CrawlerThread extends Thread {
 		}
 		//this.interrupt();
 	}
-	
+
 	private Date checkModifiedDate(String date) {
 		DateFormat df1 = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
 		DateFormat df2 = new SimpleDateFormat("EEEEE, dd-MMM-yy HH:mm:ss zzz");
@@ -305,5 +303,5 @@ public class CrawlerThread extends Thread {
 		}
 		return modDate;
 	}
-	
+
 }
