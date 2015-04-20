@@ -1,4 +1,4 @@
-package edu.upenn.cis455.mapreduce.master;
+package mapreduce;
 
 import java.io.IOException;
 import java.io.PrintWriter;

@@ -1,4 +1,4 @@
-package edu.upenn.cis455.mapreduce.worker;
+package mapreduce;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

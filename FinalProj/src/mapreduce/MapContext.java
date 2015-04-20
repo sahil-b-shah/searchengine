@@ -2,7 +2,6 @@ package mapreduce;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -10,22 +9,17 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Formatter;
 import java.math.*;
 
-import edu.upenn.cis455.mapreduce.worker.WorkerServlet;
 
 public class MapContext implements Context {
 
-	private static boolean mapping;
 	private static int numworkers;
 	private static String directory;
-	private int keysw;
 
 	public MapContext(int i, String d, int kw){
 		numworkers = i;
 		directory =d;
-		keysw = kw;
 	}
 
 	@Override
@@ -56,17 +50,16 @@ public class MapContext implements Context {
 			if (wfile.exists()){
 				out = new PrintWriter(new FileOutputStream(new File(filename), true));
 				out.append(key + "\t" + value + "\n");
-				WorkerServlet.keyswritten++;
+				//WorkerServlet.keyswritten++;
 			}else{
 				wfile.createNewFile();
 				System.out.println("Created a new file");
 				FileWriter f = new FileWriter(filename, true);
 				out = new PrintWriter(new BufferedWriter(f));
 				out.println(key + "\t" + value);
-				WorkerServlet.keyswritten++;
+				//WorkerServlet.keyswritten++;
 				}
 		}catch (IOException e) {
-			// TODO Auto-generated catch block
 			System.out.println("Error  whie trying write to file in CONTEXT");
 			e.printStackTrace();
 		}finally{

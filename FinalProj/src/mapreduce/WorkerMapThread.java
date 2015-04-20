@@ -1,9 +1,7 @@
-package edu.upenn.cis455.mapreduce.worker;
+package mapreduce;
 
 import java.io.IOException;
 
-import edu.upenn.cis455.mapreduce.Context;
-import edu.upenn.cis455.mapreduce.Job;
 
 public class WorkerMapThread implements Runnable {
 

@@ -1,4 +1,4 @@
-package edu.upenn.cis455.mapreduce.master;
+package mapreduce;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -9,7 +9,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
 
-public class MasterServlet extends HttpServlet {
+public class ShuffleURLMasterServlet extends HttpServlet {
 
 	static final long serialVersionUID = 455555001;
 	private static Map<String, ArrayList<String>> statusMap; 

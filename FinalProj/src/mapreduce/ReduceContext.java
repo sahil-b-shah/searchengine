@@ -2,16 +2,9 @@ package mapreduce;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Formatter;
-import java.math.*;
 
 public class ReduceContext implements Context {
 
@@ -28,7 +21,6 @@ public class ReduceContext implements Context {
 		try {
 			wfile.createNewFile();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -52,7 +44,6 @@ public class ReduceContext implements Context {
 			out.println(key + "\t" + value);
 
 		}catch (IOException e) {
-			// TODO Auto-generated catch block
 			System.out.println("Error  whie trying write to file in CONTEXT");
 			e.printStackTrace();
 		}finally{
