@@ -1,4 +1,4 @@
-package mapreduce;
+package mapreduce.ShuffleURL;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -6,7 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class InputMapReader {
+public class ShuffleURLInputMapReader {
 
 	File files[];
 	private int fileIndex;
@@ -15,7 +15,7 @@ public class InputMapReader {
 	private boolean done;
 	
 	
-	public InputMapReader(File fileList[]) throws FileNotFoundException{
+	public ShuffleURLInputMapReader(File fileList[]) throws FileNotFoundException{
 		files = fileList;
 		fileIndex = 0;
 		done = false;

@@ -1,4 +1,4 @@
-package mapreduce;
+package mapreduce.ShuffleURL;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -6,11 +6,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-public class ReduceContext implements Context {
+import mapreduce.Context;
+
+public class ShuffleURLReduceContext implements Context {
 
 	private static String directory;
 
-	public ReduceContext(String d){
+	public ShuffleURLReduceContext(String d){
 		directory =d;
 		
 		File wfile = new File(directory);

@@ -1,4 +1,4 @@
-package mapreduce;
+package mapreduce.ShuffleURL;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -17,10 +17,10 @@ import javax.servlet.http.*;
 import edu.upenn.cis455.mapreduce.master.MyHttpClient;
 
 
-public class WorkerServlet extends HttpServlet {
+public class ShuffleURLWorkerServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 455555002;
-	private static InputMapReader reader;
+	private static ShuffleURLInputMapReader reader;
 	private static EmitMap emit;
 	private static String status;
 	private static String lastMapKeysRead;
@@ -116,7 +116,7 @@ public class WorkerServlet extends HttpServlet {
 
 
 			//Create reader from input directory files
-			reader = new InputMapReader(fileList);
+			reader = new ShuffleURLInputMapReader(fileList);
 
 			//Create emit from Map function implementing context
 			emit = new EmitMap(spoolout, workers);

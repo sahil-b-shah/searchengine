@@ -1,16 +1,19 @@
-package mapreduce;
+package mapreduce.ShuffleURL;
 
 import java.io.IOException;
 
+import mapreduce.Context;
+import mapreduce.Job;
 
-public class WorkerMapThread implements Runnable {
+
+public class ShuffleURLMapThread implements Runnable {
 
 	private Job job;
-	private InputMapReader reader;
+	private ShuffleURLInputMapReader reader;
 	private Context context;
 
 	@SuppressWarnings("rawtypes")
-	public WorkerMapThread(Class jobClass, InputMapReader reader, Context context){
+	public ShuffleURLMapThread(Class jobClass, ShuffleURLInputMapReader reader, Context context){
 		try {
 			if(jobClass != null)
 				job = (Job) jobClass.newInstance();

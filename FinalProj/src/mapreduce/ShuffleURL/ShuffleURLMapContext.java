@@ -1,4 +1,4 @@
-package mapreduce;
+package mapreduce.ShuffleURL;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -11,13 +11,15 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.math.*;
 
+import mapreduce.Context;
 
-public class MapContext implements Context {
+
+public class ShuffleURLMapContext implements Context {
 
 	private static int numworkers;
 	private static String directory;
 
-	public MapContext(int i, String d, int kw){
+	public ShuffleURLMapContext(int i, String d, int kw){
 		numworkers = i;
 		directory =d;
 	}

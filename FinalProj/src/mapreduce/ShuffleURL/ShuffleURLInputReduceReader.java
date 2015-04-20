@@ -1,18 +1,18 @@
-package mapreduce;
+package mapreduce.ShuffleURL;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class InputReduceReader {
+public class ShuffleURLInputReduceReader {
 
 	File input;
 	private BufferedReader in;
 	private int keysRead;
 	private String line;
 
-	public InputReduceReader(File input) throws IOException{
+	public ShuffleURLInputReduceReader(File input) throws IOException{
 		this.input = input;
 		if(input.exists()){
 			this.in = new BufferedReader(new FileReader(input));

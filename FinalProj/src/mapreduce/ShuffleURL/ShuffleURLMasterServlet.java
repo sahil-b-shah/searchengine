@@ -1,4 +1,4 @@
-package mapreduce;
+package mapreduce.ShuffleURL;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -8,6 +8,8 @@ import java.util.Map;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
+
+import mapreduce.MyHttpClient;
 
 public class ShuffleURLMasterServlet extends HttpServlet {
 
