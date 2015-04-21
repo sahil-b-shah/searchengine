@@ -13,7 +13,7 @@ public class ShuffleURLJob implements Job {
 
 	@Override
 	public void reduce(String key, String[] values, Context context) {
-		context.write(key, "");
+		//context.write(key, "");
 	}
 
 }

@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -23,28 +24,36 @@ import org.w3c.tidy.Tidy;
 
 import crawler.storage.DocumentDBWrapper;
 import crawler.storage.DocumentData;
+import crawler.storage.RobotsDBWrapper;
 import crawler.storage.RobotsTxtData;
 import crawler.storage.URLFrontierDBWrapper;
 import crawler.storage.URLFrontierData;
+import crawler.storage.UnseenLinksDBWrapper;
 
 public class CrawlerThread extends Thread {
 
 	private boolean isStopped = false;
 	private DocumentDBWrapper docDB;
 	private URLFrontierDBWrapper frontierDB;
+	private RobotsDBWrapper robotsDB;
+	private UnseenLinksDBWrapper unseenLinksDB;
 	private URLRequest request;
 	private int maxLength = -1; //in bytes
 	private String urlString;
 
-	public CrawlerThread(DocumentDBWrapper docDB, URLFrontierDBWrapper frontierDB) {
+	public CrawlerThread(DocumentDBWrapper docDB, URLFrontierDBWrapper frontierDB, RobotsDBWrapper robotsDB, UnseenLinksDBWrapper unseenLinksDB) {
 		this.docDB = docDB;
 		this.frontierDB = frontierDB;
+		this.robotsDB = robotsDB;
+		this.unseenLinksDB = unseenLinksDB;
 	}
 
-	public CrawlerThread(DocumentDBWrapper docDB, URLFrontierDBWrapper frontierDB, int maxLength) {
+	public CrawlerThread(DocumentDBWrapper docDB, URLFrontierDBWrapper frontierDB, RobotsDBWrapper robotsDB, UnseenLinksDBWrapper unseenLinksDB, int maxLength) {
 		this.docDB = docDB;
 		this.frontierDB = frontierDB;
 		this.maxLength = maxLength*1000000;
+		this.robotsDB = robotsDB;
+		this.unseenLinksDB = unseenLinksDB;
 	}
 
 	@Override
@@ -60,6 +69,10 @@ public class CrawlerThread extends Thread {
 					try {
 						parseRequest(request.sendGetRequest());
 					} catch (IOException e) {
+						frontierDB.close();
+						docDB.close();
+						unseenLinksDB.close();
+						robotsDB.close();
 						System.err.println("Error sending GET request to server");
 						e.printStackTrace();
 						System.exit(-1);
@@ -69,6 +82,8 @@ public class CrawlerThread extends Thread {
 				System.out.println("DB closing");
 				frontierDB.close();
 				docDB.close();
+				unseenLinksDB.close();
+				robotsDB.close();
 				isStopped = true;
 			}
 			//db.close();
@@ -244,7 +259,7 @@ public class CrawlerThread extends Thread {
 				URL url = makeAbsolute(urlString);
 				if (!docDB.checkUrlSeen(url.getHost()+url.getFile())) {
 					//add to queue
-					frontierDB.addUrl(url.getProtocol()+"://"+url.getHost()+url.getFile());
+					unseenLinksDB.addURL(url.getProtocol()+"://"+url.getHost()+url.getFile());
 				}
 			}
 		}

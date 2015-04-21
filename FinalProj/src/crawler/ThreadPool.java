@@ -1,13 +1,18 @@
 package crawler;
 
+import java.io.FileNotFoundException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.sleepycat.je.DatabaseException;
+
 import crawler.storage.DocumentDBWrapper;
+import crawler.storage.RobotsDBWrapper;
 import crawler.storage.URLFrontierDBWrapper;
+import crawler.storage.UnseenLinksDBWrapper;
 
 
 public class ThreadPool {
@@ -16,17 +21,19 @@ public class ThreadPool {
     private List<Thread> threads = new ArrayList<Thread>();
     private boolean isStopped = false;
 
-    public ThreadPool(int noOfThreads, String documentDirectory, String frontierDirectory, int maxSize){
+    public ThreadPool(int noOfThreads, String documentDirectory, String frontierDirectory, String robotsDirectory, String unseenLinksDirectory,  int maxSize) throws DatabaseException, FileNotFoundException{
         //bq = new BlockingQueue();
     	DocumentDBWrapper docDB = DocumentDBWrapper.getInstance(documentDirectory);
     	URLFrontierDBWrapper frontierDB = URLFrontierDBWrapper.getInstance(frontierDirectory);
+		RobotsDBWrapper robotsDB = RobotsDBWrapper.getInstance(robotsDirectory);
+		UnseenLinksDBWrapper unseenLinksDB = UnseenLinksDBWrapper.getInstance(unseenLinksDirectory);
     	/*while (!db.isEmpty()) {
 			Entry<Integer, QueueEntity> entry1 = db.getNextUrl();
 			System.out.println(entry1.getKey()+": " + entry1.getValue().getUrl());
 		}*/
     	
         for(int i=0; i<noOfThreads; i++){
-            threads.add(new CrawlerThread(docDB, frontierDB, maxSize));
+            threads.add(new CrawlerThread(docDB, frontierDB, robotsDB, unseenLinksDB, maxSize));
         }
         for(Thread thread : threads){
             thread.start();

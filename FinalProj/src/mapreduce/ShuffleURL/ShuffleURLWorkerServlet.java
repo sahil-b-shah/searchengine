@@ -1,10 +1,8 @@
 package mapreduce.ShuffleURL;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
@@ -13,6 +11,7 @@ import java.util.HashMap;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
+import crawler.storage.URLFrontierDBWrapper;
 import mapreduce.MyHttpClient;
 
 
@@ -27,12 +26,14 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 	private static String port;
 	private static String job;
 	private static Thread statusThread;
+	private static String frontierDirectory;
 
 	public void init(ServletConfig config) throws ServletException {
 		String master = config.getInitParameter("master");
 		port = config.getInitParameter("port");
 		status = "idle";
 		job = "none";
+		frontierDirectory = "frontierdb";
 
 
 		mapContext = null;
@@ -167,6 +168,7 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 
 		}
 		else if(request.getRequestURI().contains("/runreduce")){
+			/*
 			status = "reducing";
 			int numThreads = Integer.parseInt(request.getParameter("numThreads"));
 			String output = request.getParameter("output");
@@ -192,12 +194,12 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 
 			File outputFile = new File(outputDir, "output.txt");
 
-			ShuffleURLReduceContext reduceContext = new ShuffleURLReduceContext(outputFile);
+			//ShuffleURLReduceContext reduceContext = new ShuffleURLReduceContext(outputFile);
 
 			//Create numThread threads to run map
 			Thread threads[] = new Thread[numThreads];
 			for(int i = 0; i < numThreads; i++){
-				ShuffleURLReduceThread workerObj = new ShuffleURLReduceThread(reader, reduceContext);
+				ShuffleURLReduceThread workerObj = new ShuffleURLReduceThread(reader, null);
 				threads[i] = new Thread(workerObj);
 				threads[i].start();
 			}
@@ -211,6 +213,7 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 				}
 			}
 
+			*/
 			System.out.println(IPPort + ": threads done reducing"); 
 
 			status = "idle";
@@ -223,10 +226,6 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 				HashMap<String, String> params = getStatusParameters();
 				client.addParams("port", params.get("port"));
 				client.addParams("status", params.get("status"));
-				client.addParams("job", params.get("job"));
-				client.addParams("keysRead", params.get("keysRead"));
-				client.addParams("keysWritten", params.get("keysWritten"));
-
 				client.sendPost();
 			}
 		}
@@ -249,27 +248,20 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 	}
 
 	/**
-	 * Append data from POST into spool-in
+	 * Append data from POST into frontier DB
 	 * @param request from POST
 	 * @throws IOException
 	 */
 	public synchronized void addData(HttpServletRequest request) throws IOException{
 		BufferedReader in = request.getReader();
-		File spoolin = new File(storageDirectory, "spool-in");
-
-		if(!spoolin.exists()){
-			spoolin.mkdir();
-		}
-
-		File storeFile = new File(spoolin, "store.txt");
-		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(storeFile,true)));
+		URLFrontierDBWrapper frontierDB = URLFrontierDBWrapper.getInstance(frontierDirectory);
 
 		String line = in.readLine();
 		while(line != null){
-			out.println(line);
+			frontierDB.addUrl(line);
 			line = in.readLine();
 		}
-		out.close();
+		frontierDB.close();
 	}
 
 	public void destroy(){
