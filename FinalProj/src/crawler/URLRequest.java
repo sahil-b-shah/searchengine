@@ -242,7 +242,7 @@ public class URLRequest {
 	}
 	
 	private void delay(int milli) {
-		milli = 0; //for testing
+		//milli = 0; //for testing
 		try {
 			Thread.sleep(milli);
 		} catch (InterruptedException e) {

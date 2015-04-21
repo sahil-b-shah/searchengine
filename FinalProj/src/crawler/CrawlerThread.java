@@ -9,6 +9,7 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
@@ -101,18 +102,13 @@ public class CrawlerThread extends Thread {
 		}
 
 		//Get set of disallowed paths from robots.txt
-		List<String> disallowed = null;
-		disallowed = robots.getDisallowedLinks();
-
-		System.out.println(disallowed);
-		//Check if the request filepath is in the disallowed set
-		if (disallowed == null) {
-			makeRequest = true;
-		} else if (disallowed.contains(request.getFilePath())) {
-			//makeRequest = false;
-			System.out.println(request.getFilePath()+"filepath is disallowed");
+		ArrayList<String> disallowed = robots.getDisallowedLinks();	
+		ArrayList<String> allowed = robots.getAllowedLinks();
+		
+		if(!allowed(request.getFilePath(), disallowed, allowed))
 			return false;
-		}
+
+		//System.out.println(disallowed);
 		System.out.println("filepath is not disallowed");
 
 		DocumentData ce = docDB.getContentById(request.getHost()+request.getFilePath());
@@ -205,7 +201,7 @@ public class CrawlerThread extends Thread {
 			addContent(is2);
 		} else if(contentType.contains("xml")) {
 			//just add to XML table
-			Document document = null;
+			/*Document document = null;
 			try {
 				DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 				DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -222,7 +218,7 @@ public class CrawlerThread extends Thread {
 				System.err.println("Error reading bytes from input stream: Line 200");
 				e.printStackTrace();
 				System.exit(-1);
-			}
+			}*/
 			addContent(is3);
 		}
 	}
@@ -327,6 +323,32 @@ public class CrawlerThread extends Thread {
 			System.exit(-1);
 		}
 		return modDate;
+	}
+	
+	/**
+	 * Method to check if link is allowed
+	 * @param filepath - path of file to check
+	 * @param disallowed links
+	 * @param allowed links
+	 * @return true if allowed, else false
+	 */
+	private static boolean allowed(String filePath, ArrayList<String> disallowedLinks, ArrayList<String> allowedLinks) {
+		while(filePath != null){
+			
+			if(disallowedLinks != null && disallowedLinks.contains(filePath)) {
+				return false;
+			}
+			if(allowedLinks != null && allowedLinks.contains(filePath)){
+				return true;
+			}
+
+			int lastIndex = filePath.length() -1;
+			if(lastIndex == -1){
+				return true;
+			}
+			filePath = filePath.substring(0, lastIndex);
+		}
+		return true;
 	}
 
 }
