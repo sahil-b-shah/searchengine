@@ -4,15 +4,18 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -60,6 +63,7 @@ public class CrawlerThread extends Thread {
 	@Override
 	public void run() {
 		while(!isStopped) {
+
 			Entry<Integer, URLFrontierData> entry = frontierDB.getNextUrl();
 			if (entry != null) {
 				//System.out.println("not null");
@@ -70,22 +74,29 @@ public class CrawlerThread extends Thread {
 					try {
 						parseRequest(request.sendGetRequest());
 					} catch (IOException e) {
-						frontierDB.close();
+						/*frontierDB.close();
 						docDB.close();
 						unseenLinksDB.close();
 						robotsDB.close();
 						System.err.println("Error sending GET request to server");
 						e.printStackTrace();
-						System.exit(-1);
+						System.exit(-1);*/
 					}
 				}
 			} else {
-				System.out.println("DB closing");
-				frontierDB.close();
-				docDB.close();
-				unseenLinksDB.close();
-				robotsDB.close();
-				isStopped = true;
+				try {
+					Thread.sleep(300000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				if(frontierDB.isEmpty()){
+					System.out.println("DB closing");
+					frontierDB.close();
+					docDB.close();
+					unseenLinksDB.close();
+					robotsDB.close();
+					isStopped = true;
+				}
 			}
 			//db.close();
 		}
@@ -104,7 +115,7 @@ public class CrawlerThread extends Thread {
 		//Get set of disallowed paths from robots.txt
 		ArrayList<String> disallowed = robots.getDisallowedLinks();	
 		ArrayList<String> allowed = robots.getAllowedLinks();
-		
+
 		if(!allowed(request.getFilePath(), disallowed, allowed))
 			return false;
 
@@ -120,7 +131,7 @@ public class CrawlerThread extends Thread {
 			System.out.println("content is not null");
 			//Date lastSeen = new Date(Long.valueOf(ce.getLastSeen()));
 			boolean modified = false;
-			
+
 			try {
 				modified = request.checkModified(Long.valueOf(ce.getLastSeen()));
 			} catch (NumberFormatException | IOException e) {
@@ -324,7 +335,7 @@ public class CrawlerThread extends Thread {
 		}
 		return modDate;
 	}
-	
+
 	/**
 	 * Method to check if link is allowed
 	 * @param filepath - path of file to check
@@ -334,7 +345,7 @@ public class CrawlerThread extends Thread {
 	 */
 	private static boolean allowed(String filePath, ArrayList<String> disallowedLinks, ArrayList<String> allowedLinks) {
 		while(filePath != null){
-			
+
 			if(disallowedLinks != null && disallowedLinks.contains(filePath)) {
 				return false;
 			}
@@ -349,6 +360,20 @@ public class CrawlerThread extends Thread {
 			filePath = filePath.substring(0, lastIndex);
 		}
 		return true;
+	}
+
+	private String decodeURL(String url) throws UnsupportedEncodingException{
+		String decodedURL = url;
+		Pattern pattern = Pattern.compile("%[0-9a-fA-f]{2}");
+		Matcher matcher = pattern.matcher(url);
+		while(matcher.find()){
+			String encoded = matcher.group();
+			if(!encoded.equalsIgnoreCase("%2f")){
+				String decoded = URLDecoder.decode(encoded, "UTF-8");
+				decodedURL = decodedURL.replace(encoded, decoded);
+			}
+		}
+		return decodedURL;
 	}
 
 }
