@@ -1,27 +1,22 @@
 package mapreduce.ShuffleURL;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.util.Map.Entry;
+
+import crawler.storage.UnseenLinksDBWrapper;
+import crawler.storage.UnseenLinksData;
 
 public class ShuffleURLInputMapReader {
 
-	File files[];
-	private int fileIndex;
-	private BufferedReader in;
+
+	private UnseenLinksDBWrapper unseenLinksDB;
 	private boolean done;
 	
 	
-	public ShuffleURLInputMapReader(File fileList[]) throws FileNotFoundException{
-		files = fileList;
-		fileIndex = 0;
+	public ShuffleURLInputMapReader(String unseenLinksDirectory) throws FileNotFoundException{
+		unseenLinksDB = UnseenLinksDBWrapper.getInstance(unseenLinksDirectory);
 		done = false;
-		if(files.length > 0)
-			in = new BufferedReader(new FileReader(files[0]));
-		else
-			done = true;
 	}
 	
 	/**
@@ -35,19 +30,15 @@ public class ShuffleURLInputMapReader {
 			return null;
 		}
 		
-		String line = in.readLine();
+		Entry<String, UnseenLinksData> link = unseenLinksDB.getNextUrl();
+		String line = null;
 		
-		while(line == null){
-			fileIndex++; //go to next file
-			in.close();  //close previous stream
-			if(fileIndex >= files.length){
-				done = true;
-				return null;
-			}
-			else{
-				in = new BufferedReader(new FileReader(files[fileIndex]));
-				line = in.readLine();  //get first line here
-			}
+		if(link == null){
+			done = true;
+			unseenLinksDB.close();
+		}
+		else{
+			line = link.getKey();
 		}
 		
 		return line;

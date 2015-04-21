@@ -27,6 +27,7 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 	private static String job;
 	private static Thread statusThread;
 	private static String frontierDirectory;
+	private static String unseenLinksDirectory;
 
 	public void init(ServletConfig config) throws ServletException {
 		String master = config.getInitParameter("master");
@@ -66,7 +67,7 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 
 		if(request.getRequestURI().contains("/runmap")){
 			status = "mapping";
-			String input = request.getParameter("input");
+			//String input = request.getParameter("input");
 			int numThreads = Integer.parseInt(request.getParameter("numThreads"));
 			int numWorkers = Integer.parseInt(request.getParameter("numWorkers"));
 
@@ -96,12 +97,12 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 			spoolout.mkdir();
 
 			//Get files in input directory
-			File inputDirectory = new File(new File(storageDirectory), input);
-			File fileList[] = inputDirectory.listFiles();
+			//File inputDirectory = new File(new File(storageDirectory), input);
+			//File fileList[] = inputDirectory.listFiles();
 
 
-			//Create reader from input directory files
-			reader = new ShuffleURLInputMapReader(fileList);
+			//Create reader from input db
+			reader = new ShuffleURLInputMapReader(unseenLinksDirectory);
 
 			//Create emit from Map function implementing context
 			mapContext = new ShuffleURLMapContext(spoolout, workers);

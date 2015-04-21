@@ -2,6 +2,8 @@ package crawler.storage;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
@@ -92,7 +94,7 @@ public class UnseenLinksDBWrapper {
 	
 	/**
 	 * Get UnseenLinksData from url
-	 * @param hostName - host to get robots.txt for
+	 * @param url - link to look at
 	 * @return RobotsTxtData
 	 */
 	public synchronized UnseenLinksData getUnseenLinksData(String url){
@@ -100,8 +102,8 @@ public class UnseenLinksDBWrapper {
 	}
 	
 	/**
-	 * Delete RobotsTxtData 
-	 * @param hostname - host to delete
+	 * Delete UnseenLinksData 
+	 * @param hostname - link just seen
 	 */
 	public synchronized void deleteUnseenLinksData(String url){
 		unseenLinksIndex.delete(url);
@@ -112,5 +114,19 @@ public class UnseenLinksDBWrapper {
 			wrapper = new UnseenLinksDBWrapper(directory);
 		}
 		return wrapper;
+	}
+	
+	public synchronized Entry<String, UnseenLinksData> getNextUrl() {
+		TreeMap<String, UnseenLinksData> orderedFrontier = new TreeMap<String, UnseenLinksData>(unseenLinksIndex.map());
+		Entry<String, UnseenLinksData> e = orderedFrontier.firstEntry();
+		if (e!=null) {
+			deleteUnseenLinksData(e.getKey());
+			//System.out.println(e.getValue().getUrl()+": "+success);
+		}
+		return e;
+	}
+	
+	public synchronized boolean isEmpty() {
+		return (unseenLinksIndex.count() == 0);
 	}
 }

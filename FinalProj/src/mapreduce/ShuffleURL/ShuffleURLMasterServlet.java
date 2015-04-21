@@ -15,10 +15,8 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 
 	static final long serialVersionUID = 455555001;
 	private static Map<String, ArrayList<String>> statusMap; 
-	private static String numMapThreads;
-	private static String numReduceThreads;
-	private static String outputDir;
-	private static String inputDir;
+	private static String numMapThreads = "30";
+	//private static String numReduceThreads = "30";
 
 	public void init(ServletConfig config) throws ServletException {
 		statusMap = new HashMap<String, ArrayList<String>>();
@@ -114,28 +112,44 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 
 			if(allWaiting){
 				System.out.println("All workers waiting");
-				for(String iport: localStatusMap.keySet()){
+				//Post to /runmap on every active worker
+				for(String worker: localStatusMap.keySet()){
+					MyHttpClient client = new MyHttpClient(worker, "/worker/runmap");
+					//client.addParams("input", inputDir);
+					client.addParams("numThreads", numMapThreads);
+					client.addParams("numWorkers", localStatusMap.size() + "");
+					int counter = 1;
+					for(String workerID: localStatusMap.keySet()){
+						client.addParams("worker"+counter, workerID);
+						counter++;
+					}
+					//System.out.println("Posting /runmap to "+ worker);
+					client.sendPost();
+				}
+				
+				//Previous reduce code below
+				/*for(String iport: localStatusMap.keySet()){
 					if((System.currentTimeMillis() - Long.parseLong(params.get(4))) < 30000){
 						MyHttpClient client = new MyHttpClient(iport, "/worker/runreduce");
 						client.addParams("output", outputDir);
 						client.addParams("numThreads", numReduceThreads);						
 						client.sendPost();
 					}
-				}
+				}*/
 			}
 		}
 		else{
 
-			inputDir = request.getParameter("input");
-		    outputDir = request.getParameter("output");
+			//inputDir = request.getParameter("input");
+		    //outputDir = request.getParameter("output");
 			numMapThreads = request.getParameter("numMapThreads");
-			numReduceThreads = request.getParameter("numReduceThreads");
+			//numReduceThreads = request.getParameter("numReduceThreads");
 			Map<String, ArrayList<String>> localStatusMap =  getStatusMap();
 
 			//Post to /runmap on every active worker
 			for(String worker: localStatusMap.keySet()){
 				MyHttpClient client = new MyHttpClient(worker, "/worker/runmap");
-				client.addParams("input", inputDir);
+				//client.addParams("input", inputDir);
 				client.addParams("numThreads", numMapThreads);
 				client.addParams("numWorkers", localStatusMap.size() + "");
 				int counter = 1;
