@@ -34,7 +34,7 @@ public class URLRequest {
 	private Date lastModified;
 	
 	
-	private int delay = 0;
+	private long delay = 5000;
 	
 	public String getProtocol() {
 		return protocol;
@@ -131,7 +131,7 @@ public class URLRequest {
 			constructRobotsTxt(this.hostName);
 			robotsTxtData = robotsDB.getRobotsTxtData(this.hostName);
 		}
-		
+		this.delay = robotsTxtData.getCrawlDelay();
 		return robotsTxtData;
 	}
 	
@@ -148,12 +148,18 @@ public class URLRequest {
 		String userAgent = "*";
 		while ((string = br.readLine()) != null) {
 			 
+			if (string.contains("#")) {
+				string = string.substring(0, string.indexOf("#"));
+			}
+			
 			//Extract key-values of robot
 			Pattern p = Pattern.compile(KEY_VALUE_REGEX);
 			Matcher m = p.matcher(string);
 			if (m.find()) {
 				String key = m.group(1);
+				key = key.trim();
 				String value = m.group(2);
+				value = value.trim();
 				if (key.equalsIgnoreCase("User-Agent")) {
 					userAgent = value;
 					robotsTxt.addUserAgent(value);
@@ -177,7 +183,7 @@ public class URLRequest {
 	}
 	
 	private HttpURLConnection sendRequest(String hostName, String filepath, String method) throws ProtocolException {
-		
+		this.delay();
 		if (!filepath.startsWith("/")) {
 			filepath = "/"+filepath;
 		}
@@ -241,16 +247,21 @@ public class URLRequest {
 		return modDate;
 	}
 	
-	private void delay(int milli) {
+	private void delay() {
 		//milli = 0; //for testing
 		try {
-			Thread.sleep(milli);
+			Thread.sleep(this.delay);
 		} catch (InterruptedException e) {
 			System.err.println("Error sleeping thread");
 			e.printStackTrace();
 		}
 	}
 	
+	/**
+	 * 
+	 * @return input stream to host or null if response code of response was not 200
+	 * @throws IOException
+	 */
 	public InputStream sendGetRequest() throws IOException {
 		HttpURLConnection con = sendRequest(hostName, filePath);
 		int responseCode = con.getResponseCode();
