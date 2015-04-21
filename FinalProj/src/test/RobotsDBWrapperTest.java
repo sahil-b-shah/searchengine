@@ -1,4 +1,4 @@
-package crawler.storage;
+package test;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import junit.framework.TestCase;
 
 import com.sleepycat.je.DatabaseException;
+
+import crawler.storage.RobotsDBWrapper;
+import crawler.storage.RobotsTxtData;
 
 
 public class RobotsDBWrapperTest extends TestCase {
