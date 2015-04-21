@@ -35,7 +35,6 @@ public class ShuffleURLInputMapReader {
 		
 		if(link == null){
 			done = true;
-			unseenLinksDB.close();
 		}
 		else{
 			line = link.getKey();

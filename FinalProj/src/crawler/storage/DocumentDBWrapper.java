@@ -1,24 +1,17 @@
 package crawler.storage;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
 import java.util.Set;
-import java.util.TreeMap;
-
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
 import com.sleepycat.persist.EntityCursor;
-import com.sleepycat.persist.EntityIndex;
 import com.sleepycat.persist.EntityStore;
 import com.sleepycat.persist.PrimaryIndex;
-import com.sleepycat.persist.SecondaryIndex;
 import com.sleepycat.persist.StoreConfig;
 
 public class DocumentDBWrapper {
@@ -33,7 +26,6 @@ public class DocumentDBWrapper {
 	//private int channelId = 0;
 	
 	private static DocumentDBWrapper db;
-	private static boolean isFirstThread = true;
 	
 	public synchronized static DocumentDBWrapper getInstance(String homeDirectory) {
 		if (db == null) {

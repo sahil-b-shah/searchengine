@@ -262,7 +262,6 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 			frontierDB.addUrl(line);
 			line = in.readLine();
 		}
-		frontierDB.close();
 	}
 
 	public void destroy(){

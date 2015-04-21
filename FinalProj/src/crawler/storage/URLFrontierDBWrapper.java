@@ -22,7 +22,6 @@ public class URLFrontierDBWrapper {
 	//private int channelId = 0;
 	
 	private static URLFrontierDBWrapper db;
-	private static boolean isFirstThread = true;
 	
 	public synchronized static URLFrontierDBWrapper getInstance(String homeDirectory) {
 		if (db == null) {
@@ -107,7 +106,7 @@ public class URLFrontierDBWrapper {
 		TreeMap<Integer, URLFrontierData> orderedFrontier = new TreeMap<Integer, URLFrontierData>(urlFrontier.map());
 		Entry<Integer, URLFrontierData> e = orderedFrontier.firstEntry();
 		if (e!=null) {
-			boolean success = urlFrontier.delete(e.getKey());
+			urlFrontier.delete(e.getKey());
 			//System.out.println(e.getValue().getUrl()+": "+success);
 		}
 		return e;
