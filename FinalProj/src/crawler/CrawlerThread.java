@@ -69,8 +69,15 @@ public class CrawlerThread extends Thread {
 				//System.out.println("not null");
 				urlString = entry.getValue().getUrl();
 				request = new URLRequest(urlString);
+				
+				boolean check = false;
+				try {
+					check = checkRequest();
+				} catch (UnsupportedEncodingException e1) {
+				}
+				
 
-				if (checkRequest()) {
+				if (check) {
 					try {
 						parseRequest(request.sendGetRequest());
 					} catch (IOException e) {
@@ -102,7 +109,7 @@ public class CrawlerThread extends Thread {
 		}
 	}
 
-	private boolean checkRequest(){
+	private boolean checkRequest() throws UnsupportedEncodingException{
 		boolean makeRequest = true;
 		RobotsTxtData robots = null;
 		try {
@@ -116,7 +123,9 @@ public class CrawlerThread extends Thread {
 		ArrayList<String> disallowed = robots.getDisallowedLinks();	
 		ArrayList<String> allowed = robots.getAllowedLinks();
 
-		if(!allowed(request.getFilePath(), disallowed, allowed))
+		String allowedTestURL = decodeURL(request.getFilePath());
+		
+		if(!allowed(allowedTestURL, disallowed, allowed))
 			return false;
 
 		//System.out.println(disallowed);
@@ -343,7 +352,7 @@ public class CrawlerThread extends Thread {
 	 * @param allowed links
 	 * @return true if allowed, else false
 	 */
-	private static boolean allowed(String filePath, ArrayList<String> disallowedLinks, ArrayList<String> allowedLinks) {
+	public static boolean allowed(String filePath, ArrayList<String> disallowedLinks, ArrayList<String> allowedLinks) {
 		while(filePath != null){
 
 			if(disallowedLinks != null && disallowedLinks.contains(filePath)) {
@@ -362,7 +371,7 @@ public class CrawlerThread extends Thread {
 		return true;
 	}
 
-	private String decodeURL(String url) throws UnsupportedEncodingException{
+	public static String decodeURL(String url) throws UnsupportedEncodingException{
 		String decodedURL = url;
 		Pattern pattern = Pattern.compile("%[0-9a-fA-f]{2}");
 		Matcher matcher = pattern.matcher(url);
