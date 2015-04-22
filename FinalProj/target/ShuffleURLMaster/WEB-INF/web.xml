@@ -5,7 +5,7 @@
      
      <servlet>
          <servlet-name>MasterServlet</servlet-name>
-         <servlet-class>edu.upenn.cis455.mapreduce.master.MasterServlet</servlet-class>
+         <servlet-class>mapreduce.ShuffleURLMaster.ShuffleURLMasterServlet</servlet-class>
      </servlet>
 
      <servlet-mapping>
