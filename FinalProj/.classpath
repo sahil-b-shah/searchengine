@@ -7,5 +7,6 @@
 	<classpathentry kind="lib" path="/home/cis455/workspace/cis455-search-engine/FinalProj/lib/junit.jar"/>
 	<classpathentry kind="lib" path="/home/cis455/workspace/cis455-search-engine/FinalProj/lib/servlet-api.jar"/>
 	<classpathentry kind="lib" path="/home/cis455/workspace/cis455-search-engine/FinalProj/lib/commons-codec-1.10.jar"/>
+	<classpathentry kind="lib" path="/home/cis455/workspace/cis455-search-engine/FinalProj/lib/jsoup-1.8.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

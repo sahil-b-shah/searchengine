@@ -3,6 +3,7 @@ package mapreduce.InvertedIndexWorker;
 import java.io.IOException;
 
 import mapreduce.Context;
+import mapreduce.InvertedIndexJob;
 import mapreduce.Job;
 
 
@@ -11,21 +12,13 @@ public class InvertedIndexWorkerReduceThread implements Runnable {
 	private Job job;
 	private InvertedIndexInputReduceReader reader;
 	private Context context;
-	
-	@SuppressWarnings("rawtypes")
-	public InvertedIndexWorkerReduceThread(Class jobClass, InvertedIndexInputReduceReader reader, Context context) {
-		try {
-			if(jobClass != null)
-				job = (Job) jobClass.newInstance();
-			else
-				job = null;
-			this.reader = reader;
-			this.context = context;
-		} catch (InstantiationException | IllegalAccessException e) {
-			System.err.println("Can't instantiate this class");
-		}
+
+	public InvertedIndexWorkerReduceThread(InvertedIndexInputReduceReader reader, Context context) {
+		job = new InvertedIndexJob();
+		this.reader = reader;
+		this.context = context;
 	}
-	
+
 	@Override
 	public void run() {
 		String line;
@@ -34,12 +27,13 @@ public class InvertedIndexWorkerReduceThread implements Runnable {
 		try {
 			line = reader.readLine();
 			while(line != null){
-				String key = line.split("\\t")[0];
-				String value = line.split("\\t")[1];
-				String[] valueArray = value.split(",");
-				
+				String params[] = line.split("\\t");
+				String key = params[0];
+				String value = params[1];
+				String[] valueArray = value.split("\\s+");
+
 				job.reduce(key, valueArray, context);
-				
+
 				line = reader.readLine();
 			}
 		} catch (IOException e) {

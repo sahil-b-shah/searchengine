@@ -1,6 +1,7 @@
 package crawler.storage;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
@@ -24,6 +25,7 @@ public class DocumentDBWrapper {
 	private EntityStore store;
 	
 	private PrimaryIndex<String, DocumentData> seenContent;
+	private Iterator<String> keys;
 	//private int channelId = 0;
 	
 	private static DocumentDBWrapper db;
@@ -122,17 +124,39 @@ public class DocumentDBWrapper {
 		return seenContent.map();
 	}
 	
+	public synchronized void initIterator(){
+		keys = seenContent.keys().iterator();
+	}
+	
+	public synchronized DocumentData getNextDocument(){
+		if(keys == null)
+			return null;
+		
+		if(!keys.hasNext()){
+			keys = null;
+			return null;
+		}
+
+		return seenContent.get(keys.next());
+		
+	}
+	
 	public synchronized DocumentData getContentById(String id) {
 		DocumentData ce = seenContent.get(id);
 		return ce;
 	}
 	
-	public synchronized void addContent(String url, String content, long date) {
+	public synchronized void addContent(String url, String content, long date, ArrayList<String> links) {
 		DocumentData ce = new DocumentData();
 		ce.setUrl(url);
 		ce.setContent(content);
 		ce.setLastSeen(String.valueOf(date));
+		ce.setLinks(links);
 		seenContent.put(ce);
+	}
+	
+	public synchronized ArrayList<String> getLinks(String document){
+		return seenContent.get(document).getLinks();
 	}
 	
 	public synchronized boolean checkUrlSeen(String docURL) {

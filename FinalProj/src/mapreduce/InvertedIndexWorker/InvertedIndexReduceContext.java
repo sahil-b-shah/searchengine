@@ -1,42 +1,36 @@
 package mapreduce.InvertedIndexWorker;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.util.HashMap;
 
+import indexer.storage.InvertedIndexDBWrapper;
 import mapreduce.Context;
 
 
 public class InvertedIndexReduceContext implements Context {
 
-	private File output;
-	private int keysWritten;
+	private InvertedIndexDBWrapper indexDB;
 	
-	public InvertedIndexReduceContext(File output) {
-		this.output = output;	
-		keysWritten = 0;
+	public InvertedIndexReduceContext(String indexDirectory) {
+		indexDB = InvertedIndexDBWrapper.getInstance(indexDirectory);
 	}
 
 	public synchronized void write(String key, String value) {
-		try {
-			keysWritten++;
-			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(output,true)));
-			out.println(key + "\t"+value);
-			out.close();
-		} catch (IOException e) {
-			System.err.println("Error in emitting reduce");
-			e.printStackTrace();
+		
+		String entry[] = value.split("\\s+");
+		HashMap<String, Integer> map = new HashMap<String, Integer>();
+
+		for(int i = 0; i < entry.length; i++){
+			String tempEntry = entry[i];
+			String params [] = tempEntry.split(";");
+			map.put(params[0], Integer.parseInt(params[1]));
 		}
+		
+		indexDB.addWord(key, map);
 
 	}
 	
-	/**
-	 * Gets current number of keys written
-	 * @return number of keys written
-	 */
-	public String getKeysWritten(){
-		return keysWritten + "";
+	public void close(){
+		indexDB.close();
 	}
+	
 }

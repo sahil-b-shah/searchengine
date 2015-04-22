@@ -14,7 +14,6 @@ import java.util.HashMap;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-import crawler.storage.URLFrontierDBWrapper;
 import mapreduce.MyHttpClient;
 import mapreduce.InvertedIndexWorker.InvertedIndexInputMapReader;
 import mapreduce.InvertedIndexWorker.InvertedIndexMapContext;
@@ -111,8 +110,7 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 
 
 			//Create reader from input db
-			//TODO
-			//reader = new InvertedIndexInputMapReader(unseenLinksDirectory);
+			reader = new InvertedIndexInputMapReader(documentDirectory);
 
 			//Create emit from Map function implementing context
 			mapContext = new InvertedIndexMapContext(spoolout, workers);
@@ -123,12 +121,10 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 			//Create numThread threads to run map
 			Thread threads[] = new Thread[numThreads];
 			for(int i = 0; i < numThreads; i++){
-				//TODO
-				//InvertedIndexWorkerMapThread workerObj = new InvertedIndexWorkerMapThread(reader, mapContext);
-				//threads[i] = new Thread(workerObj);
-				//threads[i].start();
+				InvertedIndexWorkerMapThread workerObj = new InvertedIndexWorkerMapThread(reader, mapContext);
+				threads[i] = new Thread(workerObj);
+				threads[i].start();
 			}
-
 
 
 			//Wait until all threads done
@@ -159,7 +155,9 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 				in.close();
 				client.setBody(body);
 				client.sendPost();
+				curWorker.delete();
 			}
+			
 
 			status = "waiting";
 
@@ -188,8 +186,27 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 			//Sort file
 			File spoolin = new File(storageDirectory,"spool-in");
 			File storeFile = new File(spoolin, "store.txt");
+			File spoolinFile = new File(spoolin, "spoolin.txt");
+			
+			if(storeFile.exists()){
+				System.out.println(IPPort + ": starting sort command"); 
+				Process proc = Runtime.getRuntime().exec("sort store.txt", null, spoolin);
+				BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(spoolinFile,false)));
+				String line = in.readLine();
+				while(line != null){
+					out.println(line);
+					line = in.readLine();
+				}
 
-			InvertedIndexInputReduceReader reader = new InvertedIndexInputReduceReader(storeFile);
+				in.close();
+				out.close();
+
+			}
+			
+			storeFile.delete();   //delete large store file
+
+			InvertedIndexInputReduceReader reader = new InvertedIndexInputReduceReader(spoolinFile);
 
 			File outputDir = new File(storageDirectory, output);
 
@@ -204,17 +221,16 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 			}
 			outputDir.mkdir();
 
-			File outputFile = new File(outputDir, "output.txt");
+			//File outputFile = new File(outputDir, "output.txt");
 
-			//InvertedIndexReduceContext reduceContext = new InvertedIndexReduceContext(outputFile);
+			InvertedIndexReduceContext reduceContext = new InvertedIndexReduceContext(indexDirectory);
 
 			//Create numThread threads to run map
 			Thread threads[] = new Thread[numThreads];
 			for(int i = 0; i < numThreads; i++){
-				//TODO
-				//InvertedIndexWorkerReduceThread workerObj = new InvertedIndexWorkerReduceThread(reader, null);
-				//threads[i] = new Thread(workerObj);
-				//threads[i].start();
+				InvertedIndexWorkerReduceThread workerObj = new InvertedIndexWorkerReduceThread(reader, reduceContext);
+				threads[i] = new Thread(workerObj);
+				threads[i].start();
 			}
 
 			//Wait until all threads done
@@ -225,6 +241,8 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 					System.err.println("Map thread ended unnaturally");
 				}
 			}
+			
+			reduceContext.close();
 
 			
 			System.out.println(IPPort + ": threads done reducing"); 
@@ -266,17 +284,22 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 	 * @throws IOException
 	 */
 	public synchronized void addData(HttpServletRequest request) throws IOException{
-		/*BufferedReader in = request.getReader();
-		//URLFrontierDBWrapper frontierDB = URLFrontierDBWrapper.getInstance(indexDirectory);
+		BufferedReader in = request.getReader();
+		File spoolin = new File(storageDirectory, "spool-in");
 
-		//TODO: add index db
-		
+		if(!spoolin.exists()){
+			spoolin.mkdir();
+		}
+
+		File storeFile = new File(spoolin, "store.txt");
+		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(storeFile,true)));
+
 		String line = in.readLine();
 		while(line != null){
-			frontierDB.addUrl(line);
+			out.println(line);
 			line = in.readLine();
 		}
-		frontierDB.close();*/
+		out.close();
 	}
 
 	public void destroy(){

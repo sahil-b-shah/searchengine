@@ -15,11 +15,9 @@ public class InvertedIndexMapContext implements Context{
 	
 	private File workerFiles[];
 	private int numWorkers;
-	private int keysWritten;
 	private File spoolout;
 
 	public InvertedIndexMapContext(File spoolout, String workers[]) throws IOException{
-		keysWritten = 0;
 		this.spoolout = spoolout;
 		workerFiles = new File[workers.length];
 		for(int i = 1; i <= workers.length; i++){
@@ -43,7 +41,6 @@ public class InvertedIndexMapContext implements Context{
 		
 		
 		try {
-			keysWritten++;
 			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(selectedFile,true)));
 			out.println(key + "\t"+value);
 			out.close();
@@ -80,14 +77,6 @@ public class InvertedIndexMapContext implements Context{
 	 */
 	public File[] getWorkerFiles(){
 		return workerFiles;
-	}
-	
-	/**
-	 * Gets current number of keys written 
-	 * @return number of keys written
-	 */
-	public String getKeysWritten(){
-		return keysWritten + "";
 	}
 	
 }
