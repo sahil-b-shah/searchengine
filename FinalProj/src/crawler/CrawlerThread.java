@@ -63,23 +63,23 @@ public class CrawlerThread extends Thread {
 	@Override
 	public void run() {
 		while(!isStopped) {
-			
+
 			try {
 				Entry<Integer, URLFrontierData> entry = frontierDB.getNextUrl();
 				if (entry != null) {
-	
+
 					//System.out.println("not null");
 					urlString = entry.getValue().getUrl();
 					request = new URLRequest(urlString);
-	
+
 					if(Crawler.addCurrentHost(request.getHost())){
-						
+
 						boolean check = false;
 						try {
 							check = checkRequest();
 						} catch (UnsupportedEncodingException e1) {
 						}
-	
+
 						if (check) {
 							try {
 								parseRequest(request.sendGetRequest());
@@ -211,6 +211,7 @@ public class CrawlerThread extends Thread {
 			e1.printStackTrace();
 			System.exit(-1);
 		}
+		
 
 		InputStream is1 = new ByteArrayInputStream(baos.toByteArray()); 
 		InputStream is2 = new ByteArrayInputStream(baos.toByteArray()); 
@@ -221,7 +222,7 @@ public class CrawlerThread extends Thread {
 		String contentType = request.getContentType();
 		if (contentType.contains("html")) {
 			//Need to use JTidy
-			ByteArrayOutputStream xhtmlOS = new ByteArrayOutputStream();
+			/*ByteArrayOutputStream xhtmlOS = new ByteArrayOutputStream();
 			Tidy tidy = new Tidy();
 			tidy.setXHTML(true);
 
@@ -237,8 +238,8 @@ public class CrawlerThread extends Thread {
 				System.err.println("Error building w3 document: HTML");
 				e.printStackTrace();
 				System.exit(-1);
-			}
-			ArrayList<String> links = extractUrls(document);
+			}*/
+			ArrayList<String> links = extractUrls(buffer.toString());
 			addContent(is2, links);
 		} else if(contentType.contains("xml")) {
 			addContent(is3, null);
@@ -260,9 +261,26 @@ public class CrawlerThread extends Thread {
 				new String(b), System.currentTimeMillis(), links);
 	}
 
-	private ArrayList<String> extractUrls(Document doc) {
+	private ArrayList<String> extractUrls(String body) {
 		ArrayList<String> links = new ArrayList<String>();
-		doc.getDocumentElement().normalize();
+		Pattern pattern = Pattern.compile("((?i)href\\s*=\\s*\")(\\S+)(\")");
+
+
+
+		Matcher matcher = pattern.matcher(body);
+		while(matcher.find()){
+			String newURL = matcher.group(2);
+			
+			URL url = makeAbsolute(request.getUrlString(), newURL);
+			//add to queue
+			System.out.println("Adding " + url.getProtocol()+"://"+url.getHost()+url.getFile());
+			unseenLinksDB.addURL(url.getProtocol()+"://"+url.getHost()+url.getFile());
+			links.add(url.getProtocol()+"://"+url.getHost()+url.getFile());
+
+
+		}
+
+		/*doc.getDocumentElement().normalize();
 		//System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
 		NodeList nList = doc.getElementsByTagName("a");
 
@@ -281,7 +299,7 @@ public class CrawlerThread extends Thread {
 				links.add(url.getProtocol()+"://"+url.getHost()+url.getFile());
 
 			}
-		}
+		}*/
 		return links;
 	}
 

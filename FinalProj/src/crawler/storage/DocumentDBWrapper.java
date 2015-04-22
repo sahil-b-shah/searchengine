@@ -41,9 +41,9 @@ public class DocumentDBWrapper {
 	private DocumentDBWrapper(String homeDirectory) {
 		envDirectory = homeDirectory;
 		System.out.println("Opening environment in: " + envDirectory);
-		envFile = new File(System.getProperty("user.dir"), envDirectory);
+		envFile = new File(envDirectory);
 		if (!envFile.exists()) {
-			if(envFile.mkdir()){
+			if(envFile.mkdirs()){
 				System.out.println("Creating directory " + envFile.getAbsolutePath());
 			}
 			else{

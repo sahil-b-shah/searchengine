@@ -24,9 +24,9 @@ public class RobotsDBWrapper {
 	private RobotsDBWrapper(String directory) throws DatabaseException, FileNotFoundException {
 		envDirectory = directory;
 		
-		File file = new File(System.getProperty("user.dir"), envDirectory);
+		File file = new File(envDirectory);
 		if (!file.exists()) {
-			if(file.mkdir()){
+			if(file.mkdirs()){
 				System.out.println("Creating directory " + file.getAbsolutePath());
 			}
 			else{
