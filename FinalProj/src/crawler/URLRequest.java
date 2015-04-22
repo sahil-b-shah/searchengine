@@ -73,7 +73,7 @@ public class URLRequest {
 	
 	public URLRequest(String urlString) {
 		this.urlString = urlString;
-		System.out.println(urlString);
+		System.out.println("Request object being made for " + urlString);
 		
 		URL urlObj = null;
 		try {
@@ -85,6 +85,7 @@ public class URLRequest {
 		}
 		hostName = urlObj.getHost();
 		port = urlObj.getPort();
+		protocol = urlObj.getProtocol();
 		if (urlObj.getPath().isEmpty()) {
 			filePath = "/";
 		} else {
@@ -100,7 +101,7 @@ public class URLRequest {
 	}
 	
 	/***
-	 * 
+	 * Sends HEAD request with If-Modified-Since header
 	 * @param date
 	 * @return true if modified since last modified date, false otherwise 
 	 * @throws IOException 
@@ -114,6 +115,25 @@ public class URLRequest {
 		
 		if (con.getResponseCode()==200){
 			this.contentLength = con.getContentLength();
+			this.contentType = con.getContentType();
+			System.out.println("Content length: "+this.contentLength);
+			return true;
+		}
+		return false;
+	}
+	
+	/***
+	 * Sends HEAD request to host
+	 * @return true if response code return success, false otherwise
+	 * @throws IOException
+	 */
+	public boolean sendHead() throws IOException {
+		HttpURLConnection con = sendRequest(hostName, filePath, "HEAD");
+				
+		if (con.getResponseCode()==200){
+			this.contentLength = con.getContentLength();
+			this.contentType = con.getContentType();
+			System.out.println("Content length: "+this.contentLength);
 			return true;
 		}
 		return false;
@@ -125,9 +145,7 @@ public class URLRequest {
 	 * @throws IOException
 	 */
 	public RobotsTxtData checkRobots() throws IOException {
-		RobotsDBWrapper robotsDB = null;
-		robotsDB = RobotsDBWrapper.getInstance("/home/cis455/storage");
-
+		RobotsDBWrapper robotsDB = RobotsDBWrapper.getInstance("/home/cis455/storage");
 		
 		RobotsTxtData robotsTxtData = robotsDB.getRobotsTxtData(this.hostName);
 		if (robotsTxtData == null) {

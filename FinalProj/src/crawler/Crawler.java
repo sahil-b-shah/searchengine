@@ -43,14 +43,13 @@ public class Crawler {
 	}
 	
 	public static void main(String [] args) throws DatabaseException, FileNotFoundException {
-		if((args.length != 4) && (args.length != 3)) {
+		if((args.length != 3) && (args.length != 2)) {
 			System.err.println("Incorrect number of arguments");
 			System.exit(-1);
 		}
 		
 		currentHosts = new ConcurrentHashMap<String, String>();
 		
-		urlString = args[0];
 		//Directory for stores
 		documentDirectory = "/documentdb";
 		frontierDirectory = "/frontierdb";
@@ -58,23 +57,19 @@ public class Crawler {
 		unseenLinksDirectory = "/unseenlinksdb";
 		
 		//urlString = "https://dbappserv.cis.upenn.edu/crawltest/marie/tpc/part.xml";
-		urlString = args[1];
+		urlString = args[0];
 		
-		maxSize = Integer.parseInt(args[2]);
-		if (args.length == 4) {
-			maxFiles = Integer.parseInt(args[3]);
+		maxSize = Integer.parseInt(args[1]);
+		if (args.length == 3) {
+			maxFiles = Integer.parseInt(args[2]);
 		}
-		DocumentDBWrapper documentDB = DocumentDBWrapper.getInstance(documentDirectory);
+		
+		DocumentDBWrapper docDB = DocumentDBWrapper.getInstance(documentDirectory);
+		docDB.getAllContent();
+		docDB.close();
+		
 		URLFrontierDBWrapper frontierDB = URLFrontierDBWrapper.getInstance(frontierDirectory);
-		RobotsDBWrapper robotsDB = RobotsDBWrapper.getInstance(robotsDirectory);
-		UnseenLinksDBWrapper unseenLinksDB = UnseenLinksDBWrapper.getInstance(unseenLinksDirectory);
-
 		frontierDB.addUrl(urlString);
-		documentDB.getAllContent();
-		frontierDB.close();
-		documentDB.close();
-		robotsDB.close();
-		unseenLinksDB.close();
 		setup();
 	}
 }

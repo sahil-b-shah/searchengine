@@ -98,12 +98,13 @@ public class CrawlerThread extends Thread {
 				}
 			} else {
 				try {
-					Thread.sleep(300000);
+					//Thread.sleep(300000);
+					Thread.sleep(3000);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 				if(frontierDB.isEmpty()){
-					System.out.println("DB closing");
+					System.out.println("Crawl on thread " + Thread.currentThread().getId()+" is ending");
 					frontierDB.close();
 					docDB.close();
 					unseenLinksDB.close();
@@ -142,6 +143,14 @@ public class CrawlerThread extends Thread {
 
 		if (ce == null) {
 			makeRequest = true & makeRequest;
+			try {
+				if (!request.sendHead()) {
+					System.err.println("Error sending head request");
+				}
+			} catch (IOException e) {
+				System.err.println("Error sending head request: IO Exception caught");
+				e.printStackTrace();
+			}
 		} else {
 			System.out.println("content is not null");
 			//Date lastSeen = new Date(Long.valueOf(ce.getLastSeen()));
@@ -159,23 +168,22 @@ public class CrawlerThread extends Thread {
 				System.out.println(request.getFilePath()+" Last modified is before last seen");
 				return false;
 			} else {
+				System.out.println(request.getFilePath()+" Last modified is after last seen");
 				makeRequest = true & makeRequest;
 			}
 		}
-		System.out.println("Modified date is after last seen, or link has not been seen");
-
 		//Check content length
 		if (maxLength == -1) {
 			makeRequest = true & makeRequest;
 		} else if (request.getContentLength() == -1) {
-			System.out.println(request.getContentLength()+"is not specified");
+			System.out.println(request.getContentLength()+" is not specified");
 			return false;
 			//makeRequest = false;
 		} else if(request.getContentLength() <= maxLength) {
 			makeRequest = true & makeRequest;
 		} else if (request.getContentLength() > maxLength) {
 			//makeRequest = false;
-			System.out.println(request.getContentLength()+"is more than max");
+			System.out.println(request.getContentLength()+" is more than max");
 			return false;
 		}
 		return makeRequest;
@@ -281,9 +289,9 @@ public class CrawlerThread extends Thread {
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Extracted ");
+		System.out.print("Extracted ");
 		System.out.print(extracted.getHost()+extracted.getPath());
-		System.out.print(" from "+base.getHost()+base.getPath());
+		System.out.println(" from "+base.getHost()+base.getPath());
 
 		return extracted;
 	}

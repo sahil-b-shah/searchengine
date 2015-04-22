@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
@@ -38,8 +39,20 @@ public class DocumentDBWrapper {
 	private DocumentDBWrapper(String homeDirectory) {
 		envDirectory = homeDirectory;
 		System.out.println("Opening environment in: " + envDirectory);
-		envFile = new File(envDirectory);
-		envFile.mkdirs();
+		envFile = new File(System.getProperty("user.dir"), envDirectory);
+		if (!envFile.exists()) {
+			if(envFile.mkdir()){
+				System.out.println("Creating directory " + envFile.getAbsolutePath());
+			}
+			else{
+				System.out.println("Failed creating directory " + envFile.getAbsolutePath());
+			};
+			
+		}
+		else{
+			System.out.println("Database directory exists");
+		}
+		
 		setup();
 	}
 	

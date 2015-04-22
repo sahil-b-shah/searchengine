@@ -25,7 +25,6 @@ public class URLFrontierDBWrapper {
 	
 	public synchronized static URLFrontierDBWrapper getInstance(String homeDirectory) {
 		if (db == null) {
-			System.out.println("Making new db wrapper");
 			db = new URLFrontierDBWrapper(homeDirectory);
 		}
 		return db;
@@ -34,8 +33,19 @@ public class URLFrontierDBWrapper {
 	private URLFrontierDBWrapper(String homeDirectory) {
 		envDirectory = homeDirectory;
 		System.out.println("Opening environment in: " + envDirectory);
-		envFile = new File(envDirectory);
-		envFile.mkdirs();
+		envFile = new File(System.getProperty("user.dir"), envDirectory);
+		if (!envFile.exists()) {
+			if(envFile.mkdir()){
+				System.out.println("Creating directory " + envFile.getAbsolutePath());
+			}
+			else{
+				System.out.println("Failed creating directory " + envFile.getAbsolutePath());
+			};
+			
+		}
+		else{
+			System.out.println("Database directory exists");
+		}
 		setup();
 	}
 	
@@ -129,18 +139,18 @@ public class URLFrontierDBWrapper {
 			return;
 		}*/
 		
-		System.out.println("Adding " + docURL+ " to db");
 		int id;
 		if(getLastUrl() == null) {
 			id = 0;
 		} else {
 			id = getLastUrl().getKey();
 		}
-		System.out.println(id+1);
 		URLFrontierData q_url = new URLFrontierData();
 		q_url.setId(id+1);
 		q_url.setUrl(docURL);
 		urlFrontier.put(q_url);
+		System.out.println("Added to frontier: " + (id+1)+"--" + docURL);
+
 	}
 		
 }
