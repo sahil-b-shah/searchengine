@@ -27,9 +27,10 @@ public class InvertedIndexWorkerReduceThread implements Runnable {
 		try {
 			line = reader.readLine();
 			while(line != null){
-				String key = line.split("\\t")[0];
-				String value = line.split("\\t")[1];
-				String[] valueArray = value.split(",");
+				String params[] = line.split("\\t");
+				String key = params[0];
+				String value = params[1];
+				String[] valueArray = value.split("\\s+");
 
 				job.reduce(key, valueArray, context);
 

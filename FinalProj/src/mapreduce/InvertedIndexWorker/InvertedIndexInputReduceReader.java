@@ -9,7 +9,6 @@ public class InvertedIndexInputReduceReader {
 
 	File input;
 	private BufferedReader in;
-	private int keysRead;
 	private String line;
 
 	public InvertedIndexInputReduceReader(File input) throws IOException{
@@ -21,7 +20,6 @@ public class InvertedIndexInputReduceReader {
 		else{
 			line = null;
 		}
-		this.keysRead = 0;
 
 	}
 
@@ -35,28 +33,36 @@ public class InvertedIndexInputReduceReader {
 		String tempLine  = null;
 		String nextLine = null;
 		if(line != null){
-			String key = line.split("\\t")[0];
+			int count = 1;
+			String word = line.split("\\t")[0];
 			String value = line.split("\\t")[1];
-			tempLine = key + "\t" + value;
+
+			//tempLine = word + "\t";
 
 			nextLine = in.readLine();
 			while(nextLine != null){
 				String nextLineKey = nextLine.split("\\t")[0];
 				String nextLineValue = nextLine.split("\\t")[1];
 
-				if(nextLineKey.equals(key)){
-					tempLine += "," + nextLineValue;
+				if(nextLineKey.equals(word)){
+					if(nextLineValue.equals(value)){
+						count++;
+					}
+					else{
+						if (tempLine == null){
+							tempLine = word + "\t" + value+";"+count;
+						}
+						else{
+							tempLine += " " + nextLineValue + ";" + count;
+						}
+						count = 1;
+					}
 					nextLine = in.readLine();
 				}
 				else{
 					break;
 				}
-
-
 			}
-
-
-			keysRead++;
 		}
 
 		line = nextLine;
@@ -64,11 +70,4 @@ public class InvertedIndexInputReduceReader {
 
 	}
 
-	/**
-	 * Gets current number of keys read
-	 * @return keys read
-	 */
-	public String getKeysRead(){
-		return keysRead + "";
-	}
 }
