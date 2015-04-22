@@ -6,6 +6,18 @@
     <mkdir dir="classes"/>
   </target>
   
+   <target name="compile-storage" description="Compiles the storage system">
+        <mkdir dir="${classes.dir}"/>
+        <javac srcdir="src/crawler/storage" destdir="${classes.dir}" debug="on" deprecation="off" optimize="on" includeAntRuntime="no">
+            <classpath>
+                <fileset dir="${inputlib.dir}">
+                    <include name="*.jar"/>
+                </fileset>
+            </classpath>
+        </javac>
+    </target>
+	
+	
   <target name="compile-jobs" depends="init">
     <javac srcdir="src" destdir="classes" includes="**/ShuffleURLJob.java,**/Job.java,**/Context.java,**/MyHttpClient.java" deprecation="on"
      debug="true" includeantruntime="false" classpath="classes">
