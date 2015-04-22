@@ -6,16 +6,17 @@
     <mkdir dir="classes"/>
   </target>
   
-   <target name="compile-storage" description="Compiles the storage system">
-        <mkdir dir="${classes.dir}"/>
-        <javac srcdir="src/crawler/storage" destdir="${classes.dir}" debug="on" deprecation="off" optimize="on" includeAntRuntime="no">
-            <classpath>
-                <fileset dir="${inputlib.dir}">
-                    <include name="*.jar"/>
-                </fileset>
-            </classpath>
-        </javac>
-    </target>
+  <target name="compile-storage" depends="init">
+    <javac srcdir="src" destdir="classes" includes=",**/crawler/storage/*.java" deprecation="on"
+     debug="true" includeantruntime="false">
+    	<classpath>
+            <fileset dir="lib/">
+                <include name="*.jar"/>
+            </fileset>
+  	   	</classpath>
+       <compilerarg value="-Xlint"/>
+    </javac>
+  </target>
 	
 	
   <target name="compile-jobs" depends="init">
@@ -27,26 +28,41 @@
   
   <target name="compile-ShuffleURLMaster" depends="init">
     <javac srcdir="src" destdir="target/ShuffleURLMaster/WEB-INF/classes" includes="**/ShuffleURLMaster/*.java" deprecation="on"
-     debug="true" includeantruntime="false" classpath="lib/servlet-api.jar">
-       <compilerarg value="-Xlint"/>
+     debug="true" includeantruntime="false">
+    	<classpath>
+            <fileset dir="lib/">
+                <include name="*.jar"/>
+            </fileset>
+  	   	</classpath>
+    	<compilerarg value="-Xlint"/>
     </javac>
   </target>
   
   <target name="compile-ShuffleURLWorker" depends="init">
     <javac srcdir="src" destdir="target/ShuffleURLWorker/WEB-INF/classes" includes="**/ShuffleURLWorker/*.java,**/ShuffleURLJob.java,**/Job.java,**/Context.java,**/MyHttpClient.java" deprecation="on"
-     debug="true" includeantruntime="false" classpath="lib/servlet-api.jar">
+     debug="true" includeantruntime="false">
+    	<classpath>
+            <fileset dir="lib/">
+                <include name="*.jar"/>
+            </fileset>
+  	   	</classpath>
        <compilerarg value="-Xlint"/>
     </javac>
   </target>
 	
 	<target name="compile-ShuffleURLWorker2" depends="init">
 	    <javac srcdir="src" destdir="target/ShuffleURLWorker2/WEB-INF/classes" includes="**/ShuffleURLWorker/*.java,**/ShuffleURLJob.java,**/Job.java,**/Context.java,**/MyHttpClient.java" deprecation="on"
-	     debug="true" includeantruntime="false" classpath="lib/servlet-api.jar">
+	     debug="true" includeantruntime="false">
+	    	<classpath>
+	            <fileset dir="lib/">
+	                <include name="*.jar"/>
+	            </fileset>
+	  	   	</classpath>
 	       <compilerarg value="-Xlint"/>
 	    </javac>
 	  </target>
 
-  <target name="all" depends="war-ShuffleURLMaster,war-ShuffleURLWorker,war-ShuffleURLWorker2,compile-jobs"/>
+  <target name="all" depends="war-ShuffleURLMaster,war-ShuffleURLWorker,war-ShuffleURLWorker2,compile-jobs, compile-storage"/>
   
   <target name="war-ShuffleURLMaster" depends="compile-ShuffleURLMaster">
     <jar destfile="ShuffleURLMaster.war">
@@ -57,7 +73,7 @@
   </target>
 
   <target name="war-ShuffleURLWorker" depends="compile-ShuffleURLWorker">
-    <jar destfile="ShuffleURLWorker.war">
+  	<jar destfile="ShuffleURLWorker.war">
       <fileset dir="target/ShuffleURLWorker/" includes="WEB-INF/classes/**/*.class"/>
       <fileset dir="target/ShuffleURLWorker/" includes="WEB-INF/lib/*.jar"/>
       <fileset dir="target/ShuffleURLWorker/" includes="WEB-INF/*.xml"/>
@@ -81,8 +97,10 @@
   <target name="clean">
     <delete dir="target/ShuffleURLMaster/WEB-INF/classes"/>
     <delete dir="target/ShuffleURLWorker/WEB-INF/classes"/>
+  	<delete dir="target/ShuffleURLWorker2/WEB-INF/classes"/>
     <delete dir="classes"/>
     <delete file="ShuffleURLMaster.war"/>
     <delete file="ShuffleURLWorker.war"/>
+  	<delete file="ShuffleURLWorker2.war"/>
   </target>
 </project>
