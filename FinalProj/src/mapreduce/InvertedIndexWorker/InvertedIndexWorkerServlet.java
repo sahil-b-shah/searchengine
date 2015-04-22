@@ -14,7 +14,6 @@ import java.util.HashMap;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-import crawler.storage.URLFrontierDBWrapper;
 import mapreduce.MyHttpClient;
 import mapreduce.InvertedIndexWorker.InvertedIndexInputMapReader;
 import mapreduce.InvertedIndexWorker.InvertedIndexMapContext;
@@ -157,7 +156,9 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 				in.close();
 				client.setBody(body);
 				client.sendPost();
+				curWorker.delete();
 			}
+			
 
 			status = "waiting";
 
@@ -186,8 +187,27 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 			//Sort file
 			File spoolin = new File(storageDirectory,"spool-in");
 			File storeFile = new File(spoolin, "store.txt");
+			File spoolinFile = new File(spoolin, "spoolin.txt");
+			
+			if(storeFile.exists()){
+				System.out.println(IPPort + ": starting sort command"); 
+				Process proc = Runtime.getRuntime().exec("sort store.txt", null, spoolin);
+				BufferedReader in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(spoolinFile,false)));
+				String line = in.readLine();
+				while(line != null){
+					out.println(line);
+					line = in.readLine();
+				}
 
-			InvertedIndexInputReduceReader reader = new InvertedIndexInputReduceReader(storeFile);
+				in.close();
+				out.close();
+
+			}
+			
+			storeFile.delete();   //delete large store file
+
+			InvertedIndexInputReduceReader reader = new InvertedIndexInputReduceReader(spoolinFile);
 
 			File outputDir = new File(storageDirectory, output);
 
@@ -204,12 +224,12 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 
 			File outputFile = new File(outputDir, "output.txt");
 
-			//InvertedIndexReduceContext reduceContext = new InvertedIndexReduceContext(outputFile);
+			InvertedIndexReduceContext reduceContext = new InvertedIndexReduceContext(outputFile);
 
 			//Create numThread threads to run map
 			Thread threads[] = new Thread[numThreads];
 			for(int i = 0; i < numThreads; i++){
-				InvertedIndexWorkerReduceThread workerObj = new InvertedIndexWorkerReduceThread(reader, null);
+				InvertedIndexWorkerReduceThread workerObj = new InvertedIndexWorkerReduceThread(reader, reduceContext);
 				threads[i] = new Thread(workerObj);
 				threads[i].start();
 			}
