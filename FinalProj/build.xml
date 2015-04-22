@@ -1,76 +1,76 @@
 <project name="HW3" default="all" basedir="./">
   <target name="init">
-    <mkdir dir="target/master/WEB-INF/classes"/>
-    <mkdir dir="target/worker/WEB-INF/classes"/>
-  	<mkdir dir="target/worker2/WEB-INF/classes"/>
+    <mkdir dir="target/ShuffleURLMaster/WEB-INF/classes"/>
+    <mkdir dir="target/ShuffleURLWorker/WEB-INF/classes"/>
+  	<mkdir dir="target/ShuffleURLWorker2/WEB-INF/classes"/>
     <mkdir dir="classes"/>
   </target>
   
   <target name="compile-jobs" depends="init">
-    <javac srcdir="src" destdir="classes" includes="**/job/*.java,**/Job.java,**/Context.java" deprecation="on"
+    <javac srcdir="src" destdir="classes" includes="**/ShuffleURLJob.java,**/Job.java,**/Context.java,**/MyHttpClient.java" deprecation="on"
      debug="true" includeantruntime="false" classpath="classes">
        <compilerarg value="-Xlint"/>
     </javac>
   </target>
   
-  <target name="compile-master" depends="init">
-    <javac srcdir="src" destdir="target/master/WEB-INF/classes" includes="**/master/*.java" deprecation="on"
+  <target name="compile-ShuffleURLMaster" depends="init">
+    <javac srcdir="src" destdir="target/ShuffleURLMaster/WEB-INF/classes" includes="**/ShuffleURLMaster/*.java" deprecation="on"
      debug="true" includeantruntime="false" classpath="lib/servlet-api.jar">
        <compilerarg value="-Xlint"/>
     </javac>
   </target>
   
-  <target name="compile-worker" depends="init">
-    <javac srcdir="src" destdir="target/worker/WEB-INF/classes" includes="**/worker/*.java,**/job/*.java,**/Job.java,**/Context.java" deprecation="on"
+  <target name="compile-ShuffleURLWorker" depends="init">
+    <javac srcdir="src" destdir="target/ShuffleURLWorker/WEB-INF/classes" includes="**/ShuffleURLWorker/*.java,**/ShuffleURLJob.java,**/Job.java,**/Context.java,**/MyHttpClient.java" deprecation="on"
      debug="true" includeantruntime="false" classpath="lib/servlet-api.jar">
        <compilerarg value="-Xlint"/>
     </javac>
   </target>
 	
-	<target name="compile-worker2" depends="init">
-	    <javac srcdir="src" destdir="target/worker2/WEB-INF/classes" includes="**/worker/*.java,**/job/*.java,**/Job.java,**/Context.java" deprecation="on"
+	<target name="compile-ShuffleURLWorker2" depends="init">
+	    <javac srcdir="src" destdir="target/ShuffleURLWorker2/WEB-INF/classes" includes="**/ShuffleURLWorker/*.java,**/ShuffleURLJob.java,**/Job.java,**/Context.java,**/MyHttpClient.java" deprecation="on"
 	     debug="true" includeantruntime="false" classpath="lib/servlet-api.jar">
 	       <compilerarg value="-Xlint"/>
 	    </javac>
 	  </target>
 
-  <target name="all" depends="war-master,war-worker,war-worker2,compile-jobs"/>
+  <target name="all" depends="war-ShuffleURLMaster,war-ShuffleURLWorker,war-ShuffleURLWorker2,compile-jobs"/>
   
-  <target name="war-master" depends="compile-master">
-    <jar destfile="master.war">
-      <fileset dir="target/master/" includes="WEB-INF/classes/**/*.class"/>
-      <fileset dir="target/master/" includes="WEB-INF/lib/*.jar"/>
-      <fileset dir="target/master/" includes="WEB-INF/*.xml"/>
+  <target name="war-ShuffleURLMaster" depends="compile-ShuffleURLMaster">
+    <jar destfile="ShuffleURLMaster.war">
+      <fileset dir="target/ShuffleURLMaster/" includes="WEB-INF/classes/**/*.class"/>
+      <fileset dir="target/ShuffleURLMaster/" includes="WEB-INF/lib/*.jar"/>
+      <fileset dir="target/ShuffleURLMaster/" includes="WEB-INF/*.xml"/>
     </jar>
   </target>
 
-  <target name="war-worker" depends="compile-worker">
-    <jar destfile="worker.war">
-      <fileset dir="target/worker/" includes="WEB-INF/classes/**/*.class"/>
-      <fileset dir="target/worker/" includes="WEB-INF/lib/*.jar"/>
-      <fileset dir="target/worker/" includes="WEB-INF/*.xml"/>
+  <target name="war-ShuffleURLWorker" depends="compile-ShuffleURLWorker">
+    <jar destfile="ShuffleURLWorker.war">
+      <fileset dir="target/ShuffleURLWorker/" includes="WEB-INF/classes/**/*.class"/>
+      <fileset dir="target/ShuffleURLWorker/" includes="WEB-INF/lib/*.jar"/>
+      <fileset dir="target/ShuffleURLWorker/" includes="WEB-INF/*.xml"/>
     </jar>
   </target>
 	
-	<target name="war-worker2" depends="compile-worker2">
-	    <jar destfile="worker2.war">
-	      <fileset dir="target/worker2/" includes="WEB-INF/classes/**/*.class"/>
-	      <fileset dir="target/worker2/" includes="WEB-INF/lib/*.jar"/>
-	      <fileset dir="target/worker2/" includes="WEB-INF/*.xml"/>
+	<target name="war-ShuffleURLWorker2" depends="compile-ShuffleURLWorker2">
+	    <jar destfile="ShuffleURLWorker2.war">
+	      <fileset dir="target/ShuffleURLWorker2/" includes="WEB-INF/classes/**/*.class"/>
+	      <fileset dir="target/ShuffleURLWorker2/" includes="WEB-INF/lib/*.jar"/>
+	      <fileset dir="target/ShuffleURLWorker2/" includes="WEB-INF/*.xml"/>
 	    </jar>
 	</target>
   
   <target name="pack" description="Create an archive for submission">
     <zip destfile="submit-hw3.zip">
-      <zipfileset dir="." excludes="target/**,**/*.class,submit-hw3.zip,master.war,worker*.war"/>
+      <zipfileset dir="." excludes="target/**,**/*.class,submit-hw3.zip,ShuffleURLMaster.war,ShuffleURLWorker*.war"/>
     </zip>
   </target>
   
   <target name="clean">
-    <delete dir="target/master/WEB-INF/classes"/>
-    <delete dir="target/worker/WEB-INF/classes"/>
+    <delete dir="target/ShuffleURLMaster/WEB-INF/classes"/>
+    <delete dir="target/ShuffleURLWorker/WEB-INF/classes"/>
     <delete dir="classes"/>
-    <delete file="master.war"/>
-    <delete file="worker.war"/>
+    <delete file="ShuffleURLMaster.war"/>
+    <delete file="ShuffleURLWorker.war"/>
   </target>
 </project>

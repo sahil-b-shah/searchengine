@@ -1,7 +1,5 @@
-package mapreduce.ShuffleURL;
+package mapreduce;
 
-import mapreduce.Context;
-import mapreduce.Job;
 
 public class ShuffleURLJob implements Job {
 

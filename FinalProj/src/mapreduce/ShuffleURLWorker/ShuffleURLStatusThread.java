@@ -1,4 +1,4 @@
-package mapreduce.ShuffleURL;
+package mapreduce.ShuffleURLWorker;
 
 import java.util.HashMap;
 

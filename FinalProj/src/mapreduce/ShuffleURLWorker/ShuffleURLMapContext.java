@@ -1,4 +1,4 @@
-package mapreduce.ShuffleURL;
+package mapreduce.ShuffleURLWorker;
 
 import java.io.BufferedWriter;
 import java.io.File;

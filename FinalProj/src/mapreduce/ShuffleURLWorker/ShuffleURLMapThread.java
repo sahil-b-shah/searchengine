@@ -1,36 +1,41 @@
-package mapreduce.ShuffleURL;
+package mapreduce.ShuffleURLWorker;
 
 import java.io.IOException;
 
 import mapreduce.Context;
 import mapreduce.Job;
+import mapreduce.ShuffleURLJob;
 
-public class ShuffleURLReduceThread implements Runnable {
+
+public class ShuffleURLMapThread implements Runnable {
 
 	private Job job;
-	private ShuffleURLInputReduceReader reader;
+	private ShuffleURLInputMapReader reader;
 	private Context context;
 
-	public ShuffleURLReduceThread(ShuffleURLInputReduceReader reader, Context context) {
+	public ShuffleURLMapThread(ShuffleURLInputMapReader reader, Context context){
+
 		job = new ShuffleURLJob();
 		this.reader = reader;
 		this.context = context;
+
 	}
 
 	@Override
 	public void run() {
-		String line;
+
 		if(job == null)
 			return;
 		try {
-			line = reader.readLine();
+			String line = reader.readLine();
 			while(line != null){
-				job.reduce(line, null, context);
+				job.map(line, "", context);
 				line = reader.readLine();
 			}
 		} catch (IOException e) {
-			System.err.println("Error reading from reduce input");
+			System.err.println("Error reading from map input");
 		}
+
 	}
 
 }

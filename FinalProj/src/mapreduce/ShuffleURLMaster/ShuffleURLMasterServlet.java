@@ -1,4 +1,4 @@
-package mapreduce.ShuffleURL;
+package mapreduce.ShuffleURLMaster;
 
 import java.io.*;
 import java.util.ArrayList;
