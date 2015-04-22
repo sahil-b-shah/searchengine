@@ -1,4 +1,4 @@
-package mapreduce.ShuffleURLWorker;
+package mapreduce.InvertedIndexWorker;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -6,21 +6,20 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigInteger;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 import mapreduce.Context;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
-
-public class ShuffleURLMapContext implements Context{
+public class InvertedIndexMapContext implements Context{
 	
 	private File workerFiles[];
 	private int numWorkers;
+	private int keysWritten;
 	private File spoolout;
 
-	public ShuffleURLMapContext(File spoolout, String workers[]) throws IOException{
+	public InvertedIndexMapContext(File spoolout, String workers[]) throws IOException{
+		keysWritten = 0;
 		this.spoolout = spoolout;
 		workerFiles = new File[workers.length];
 		for(int i = 1; i <= workers.length; i++){
@@ -34,19 +33,8 @@ public class ShuffleURLMapContext implements Context{
 	@Override
 	public synchronized void write(String key, String value) {
 		
-		URL url;
-		try {
-			url = new URL(key);
-		} catch (MalformedURLException e1) {
-			System.out.println("Malformed url to write");
-			return;
-		}
-		
-		//Hash by hostname
-		String host = url.getHost();
-		
 		//Hash key using SHA-1
-		String hashedValue = DigestUtils.sha1Hex(host);
+		String hashedValue = DigestUtils.sha1Hex(key);
 		
 		int fileNumber = pickNumberBucket(numWorkers, hashedValue);
 		
@@ -55,8 +43,9 @@ public class ShuffleURLMapContext implements Context{
 		
 		
 		try {
+			keysWritten++;
 			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(selectedFile,true)));
-			out.println(key);
+			out.println(key + "\t"+value);
 			out.close();
 			
 		} catch (IOException e) {
@@ -93,5 +82,12 @@ public class ShuffleURLMapContext implements Context{
 		return workerFiles;
 	}
 	
+	/**
+	 * Gets current number of keys written 
+	 * @return number of keys written
+	 */
+	public String getKeysWritten(){
+		return keysWritten + "";
+	}
 	
 }

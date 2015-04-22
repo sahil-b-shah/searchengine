@@ -1,4 +1,5 @@
-package mapreduce.ShuffleURLMaster;
+package mapreduce.InvertedIndexMaster;
+
 
 import java.io.*;
 import java.util.ArrayList;
@@ -11,12 +12,12 @@ import javax.servlet.http.*;
 
 import mapreduce.MyHttpClient;
 
-public class ShuffleURLMasterServlet extends HttpServlet {
+public class InvertedIndexMasterServlet extends HttpServlet {
 
 	static final long serialVersionUID = 455555001;
 	private static Map<String, ArrayList<String>> statusMap; 
-	private static String numMapThreads = "30";
-	//private static String numReduceThreads = "30";
+	private static String numMapThreads = "20";
+	private static String numReduceThreads = "20";
 
 	public void init(ServletConfig config) throws ServletException {
 		statusMap = new HashMap<String, ArrayList<String>>();
@@ -64,7 +65,7 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 			//Post to itself first
 			out.println("<form style='text-align:center;'  method='post'>");
 			out.println("<p align='center'>Input directory: </p><input type='text' name='input'></br>");
-			//out.println("<p align='center'>Output directory: </p><input type='text' name='output'></br>");
+			out.println("<p align='center'>Output directory: </p><input type='text' name='output'></br>");
 			out.println("<p align='center'>Number of map threads: </p><input type='text' name='numMapThreads'></br>");
 			out.println("<p align='center'>Number of reduce threads: </p><input type='text' name='numReduceThreads'></br>");
 			out.println("<input type='submit' value='Start Job'></form>");
@@ -112,30 +113,14 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 
 			if(allWaiting){
 				System.out.println("All workers waiting");
-				//Post to /runmap on every active worker
-				for(String worker: localStatusMap.keySet()){
-					MyHttpClient client = new MyHttpClient(worker, "/worker/runmap");
-					//client.addParams("input", inputDir);
-					client.addParams("numThreads", numMapThreads);
-					client.addParams("numWorkers", localStatusMap.size() + "");
-					int counter = 1;
-					for(String workerID: localStatusMap.keySet()){
-						client.addParams("worker"+counter, workerID);
-						counter++;
-					}
-					//System.out.println("Posting /runmap to "+ worker);
-					client.sendPost();
-				}
-				
 				//Previous reduce code below
-				/*for(String iport: localStatusMap.keySet()){
+				for(String iport: localStatusMap.keySet()){
 					if((System.currentTimeMillis() - Long.parseLong(params.get(4))) < 30000){
 						MyHttpClient client = new MyHttpClient(iport, "/worker/runreduce");
-						client.addParams("output", outputDir);
 						client.addParams("numThreads", numReduceThreads);						
 						client.sendPost();
 					}
-				}*/
+				}
 			}
 		}
 		else{
@@ -191,3 +176,4 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 	}
 
 }
+

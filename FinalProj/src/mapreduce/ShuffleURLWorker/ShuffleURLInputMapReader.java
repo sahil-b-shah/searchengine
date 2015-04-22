@@ -27,6 +27,8 @@ public class ShuffleURLInputMapReader {
 	public synchronized String readLine() throws IOException{
 		
 		if(done){
+			if(unseenLinksDB != null) 
+				unseenLinksDB.close();
 			return null;
 		}
 		

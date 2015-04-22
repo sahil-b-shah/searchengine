@@ -1,9 +1,12 @@
-package mapreduce.ShuffleURLWorker;
+package mapreduce.InvertedIndexWorker;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.util.HashMap;
@@ -13,29 +16,34 @@ import javax.servlet.http.*;
 
 import crawler.storage.URLFrontierDBWrapper;
 import mapreduce.MyHttpClient;
+import mapreduce.InvertedIndexWorker.InvertedIndexInputMapReader;
+import mapreduce.InvertedIndexWorker.InvertedIndexMapContext;
+import mapreduce.InvertedIndexWorker.InvertedIndexWorkerMapThread;
+import mapreduce.InvertedIndexWorker.InvertedIndexStatusThread;
 
 
 
-public class ShuffleURLWorkerServlet extends HttpServlet {
+
+public class InvertedIndexWorkerServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 455555002;
-	private static ShuffleURLInputMapReader reader;
-	private static ShuffleURLMapContext mapContext;
+	private static InvertedIndexInputMapReader reader;
+	private static InvertedIndexMapContext mapContext;
 	private static String status;
 	private static String storageDirectory;
 	private static String port;
 	private static String job;
 	private static Thread statusThread;
-	private static String frontierDirectory;
-	private static String unseenLinksDirectory;
+	private static String documentDirectory;
+	private static String indexDirectory;
 
 	public void init(ServletConfig config) throws ServletException {
 		String master = config.getInitParameter("master");
 		port = config.getInitParameter("port");
 		status = "idle";
 		job = "none";
-		frontierDirectory = config.getInitParameter("frontierDirectory");
-		unseenLinksDirectory = config.getInitParameter("unseenLinksDirectory");
+		documentDirectory = config.getInitParameter("documentDirectory");
+		indexDirectory = config.getInitParameter("indexDirectory");
 
 
 		mapContext = null;
@@ -45,7 +53,7 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 		System.out.println("Worker init");
 
 		//Create thread that issues GET every 10 seconds
-		ShuffleURLStatusThread statusObj = new ShuffleURLStatusThread(master, this);
+		InvertedIndexStatusThread statusObj = new InvertedIndexStatusThread(master, this);
 		statusThread = new Thread(statusObj);
 		statusThread.start();
 	}
@@ -103,10 +111,11 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 
 
 			//Create reader from input db
-			reader = new ShuffleURLInputMapReader(unseenLinksDirectory);
+			//TODO
+			//reader = new InvertedIndexInputMapReader(unseenLinksDirectory);
 
 			//Create emit from Map function implementing context
-			mapContext = new ShuffleURLMapContext(spoolout, workers);
+			mapContext = new InvertedIndexMapContext(spoolout, workers);
 
 
 			System.out.println(IPPort + ": starting threads mapping"); 
@@ -114,9 +123,10 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 			//Create numThread threads to run map
 			Thread threads[] = new Thread[numThreads];
 			for(int i = 0; i < numThreads; i++){
-				ShuffleURLMapThread workerObj = new ShuffleURLMapThread(reader, mapContext);
-				threads[i] = new Thread(workerObj);
-				threads[i].start();
+				//TODO
+				//InvertedIndexWorkerMapThread workerObj = new InvertedIndexWorkerMapThread(reader, mapContext);
+				//threads[i] = new Thread(workerObj);
+				//threads[i].start();
 			}
 
 
@@ -170,7 +180,7 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 
 		}
 		else if(request.getRequestURI().contains("/runreduce")){
-			/*
+			
 			status = "reducing";
 			int numThreads = Integer.parseInt(request.getParameter("numThreads"));
 			String output = request.getParameter("output");
@@ -179,7 +189,7 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 			File spoolin = new File(storageDirectory,"spool-in");
 			File storeFile = new File(spoolin, "store.txt");
 
-			ShuffleURLInputReduceReader reader = new ShuffleURLInputReduceReader(storeFile);
+			InvertedIndexInputReduceReader reader = new InvertedIndexInputReduceReader(storeFile);
 
 			File outputDir = new File(storageDirectory, output);
 
@@ -196,14 +206,15 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 
 			File outputFile = new File(outputDir, "output.txt");
 
-			//ShuffleURLReduceContext reduceContext = new ShuffleURLReduceContext(outputFile);
+			//InvertedIndexReduceContext reduceContext = new InvertedIndexReduceContext(outputFile);
 
 			//Create numThread threads to run map
 			Thread threads[] = new Thread[numThreads];
 			for(int i = 0; i < numThreads; i++){
-				ShuffleURLReduceThread workerObj = new ShuffleURLReduceThread(reader, null);
-				threads[i] = new Thread(workerObj);
-				threads[i].start();
+				//TODO
+				//InvertedIndexWorkerReduceThread workerObj = new InvertedIndexWorkerReduceThread(reader, null);
+				//threads[i] = new Thread(workerObj);
+				//threads[i].start();
 			}
 
 			//Wait until all threads done
@@ -215,7 +226,7 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 				}
 			}
 
-			*/
+			
 			System.out.println(IPPort + ": threads done reducing"); 
 
 			status = "idle";
@@ -255,15 +266,17 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 	 * @throws IOException
 	 */
 	public synchronized void addData(HttpServletRequest request) throws IOException{
-		BufferedReader in = request.getReader();
-		URLFrontierDBWrapper frontierDB = URLFrontierDBWrapper.getInstance(frontierDirectory);
+		/*BufferedReader in = request.getReader();
+		//URLFrontierDBWrapper frontierDB = URLFrontierDBWrapper.getInstance(indexDirectory);
 
+		//TODO: add index db
+		
 		String line = in.readLine();
 		while(line != null){
 			frontierDB.addUrl(line);
 			line = in.readLine();
 		}
-		frontierDB.close();
+		frontierDB.close();*/
 	}
 
 	public void destroy(){
