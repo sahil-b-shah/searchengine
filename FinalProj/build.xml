@@ -2,11 +2,12 @@
   <target name="init">
     <mkdir dir="target/master/WEB-INF/classes"/>
     <mkdir dir="target/worker/WEB-INF/classes"/>
+  	<mkdir dir="target/worker2/WEB-INF/classes"/>
     <mkdir dir="classes"/>
   </target>
   
   <target name="compile-jobs" depends="init">
-    <javac srcdir="src" destdir="target/worker/WEB-INF/classes" includes="**/job/*.java,**/Job.java,**/Context.java" deprecation="on"
+    <javac srcdir="src" destdir="classes" includes="**/job/*.java,**/Job.java,**/Context.java" deprecation="on"
      debug="true" includeantruntime="false" classpath="classes">
        <compilerarg value="-Xlint"/>
     </javac>
@@ -20,18 +21,20 @@
   </target>
   
   <target name="compile-worker" depends="init">
-    <javac srcdir="src" destdir="target/worker/WEB-INF/classes" includes="**/worker/*.java" deprecation="on"
-     debug="true" includeantruntime="false">
-        <classpath>
-            <fileset dir="lib/">
-                <include name="*.jar"/>
-            </fileset>
-        </classpath>
+    <javac srcdir="src" destdir="target/worker/WEB-INF/classes" includes="**/worker/*.java,**/job/*.java,**/Job.java,**/Context.java" deprecation="on"
+     debug="true" includeantruntime="false" classpath="lib/servlet-api.jar">
        <compilerarg value="-Xlint"/>
     </javac>
   </target>
+	
+	<target name="compile-worker2" depends="init">
+	    <javac srcdir="src" destdir="target/worker2/WEB-INF/classes" includes="**/worker/*.java,**/job/*.java,**/Job.java,**/Context.java" deprecation="on"
+	     debug="true" includeantruntime="false" classpath="lib/servlet-api.jar">
+	       <compilerarg value="-Xlint"/>
+	    </javac>
+	  </target>
 
-  <target name="all" depends="war-master,war-worker,compile-jobs"/>
+  <target name="all" depends="war-master,war-worker,war-worker2,compile-jobs"/>
   
   <target name="war-master" depends="compile-master">
     <jar destfile="master.war">
@@ -41,18 +44,21 @@
     </jar>
   </target>
 
-  <target name="war-worker" depends="compile-worker, compile-jobs, compile-master">
-    <copy todir="target/worker/WEB-INF/lib/" overwrite="true">
-        <fileset dir="lib/">
-            <include name="*.jar"/>
-        </fileset>
-    </copy>
+  <target name="war-worker" depends="compile-worker">
     <jar destfile="worker.war">
       <fileset dir="target/worker/" includes="WEB-INF/classes/**/*.class"/>
       <fileset dir="target/worker/" includes="WEB-INF/lib/*.jar"/>
       <fileset dir="target/worker/" includes="WEB-INF/*.xml"/>
     </jar>
   </target>
+	
+	<target name="war-worker2" depends="compile-worker2">
+	    <jar destfile="worker2.war">
+	      <fileset dir="target/worker2/" includes="WEB-INF/classes/**/*.class"/>
+	      <fileset dir="target/worker2/" includes="WEB-INF/lib/*.jar"/>
+	      <fileset dir="target/worker2/" includes="WEB-INF/*.xml"/>
+	    </jar>
+	</target>
   
   <target name="pack" description="Create an archive for submission">
     <zip destfile="submit-hw3.zip">
