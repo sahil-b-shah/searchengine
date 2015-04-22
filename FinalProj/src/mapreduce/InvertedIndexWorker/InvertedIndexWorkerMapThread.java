@@ -3,6 +3,7 @@ package mapreduce.InvertedIndexWorker;
 import java.io.IOException;
 
 import mapreduce.Context;
+import mapreduce.InvertedIndexJob;
 import mapreduce.Job;
 
 
@@ -14,17 +15,9 @@ public class InvertedIndexWorkerMapThread implements Runnable {
 
 	@SuppressWarnings("rawtypes")
 	public InvertedIndexWorkerMapThread(Class jobClass, InvertedIndexInputMapReader reader, Context context){
-		try {
-			if(jobClass != null)
-				job = (Job) jobClass.newInstance();
-			else
-				job = null;
-			this.reader = reader;
-			this.context = context;
-			
-		} catch (InstantiationException | IllegalAccessException e) {
-			System.err.println("Can't instantiate this class");
-		}
+		job = new InvertedIndexJob();
+		this.reader = reader;
+		this.context = context;
 	}
 
 	@Override
@@ -35,7 +28,7 @@ public class InvertedIndexWorkerMapThread implements Runnable {
 		try {
 			String line = reader.readLine();
 			while(line != null){
-				String params[] = line.split("\\t");
+				String params[] = line.split(",");
 				job.map(params[0], params[1], context);
 				line = reader.readLine();
 			}
