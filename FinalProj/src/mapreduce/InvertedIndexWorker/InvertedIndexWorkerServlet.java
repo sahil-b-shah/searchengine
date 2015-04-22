@@ -283,17 +283,22 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 	 * @throws IOException
 	 */
 	public synchronized void addData(HttpServletRequest request) throws IOException{
-		/*BufferedReader in = request.getReader();
-		//URLFrontierDBWrapper frontierDB = URLFrontierDBWrapper.getInstance(indexDirectory);
+		BufferedReader in = request.getReader();
+		File spoolin = new File(storageDirectory, "spool-in");
 
-		//TODO: add index db
-		
+		if(!spoolin.exists()){
+			spoolin.mkdir();
+		}
+
+		File storeFile = new File(spoolin, "store.txt");
+		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(storeFile,true)));
+
 		String line = in.readLine();
 		while(line != null){
-			frontierDB.addUrl(line);
+			out.println(line);
 			line = in.readLine();
 		}
-		frontierDB.close();*/
+		out.close();
 	}
 
 	public void destroy(){
