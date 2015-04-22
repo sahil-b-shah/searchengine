@@ -4,8 +4,7 @@ public class InvertedIndexJob implements Job{
 
 	@Override
 	public void map(String key, String value, Context context) {
-		// TODO Auto-generated method stub
-		
+		context.write(key, value);
 	}
 
 	@Override

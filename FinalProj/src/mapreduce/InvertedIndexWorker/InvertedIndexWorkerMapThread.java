@@ -13,8 +13,7 @@ public class InvertedIndexWorkerMapThread implements Runnable {
 	private InvertedIndexInputMapReader reader;
 	private Context context;
 
-	@SuppressWarnings("rawtypes")
-	public InvertedIndexWorkerMapThread(Class jobClass, InvertedIndexInputMapReader reader, Context context){
+	public InvertedIndexWorkerMapThread(InvertedIndexInputMapReader reader, Context context){
 		job = new InvertedIndexJob();
 		this.reader = reader;
 		this.context = context;
@@ -28,7 +27,7 @@ public class InvertedIndexWorkerMapThread implements Runnable {
 		try {
 			String line = reader.readLine();
 			while(line != null){
-				String params[] = line.split(",");
+				String params[] = line.split("\\s+");
 				job.map(params[0], params[1], context);
 				line = reader.readLine();
 			}

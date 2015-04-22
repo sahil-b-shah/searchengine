@@ -111,8 +111,7 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 
 
 			//Create reader from input db
-			//TODO
-			//reader = new InvertedIndexInputMapReader(unseenLinksDirectory);
+			reader = new InvertedIndexInputMapReader(documentDirectory);
 
 			//Create emit from Map function implementing context
 			mapContext = new InvertedIndexMapContext(spoolout, workers);
@@ -123,10 +122,9 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 			//Create numThread threads to run map
 			Thread threads[] = new Thread[numThreads];
 			for(int i = 0; i < numThreads; i++){
-				//TODO
-				//InvertedIndexWorkerMapThread workerObj = new InvertedIndexWorkerMapThread(reader, mapContext);
-				//threads[i] = new Thread(workerObj);
-				//threads[i].start();
+				InvertedIndexWorkerMapThread workerObj = new InvertedIndexWorkerMapThread(reader, mapContext);
+				threads[i] = new Thread(workerObj);
+				threads[i].start();
 			}
 
 
@@ -211,10 +209,9 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 			//Create numThread threads to run map
 			Thread threads[] = new Thread[numThreads];
 			for(int i = 0; i < numThreads; i++){
-				//TODO
-				//InvertedIndexWorkerReduceThread workerObj = new InvertedIndexWorkerReduceThread(reader, null);
-				//threads[i] = new Thread(workerObj);
-				//threads[i].start();
+				InvertedIndexWorkerReduceThread workerObj = new InvertedIndexWorkerReduceThread(reader, null);
+				threads[i] = new Thread(workerObj);
+				threads[i].start();
 			}
 
 			//Wait until all threads done

@@ -55,7 +55,7 @@ public class InvertedIndexInputMapReader {
 			}
 		}
 		else{
-			currentWord = words[index];
+			currentWord = words[index] + " " +document.getUrl();
 			index++;
 		}
 
