@@ -127,7 +127,6 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 			}
 
 
-
 			//Wait until all threads done
 			for(int i = 0; i < numThreads; i++){
 				try {
@@ -222,9 +221,9 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 			}
 			outputDir.mkdir();
 
-			File outputFile = new File(outputDir, "output.txt");
+			//File outputFile = new File(outputDir, "output.txt");
 
-			InvertedIndexReduceContext reduceContext = new InvertedIndexReduceContext(outputFile);
+			InvertedIndexReduceContext reduceContext = new InvertedIndexReduceContext(indexDirectory);
 
 			//Create numThread threads to run map
 			Thread threads[] = new Thread[numThreads];
@@ -242,6 +241,8 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 					System.err.println("Map thread ended unnaturally");
 				}
 			}
+			
+			reduceContext.close();
 
 			
 			System.out.println(IPPort + ": threads done reducing"); 
