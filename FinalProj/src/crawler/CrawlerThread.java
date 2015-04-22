@@ -63,54 +63,61 @@ public class CrawlerThread extends Thread {
 	@Override
 	public void run() {
 		while(!isStopped) {
-
-			Entry<Integer, URLFrontierData> entry = frontierDB.getNextUrl();
-			if (entry != null) {
-
-				//System.out.println("not null");
-				urlString = entry.getValue().getUrl();
-				request = new URLRequest(urlString);
-
-				if(!Crawler.addCurrentHost(request.getHost())){
-					boolean check = false;
-					try {
-						check = checkRequest();
-					} catch (UnsupportedEncodingException e1) {
-					}
-
-					if (check) {
+			
+			try {
+				Entry<Integer, URLFrontierData> entry = frontierDB.getNextUrl();
+				if (entry != null) {
+	
+					//System.out.println("not null");
+					urlString = entry.getValue().getUrl();
+					request = new URLRequest(urlString);
+	
+					if(Crawler.addCurrentHost(request.getHost())){
+						
+						boolean check = false;
 						try {
-							parseRequest(request.sendGetRequest());
-						} catch (IOException e) {
-							/*frontierDB.close();
+							check = checkRequest();
+						} catch (UnsupportedEncodingException e1) {
+						}
+	
+						if (check) {
+							try {
+								parseRequest(request.sendGetRequest());
+							} catch (IOException e) {
+								/*frontierDB.close();
+							docDB.close();
+							unseenLinksDB.close();
+							robotsDB.close();
+							System.err.println("Error sending GET request to server");
+							e.printStackTrace();
+							System.exit(-1);*/
+							}
+						}
+						Crawler.deleteCurrentHost(request.getHost());
+					}
+					else{
+						System.out.println("penis");
+						frontierDB.addUrl(urlString);
+					}
+				} else {
+					try {
+						//Thread.sleep(300000);
+						Thread.sleep(3000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					if(frontierDB.isEmpty()){
+						System.out.println("Crawl on thread " + Thread.currentThread().getId()+" is ending");
+						frontierDB.close();
 						docDB.close();
 						unseenLinksDB.close();
 						robotsDB.close();
-						System.err.println("Error sending GET request to server");
-						e.printStackTrace();
-						System.exit(-1);*/
-						}
+						isStopped = true;
 					}
-					Crawler.deleteCurrentHost(request.getHost());
 				}
-				else{
-					frontierDB.addUrl(urlString);
-				}
-			} else {
-				try {
-					//Thread.sleep(300000);
-					Thread.sleep(3000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				if(frontierDB.isEmpty()){
-					System.out.println("Crawl on thread " + Thread.currentThread().getId()+" is ending");
-					frontierDB.close();
-					docDB.close();
-					unseenLinksDB.close();
-					robotsDB.close();
-					isStopped = true;
-				}
+			} catch (Exception e) {
+				System.err.println("Error processing link "+request.getUrlString());
+				e.printStackTrace();
 			}
 			//db.close();
 		}

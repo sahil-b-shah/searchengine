@@ -64,6 +64,7 @@ public class Crawler {
 			maxFiles = Integer.parseInt(args[2]);
 		}
 		
+		System.out.println("Printing current unseen links");
 		DocumentDBWrapper docDB = DocumentDBWrapper.getInstance(documentDirectory);
 		docDB.getAllContent();
 		docDB.close();

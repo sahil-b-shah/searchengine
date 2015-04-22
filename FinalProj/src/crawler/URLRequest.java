@@ -209,7 +209,7 @@ public class URLRequest {
 			filepath = "/"+filepath;
 		}
 		String requestString = this.protocol+"://"+hostName + filepath;
-		
+		System.out.println("Sending request to "+requestString);
 		HttpURLConnection con = null;
 		URL url = null;
 		try {
