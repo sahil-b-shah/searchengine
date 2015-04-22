@@ -223,16 +223,16 @@ public class CrawlerThread extends Thread {
 				e.printStackTrace();
 				System.exit(-1);
 			}
-			extractUrls(document);
-			addContent(is2);
+			ArrayList<String> links = extractUrls(document);
+			addContent(is2, links);
 		} else if(contentType.contains("xml")) {
-			addContent(is3);
+			addContent(is3, null);
 		}
 	}
 
 
 
-	private void addContent(InputStream is) {
+	private void addContent(InputStream is, ArrayList<String> links) {
 		byte b[] = new byte[request.getContentLength()];
 		try {
 			is.read(b);
@@ -242,10 +242,11 @@ public class CrawlerThread extends Thread {
 			System.exit(-1);
 		}
 		docDB.addContent(request.getHost()+request.getFilePath(),
-				new String(b), System.currentTimeMillis());
+				new String(b), System.currentTimeMillis(), links);
 	}
 
-	private void extractUrls(Document doc) {
+	private ArrayList<String> extractUrls(Document doc) {
+		ArrayList<String> links = new ArrayList<String>();
 		doc.getDocumentElement().normalize();
 		//System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
 		NodeList nList = doc.getElementsByTagName("a");
@@ -262,9 +263,11 @@ public class CrawlerThread extends Thread {
 				URL url = makeAbsolute(request.getUrlString(), extractedString);
 				//add to queue
 				unseenLinksDB.addURL(url.getProtocol()+"://"+url.getHost()+url.getFile());
+				links.add(url.getProtocol()+"://"+url.getHost()+url.getFile());
 
 			}
 		}
+		return links;
 	}
 
 	private URL makeAbsolute(String urlStrin, String extractedString) {

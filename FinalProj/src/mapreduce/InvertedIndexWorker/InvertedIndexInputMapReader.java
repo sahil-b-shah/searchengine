@@ -5,63 +5,73 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringReader;
+import java.util.Map;
+import java.util.Set;
+
+import crawler.storage.DocumentDBWrapper;
+import crawler.storage.DocumentData;
 
 public class InvertedIndexInputMapReader {
 
-	File files[];
+	DocumentData document;
 	private int fileIndex;
 	private BufferedReader in;
-	private int keysRead;
 	private boolean done;
-	
-	
-	public InvertedIndexInputMapReader(File fileList[]) throws FileNotFoundException{
-		files = fileList;
-		fileIndex = 0;
+	private DocumentDBWrapper documentDB;
+
+
+	public InvertedIndexInputMapReader(String documentDirectiory) throws FileNotFoundException{
+		documentDB = DocumentDBWrapper.getInstance(documentDirectiory);
+		documentDB.initIterator();
+		document = documentDB.getNextDocument();
+
 		done = false;
-		if(files.length > 0)
-			in = new BufferedReader(new FileReader(files[0]));
+		if(document != null){
+			in = new BufferedReader(new StringReader(cleanDocument(document.getContent())));
+		}
 		else
 			done = true;
-		this.keysRead = 0;
 	}
-	
+
 	/**
 	 * Gets next line
 	 * @return line read, or null if done
 	 * @throws IOException
 	 */
 	public synchronized String readLine() throws IOException{
-		
+
 		if(done){
 			return null;
 		}
-		
+
 		String line = in.readLine();
-		
-		while(line == null){
-			fileIndex++; //go to next file
+
+		if(line == null){
 			in.close();  //close previous stream
-			if(fileIndex >= files.length){
-				done = true;
-				return null;
+			document = documentDB.getNextDocument();
+			if(document != null){
+				in = new BufferedReader(new StringReader(cleanDocument(document.getContent())));
 			}
 			else{
-				in = new BufferedReader(new FileReader(files[fileIndex]));
-				line = in.readLine();  //get first line here
-				keysRead++;
+				documentDB.close();
+				done = true;
+				line = null;
 			}
 		}
-		
+
 		return line;
 	}
-	
-	/**
-	 * Gets current number of keys read
-	 * @return keys read
-	 */
-	public String getKeysRead(){
-		return keysRead + "";
+
+	public String cleanDocument(String docString){
+
+		String regex = "";
+		
+		docString = docString.replaceAll(regex, "");
+		
+		return docString;
 	}
-	
+
+
+
 }
