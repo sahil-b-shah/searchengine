@@ -226,25 +226,6 @@ public class CrawlerThread extends Thread {
 			extractUrls(document);
 			addContent(is2);
 		} else if(contentType.contains("xml")) {
-			//just add to XML table
-			/*Document document = null;
-			try {
-				DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-				DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-				document = dBuilder.parse(is1);
-			} catch (Exception e) {
-				System.err.println("Error building w3 document: XML");
-				e.printStackTrace();
-				System.exit(-1);
-			}
-			byte b[] = new byte[request.getContentLength()];
-			try {
-				is2.read(b);
-			} catch (IOException e) {
-				System.err.println("Error reading bytes from input stream: Line 200");
-				e.printStackTrace();
-				System.exit(-1);
-			}*/
 			addContent(is3);
 		}
 	}
@@ -279,20 +260,19 @@ public class CrawlerThread extends Thread {
 				System.out.println("Link : " + eElement.getAttribute("href"));
 				String extractedString = eElement.getAttribute("href");
 				URL url = makeAbsolute(request.getUrlString(), extractedString);
-				if (!docDB.checkUrlSeen(url.getHost()+url.getFile())) {
-					//add to queue
-					unseenLinksDB.addURL(url.getProtocol()+"://"+url.getHost()+url.getFile());
-				}
+				//add to queue
+				unseenLinksDB.addURL(url.getProtocol()+"://"+url.getHost()+url.getFile());
+
 			}
 		}
 	}
 
 	private URL makeAbsolute(String urlStrin, String extractedString) {
-			
+
 		if (!urlString.endsWith(".html") && !urlString.endsWith("/")) {
 			urlString = urlString.concat("/");
 		}
-		
+
 		URL base = null;
 		URL extracted = null;
 		try {
