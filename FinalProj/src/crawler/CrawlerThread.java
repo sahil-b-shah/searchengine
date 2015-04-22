@@ -66,29 +66,35 @@ public class CrawlerThread extends Thread {
 
 			Entry<Integer, URLFrontierData> entry = frontierDB.getNextUrl();
 			if (entry != null) {
+
 				//System.out.println("not null");
 				urlString = entry.getValue().getUrl();
 				request = new URLRequest(urlString);
-				
-				boolean check = false;
-				try {
-					check = checkRequest();
-				} catch (UnsupportedEncodingException e1) {
-				}
-				
 
-				if (check) {
+				if(!Crawler.addCurrentHost(request.getHost())){
+					boolean check = false;
 					try {
-						parseRequest(request.sendGetRequest());
-					} catch (IOException e) {
-						/*frontierDB.close();
+						check = checkRequest();
+					} catch (UnsupportedEncodingException e1) {
+					}
+
+					if (check) {
+						try {
+							parseRequest(request.sendGetRequest());
+						} catch (IOException e) {
+							/*frontierDB.close();
 						docDB.close();
 						unseenLinksDB.close();
 						robotsDB.close();
 						System.err.println("Error sending GET request to server");
 						e.printStackTrace();
 						System.exit(-1);*/
+						}
 					}
+					Crawler.deleteCurrentHost(request.getHost());
+				}
+				else{
+					frontierDB.addUrl(urlString);
 				}
 			} else {
 				try {
@@ -124,7 +130,7 @@ public class CrawlerThread extends Thread {
 		ArrayList<String> allowed = robots.getAllowedLinks();
 
 		String allowedTestURL = decodeURL(request.getFilePath());
-		
+
 		if(!allowed(allowedTestURL, disallowed, allowed))
 			return false;
 

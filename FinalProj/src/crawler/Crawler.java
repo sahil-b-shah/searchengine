@@ -2,6 +2,8 @@ package crawler;
 
 
 import java.io.FileNotFoundException;
+import java.util.HashSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.sleepycat.je.DatabaseException;
 
@@ -22,9 +24,22 @@ public class Crawler {
 	private static int maxFiles;
 	
 	private static ThreadPool pool;
+	private static ConcurrentHashMap<String, String> currentHosts;
 	
 	private static void setup() throws DatabaseException, FileNotFoundException {
 		pool = new ThreadPool(1, documentDirectory, frontierDirectory, robotsDirectory, unseenLinksDirectory,  maxSize);
+	}
+	
+	
+	public static synchronized void deleteCurrentHost(String host){
+		currentHosts.remove(host);
+	}
+	
+	public static synchronized boolean addCurrentHost(String host){
+		if(currentHosts.contains(host))
+			return false;
+		currentHosts.put(host, host);
+		return true;
 	}
 	
 	public static void main(String [] args) throws DatabaseException, FileNotFoundException {
@@ -32,6 +47,8 @@ public class Crawler {
 			System.err.println("Incorrect number of arguments");
 			System.exit(-1);
 		}
+		
+		currentHosts = new ConcurrentHashMap<String, String>();
 		
 		urlString = args[0];
 		//Directory for stores
