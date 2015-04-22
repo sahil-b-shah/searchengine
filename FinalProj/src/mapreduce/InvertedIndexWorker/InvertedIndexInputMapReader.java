@@ -1,13 +1,9 @@
 package mapreduce.InvertedIndexWorker;
 
-import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.StringReader;
-import java.util.Map;
-import java.util.Set;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import crawler.storage.DocumentDBWrapper;
 import crawler.storage.DocumentData;
@@ -15,8 +11,8 @@ import crawler.storage.DocumentData;
 public class InvertedIndexInputMapReader {
 
 	DocumentData document;
-	private int fileIndex;
-	private BufferedReader in;
+	private String[] words;
+	private int index;
 	private boolean done;
 	private DocumentDBWrapper documentDB;
 
@@ -28,7 +24,8 @@ public class InvertedIndexInputMapReader {
 
 		done = false;
 		if(document != null){
-			in = new BufferedReader(new StringReader(cleanDocument(document.getContent())));
+			index = 0;
+			words = cleanDocument(document.getContent()).split("\\s+");
 		}
 		else
 			done = true;
@@ -40,38 +37,34 @@ public class InvertedIndexInputMapReader {
 	 * @throws IOException
 	 */
 	public synchronized String readLine() throws IOException{
-
+		String currentWord = null;
 		if(done){
 			return null;
 		}
 
-		String line = in.readLine();
-
-		if(line == null){
-			in.close();  //close previous stream
+		if(index >= words.length){
+			words = null;
 			document = documentDB.getNextDocument();
 			if(document != null){
-				in = new BufferedReader(new StringReader(cleanDocument(document.getContent())));
+				index = 0;
+				words = cleanDocument(document.getContent()).split("\\s+");		
 			}
 			else{
 				documentDB.close();
 				done = true;
-				line = null;
 			}
 		}
+		else{
+			currentWord = words[index];
+			index++;
+		}
 
-		return line;
+		return currentWord;
 	}
 
 	public String cleanDocument(String docString){
-
-		String regex = "";
-		
-		docString = docString.replaceAll(regex, "");
-		
-		return docString;
+		Document doc = Jsoup.parse(docString);
+		return doc.body().text();
 	}
-
-
 
 }
