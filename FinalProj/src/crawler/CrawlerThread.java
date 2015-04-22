@@ -277,8 +277,8 @@ public class CrawlerThread extends Thread {
 			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 				Element eElement = (Element) nNode;
 				System.out.println("Link : " + eElement.getAttribute("href"));
-				String urlString = eElement.getAttribute("href");
-				URL url = makeAbsolute(urlString);
+				String extractedString = eElement.getAttribute("href");
+				URL url = makeAbsolute(request.getUrlString(), extractedString);
 				if (!docDB.checkUrlSeen(url.getHost()+url.getFile())) {
 					//add to queue
 					unseenLinksDB.addURL(url.getProtocol()+"://"+url.getHost()+url.getFile());
@@ -287,7 +287,12 @@ public class CrawlerThread extends Thread {
 		}
 	}
 
-	private URL makeAbsolute(String extractedString) {
+	private URL makeAbsolute(String urlStrin, String extractedString) {
+			
+		if (!urlString.endsWith(".html") && !urlString.endsWith("/")) {
+			urlString = urlString.concat("/");
+		}
+		
 		URL base = null;
 		URL extracted = null;
 		try {
@@ -296,21 +301,9 @@ public class CrawlerThread extends Thread {
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
-		/*if (urlString.startsWith("/")) {
-			StringBuffer sb = new StringBuffer();
-			sb.append(request.getProtocol()+"://"+request.getHost()+"/"+urlString.substring(1));
-			return sb.toString();
-		} else if (!urlString.startsWith("http")) {
-			StringBuffer sb = new StringBuffer();
-			//if file
-			if (urlString.contains(".")) {
-				/
-			}
-			sb.append(request.getProtocol()+"://"+request.getHost()+"/"+urlString);
-			return sb.toString();
-		}*/
-		System.out.println(base.getHost()+base.getPath());
-		System.out.println(extracted.getHost()+extracted.getPath());
+		System.out.println("Extracted ");
+		System.out.print(extracted.getHost()+extracted.getPath());
+		System.out.print(" from "+base.getHost()+base.getPath());
 
 		return extracted;
 	}

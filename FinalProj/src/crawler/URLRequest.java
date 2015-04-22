@@ -36,6 +36,9 @@ public class URLRequest {
 	
 	private long delay = 5000;
 	
+	public String getUrlString() {
+		return urlString;
+	}
 	public String getProtocol() {
 		return protocol;
 	}

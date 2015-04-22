@@ -1,12 +1,8 @@
 package crawler;
 
 import java.io.FileNotFoundException;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.sleepycat.je.DatabaseException;
 
 import crawler.storage.DocumentDBWrapper;
@@ -19,8 +15,6 @@ public class ThreadPool {
 
 	//private BlockingQueue bq = null;
     private List<Thread> threads = new ArrayList<Thread>();
-    private boolean isStopped = false;
-
     public ThreadPool(int noOfThreads, String documentDirectory, String frontierDirectory, String robotsDirectory, String unseenLinksDirectory,  int maxSize) throws DatabaseException, FileNotFoundException{
         //bq = new BlockingQueue();
     	DocumentDBWrapper docDB = DocumentDBWrapper.getInstance(documentDirectory);
@@ -54,7 +48,6 @@ public class ThreadPool {
     }*/
 
     public synchronized void stop(){
-        this.isStopped = true;
         notifyAll();
         for(Thread thread : threads){
            ((CrawlerThread) thread).doStop();
