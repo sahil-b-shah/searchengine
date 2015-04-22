@@ -34,13 +34,14 @@ public class URLFrontierDBWrapper {
 		envDirectory = homeDirectory;
 		System.out.println("Opening environment in: " + envDirectory);
 		envFile = new File(envDirectory);
+		//System.out.println(envFile.getAbsolutePath());
 		if (!envFile.exists()) {
 			if(envFile.mkdirs()){
 				System.out.println("Creating directory " + envFile.getAbsolutePath());
 			}
 			else{
 				System.out.println("Failed creating directory " + envFile.getAbsolutePath());
-			};
+			}
 			
 		}
 		else{

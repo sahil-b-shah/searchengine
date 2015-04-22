@@ -48,7 +48,7 @@ public class DocumentDBWrapper {
 			}
 			else{
 				System.out.println("Failed creating directory " + envFile.getAbsolutePath());
-			};
+			}
 			
 		}
 		else{
@@ -153,6 +153,8 @@ public class DocumentDBWrapper {
 		ce.setLastSeen(String.valueOf(date));
 		ce.setLinks(links);
 		seenContent.put(ce);
+		System.out.println("bitches being added");
+
 	}
 	
 	public synchronized ArrayList<String> getLinks(String document){

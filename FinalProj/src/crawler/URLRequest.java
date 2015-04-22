@@ -34,7 +34,7 @@ public class URLRequest {
 	private Date lastModified;
 	
 	
-	private long delay = 5000;
+	private int delay = 5;
 	
 	public String getUrlString() {
 		return urlString;
@@ -152,7 +152,8 @@ public class URLRequest {
 			constructRobotsTxt(this.hostName);
 			robotsTxtData = robotsDB.getRobotsTxtData(this.hostName);
 		}
-		this.delay = robotsTxtData.getCrawlDelay();
+		this.delay = (int) robotsTxtData.getCrawlDelay();
+		this.delay = (this.delay == 0) ? 5 : this.delay;
 		return robotsTxtData;
 	}
 	
@@ -180,6 +181,7 @@ public class URLRequest {
 				String key = m.group(1);
 				key = key.trim();
 				String value = m.group(2);
+				System.out.println("Robots --"+key+": "+value);
 				value = value.trim();
 				if (key.equalsIgnoreCase("User-Agent")) {
 					userAgent = value;
@@ -271,7 +273,7 @@ public class URLRequest {
 	private void delay() {
 		//milli = 0; //for testing
 		try {
-			Thread.sleep(this.delay);
+			Thread.sleep(this.delay*1000);
 		} catch (InterruptedException e) {
 			System.err.println("Error sleeping thread");
 			e.printStackTrace();

@@ -3,6 +3,8 @@ package crawler;
 
 import java.io.FileNotFoundException;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.sleepycat.je.DatabaseException;
@@ -11,6 +13,7 @@ import crawler.storage.DocumentDBWrapper;
 import crawler.storage.RobotsDBWrapper;
 import crawler.storage.URLFrontierDBWrapper;
 import crawler.storage.UnseenLinksDBWrapper;
+import crawler.storage.UnseenLinksData;
 
 
 public class Crawler {
@@ -27,7 +30,7 @@ public class Crawler {
 	private static ConcurrentHashMap<String, String> currentHosts;
 	
 	private static void setup() throws DatabaseException, FileNotFoundException {
-		pool = new ThreadPool(1, documentDirectory, frontierDirectory, robotsDirectory, unseenLinksDirectory,  maxSize);
+		pool = new ThreadPool(10, documentDirectory, frontierDirectory, robotsDirectory, unseenLinksDirectory,  maxSize);
 	}
 	
 	
@@ -51,10 +54,10 @@ public class Crawler {
 		currentHosts = new ConcurrentHashMap<String, String>();
 		
 		//Directory for stores
-		documentDirectory = "/documentdb";
-		frontierDirectory = "/frontierdb";
-		robotsDirectory = "/robotsdb";
-		unseenLinksDirectory = "/unseenlinksdb";
+		documentDirectory = "/home/cis455/database/documentdb";
+		frontierDirectory = "/home/cis455/database/frontierdb";
+		robotsDirectory = "/home/cis455/database/robotsdb";
+		unseenLinksDirectory = "/home/cis455/database/unseenlinksdb";
 		
 		//urlString = "https://dbappserv.cis.upenn.edu/crawltest/marie/tpc/part.xml";
 		urlString = args[0];
@@ -64,13 +67,32 @@ public class Crawler {
 			maxFiles = Integer.parseInt(args[2]);
 		}
 		
-		System.out.println("Printing current unseen links");
+		System.out.println("Printing current document");
 		DocumentDBWrapper docDB = DocumentDBWrapper.getInstance(documentDirectory);
 		docDB.getAllContent();
 		docDB.close();
 		
+		System.out.println("Prinitng unseen links");
+		UnseenLinksDBWrapper unseenDB = UnseenLinksDBWrapper.getInstance(unseenLinksDirectory);
+		unseenDB.getAllContent();
+		unseenDB.close();
+		
+		seedFromUnseen();
+		
 		URLFrontierDBWrapper frontierDB = URLFrontierDBWrapper.getInstance(frontierDirectory);
 		frontierDB.addUrl(urlString);
 		setup();
+	}
+	
+	private static void seedFromUnseen() throws DatabaseException, FileNotFoundException {
+		Map<String, UnseenLinksData> unseenMap = UnseenLinksDBWrapper.getInstance(unseenLinksDirectory).getAllContent();
+		Set<String> links = unseenMap.keySet();
+		
+		URLFrontierDBWrapper frontierDB = URLFrontierDBWrapper.getInstance(frontierDirectory);
+		
+		for (String link : links) {
+			frontierDB.addUrl(link);
+		}
+		frontierDB.close();
 	}
 }

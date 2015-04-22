@@ -31,7 +31,7 @@ public class RobotsDBWrapper {
 			}
 			else{
 				System.out.println("Failed creating directory " + file.getAbsolutePath());
-			};
+			}
 			
 		}
 		else{

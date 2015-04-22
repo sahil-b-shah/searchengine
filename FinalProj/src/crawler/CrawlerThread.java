@@ -136,12 +136,16 @@ public class CrawlerThread extends Thread {
 		//Get set of disallowed paths from robots.txt
 		ArrayList<String> disallowed = robots.getDisallowedLinks();	
 		ArrayList<String> allowed = robots.getAllowedLinks();
-
+		
+		System.out.println(disallowed.toString());
+		System.out.println(allowed.toString());
 		String allowedTestURL = decodeURL(request.getFilePath());
-
-		if(!allowed(allowedTestURL, disallowed, allowed))
+		System.out.println(allowedTestURL);
+		
+		if(!allowed(allowedTestURL, disallowed, allowed)) {
+			System.out.println("This bitch be disallowed");
 			return false;
-
+		}
 		//System.out.println(disallowed);
 		System.out.println("filepath is not disallowed");
 
@@ -213,33 +217,14 @@ public class CrawlerThread extends Thread {
 		}
 		
 
-		InputStream is1 = new ByteArrayInputStream(baos.toByteArray()); 
 		InputStream is2 = new ByteArrayInputStream(baos.toByteArray()); 
-		InputStream is3 = new ByteArrayInputStream(baos.toByteArray()); 
+		InputStream is3 = new ByteArrayInputStream(baos.toByteArray());
 
 
 		//InputStream isCopy = new InputStream(is);
 		String contentType = request.getContentType();
 		if (contentType.contains("html")) {
-			//Need to use JTidy
-			/*ByteArrayOutputStream xhtmlOS = new ByteArrayOutputStream();
-			Tidy tidy = new Tidy();
-			tidy.setXHTML(true);
-
-			//xhtml is tide output from parsing
-			tidy.parse(is1, xhtmlOS);
-
-			Document document = null;
-			try {
-				DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-				DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-				document = dBuilder.parse(new ByteArrayInputStream(xhtmlOS.toByteArray()));
-			} catch (Exception e) {
-				System.err.println("Error building w3 document: HTML");
-				e.printStackTrace();
-				System.exit(-1);
-			}*/
-			ArrayList<String> links = extractUrls(buffer.toString());
+			ArrayList<String> links = extractUrls(new String(buffer));
 			addContent(is2, links);
 		} else if(contentType.contains("xml")) {
 			addContent(is3, null);
@@ -280,30 +265,10 @@ public class CrawlerThread extends Thread {
 
 		}
 
-		/*doc.getDocumentElement().normalize();
-		//System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
-		NodeList nList = doc.getElementsByTagName("a");
-
-		for (int temp = 0; temp < nList.getLength(); temp++) {
-
-			Node nNode = nList.item(temp);
-			System.out.println("\nCurrent Element :" + nNode.getNodeName());
-
-			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-				Element eElement = (Element) nNode;
-				System.out.println("Link : " + eElement.getAttribute("href"));
-				String extractedString = eElement.getAttribute("href");
-				URL url = makeAbsolute(request.getUrlString(), extractedString);
-				//add to queue
-				unseenLinksDB.addURL(url.getProtocol()+"://"+url.getHost()+url.getFile());
-				links.add(url.getProtocol()+"://"+url.getHost()+url.getFile());
-
-			}
-		}*/
 		return links;
 	}
 
-	private URL makeAbsolute(String urlStrin, String extractedString) {
+	private URL makeAbsolute(String urlString, String extractedString) {
 
 		if (!urlString.endsWith(".html") && !urlString.endsWith("/")) {
 			urlString = urlString.concat("/");

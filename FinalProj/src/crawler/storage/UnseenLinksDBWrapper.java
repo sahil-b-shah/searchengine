@@ -2,12 +2,16 @@ package crawler.storage;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
+import com.sleepycat.persist.EntityCursor;
 import com.sleepycat.persist.EntityStore;
 import com.sleepycat.persist.PrimaryIndex;
 import com.sleepycat.persist.StoreConfig;
@@ -32,7 +36,7 @@ public class UnseenLinksDBWrapper {
 			}
 			else{
 				System.out.println("Failed creating directory " + file.getAbsolutePath());
-			};
+			}
 			
 		}
 		else{
@@ -128,5 +132,16 @@ public class UnseenLinksDBWrapper {
 	
 	public synchronized boolean isEmpty() {
 		return (unseenLinksIndex.count() == 0);
+	}
+	
+	public synchronized Map<String, UnseenLinksData> getAllContent() {
+		EntityCursor<UnseenLinksData> c = unseenLinksIndex.entities();
+		Iterator<UnseenLinksData> ir = c.iterator();
+		while (ir.hasNext()) {
+			UnseenLinksData data = ir.next();
+			System.out.println("Unseen: "+data.getUrl());
+		}
+		c.close();
+		return unseenLinksIndex.map();
 	}
 }

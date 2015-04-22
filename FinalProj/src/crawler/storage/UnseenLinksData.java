@@ -9,6 +9,10 @@ public class UnseenLinksData {
 	@PrimaryKey
 	private String url;
 	
+	public String getUrl() {
+		return this.url;
+	}
+	
 	public UnseenLinksData(){
 		
 	}
