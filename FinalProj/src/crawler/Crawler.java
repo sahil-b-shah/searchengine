@@ -70,7 +70,7 @@ public class Crawler {
 		documentDirectory = homeDir+"/documentdb";
 		frontierDirectory = homeDir+"/frontierdb";
 		robotsDirectory = homeDir+"/robotsdb";
-		unseenLinksDirectory = homeDir+"/unseenLinksdb";
+		unseenLinksDirectory = homeDir+"/unseenlinksdb";
 		
 		maxSize = Integer.parseInt(args[2]);
 		if (args.length == 4) {
