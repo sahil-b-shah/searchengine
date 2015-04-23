@@ -110,7 +110,7 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 				}
 			}
 
-			if(allWaiting){
+			/*if(allWaiting){
 				System.out.println("All workers waiting");
 				//Post to /runmap on every active worker
 				for(String worker: localStatusMap.keySet()){
@@ -135,8 +135,8 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 						client.addParams("numThreads", numReduceThreads);						
 						client.sendPost();
 					}
-				}*/
-			}
+				}
+			}*/
 		}
 		else{
 
@@ -148,7 +148,7 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 
 			//Post to /runmap on every active worker
 			for(String worker: localStatusMap.keySet()){
-				MyHttpClient client = new MyHttpClient(worker, "/worker/runmap");
+				MyHttpClient client = new MyHttpClient(worker, "/ShuffleURLWorker/runmap");
 				//client.addParams("input", inputDir);
 				client.addParams("numThreads", numMapThreads);
 				client.addParams("numWorkers", localStatusMap.size() + "");

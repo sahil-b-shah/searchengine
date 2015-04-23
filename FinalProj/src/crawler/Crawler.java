@@ -44,27 +44,37 @@ public class Crawler {
 		currentHosts.put(host, host);
 		return true;
 	}
-	
+	/**
+	 * 
+	 * @param args
+	 * 0: seed url
+	 * 1: location of home directory
+	 * 3: max size of files being downloaded
+	 * optional 4: max number of files to be downloaded
+	 * @throws DatabaseException
+	 * @throws FileNotFoundException
+	 */
 	public static void main(String [] args) throws DatabaseException, FileNotFoundException {
-		if((args.length != 3) && (args.length != 2)) {
+		
+		if((args.length != 4) && (args.length != 3)) {
 			System.err.println("Incorrect number of arguments");
 			System.exit(-1);
 		}
 		
 		currentHosts = new ConcurrentHashMap<String, String>();
 		
-		//Directory for stores
-		documentDirectory = "/home/cis455/database/documentdb";
-		frontierDirectory = "/home/cis455/database/frontierdb";
-		robotsDirectory = "/home/cis455/database/robotsdb";
-		unseenLinksDirectory = "/home/cis455/database/unseenlinksdb";
-		
 		//urlString = "https://dbappserv.cis.upenn.edu/crawltest/marie/tpc/part.xml";
 		urlString = args[0];
+		String homeDir = args[1];
+		//Directory for stores
+		documentDirectory = homeDir+"/documentdb";
+		frontierDirectory = homeDir+"/frontierdb";
+		robotsDirectory = homeDir+"/robotsdb";
+		unseenLinksDirectory = homeDir+"/unseenLinksdb";
 		
-		maxSize = Integer.parseInt(args[1]);
-		if (args.length == 3) {
-			maxFiles = Integer.parseInt(args[2]);
+		maxSize = Integer.parseInt(args[2]);
+		if (args.length == 4) {
+			maxFiles = Integer.parseInt(args[3]);
 		}
 		
 		System.out.println("Printing current document");

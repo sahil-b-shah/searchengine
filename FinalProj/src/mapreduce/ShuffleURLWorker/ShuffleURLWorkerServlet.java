@@ -138,7 +138,7 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 			//once all keys read, send a POST to /pushdata for appropriate workers	
 			for(File curWorker: workerFiles){
 				String address = request.getParameter(curWorker.getName());
-				MyHttpClient client = new MyHttpClient(address, "/worker/pushdata");
+				MyHttpClient client = new MyHttpClient(address, "/ShuffleURLWorker/pushdata");
 				BufferedReader in = new BufferedReader(new FileReader(curWorker));
 				String body= "";
 				String line = in.readLine();
@@ -157,7 +157,7 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 			mapContext  =null;
 
 			//Issue /workerstatus
-			MyHttpClient client = new MyHttpClient(IPPort, "/master/workerstatus");
+			MyHttpClient client = new MyHttpClient(IPPort, "/ShuffleURLMaster/workerstatus");
 			if(client.connected()){
 
 				HashMap<String, String> params = getStatusParameters();

@@ -12,7 +12,7 @@
          </init-param>-->
          <init-param>
            <param-name>storagedir</param-name>
-           <param-value>/home/cis455/hw_servlet_test/store/</param-value>
+           <param-value>/home/cis455/ShuffleWorker1</param-value>
          </init-param>
          <init-param>
            <param-name>master</param-name>
@@ -24,11 +24,11 @@
          </init-param>
          <init-param>
            <param-name>frontierDirectory</param-name>
-           <param-value>/home/cis455/frontier1/</param-value>
+           <param-value>/home/cis455/ShuffleWorker1/frontierdb</param-value>
          </init-param>
          <init-param>
            <param-name>unseenLinksDirectory</param-name>
-           <param-value>/home/cis455/unseen1/</param-value>
+           <param-value>/home/cis455/ShuffleWorker1/unseenlinksdb</param-value>
          </init-param>
      </servlet>
 

@@ -22,7 +22,7 @@ public class ShuffleURLStatusThread implements Runnable {
 			while(true){
 
 				//Send POST every 10 seconds
-				MyHttpClient client = new MyHttpClient(IPPort, "/master/workerstatus");
+				MyHttpClient client = new MyHttpClient(IPPort, "/ShuffleURLMaster/workerstatus");
 				if(client.connected()){
 
 					HashMap<String, String> params = workerServlet.getStatusParameters();

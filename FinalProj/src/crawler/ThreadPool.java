@@ -51,6 +51,7 @@ public class ThreadPool {
 			}
 		}
 		
+		System.out.println("Closing entire crawler");
 		frontierDB.close();
 		docDB.close();
 		unseenLinksDB.close();
