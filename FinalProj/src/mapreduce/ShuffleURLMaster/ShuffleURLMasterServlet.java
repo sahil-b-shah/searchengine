@@ -154,7 +154,7 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 				client.addParams("numWorkers", localStatusMap.size() + "");
 				int counter = 1;
 				for(String workerID: localStatusMap.keySet()){
-					client.addParams("worker"+counter, workerID);
+					client.addParams("worker"+counter + ".txt", workerID);
 					counter++;
 				}
 				//System.out.println("Posting /runmap to "+ worker);
