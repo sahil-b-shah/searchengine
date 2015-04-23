@@ -3,6 +3,9 @@ package crawler;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+
+import mapreduce.ShuffleURLWorker.ShuffleURLMapThread;
+
 import com.sleepycat.je.DatabaseException;
 
 import crawler.storage.DocumentDBWrapper;
@@ -38,6 +41,21 @@ public class ThreadPool {
 				e.printStackTrace();
 			}
         }
+        
+		//Wait until all threads done
+		for(Thread thread : threads){
+			try {
+				thread.join();
+			} catch (InterruptedException e) {
+				System.err.println("Map thread ended unnaturally");
+			}
+		}
+		
+		frontierDB.close();
+		docDB.close();
+		unseenLinksDB.close();
+		robotsDB.close();
+
     }
 
     /*public synchronized void  execute(Socket request) throws Exception{

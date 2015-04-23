@@ -108,10 +108,6 @@ public class CrawlerThread extends Thread {
 					}
 					if(frontierDB.isEmpty()){
 						System.out.println("Crawl on thread " + Thread.currentThread().getId()+" is ending");
-						frontierDB.close();
-						docDB.close();
-						unseenLinksDB.close();
-						robotsDB.close();
 						isStopped = true;
 					}
 				}
