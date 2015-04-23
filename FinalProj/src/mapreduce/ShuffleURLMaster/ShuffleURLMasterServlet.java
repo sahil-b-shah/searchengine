@@ -46,10 +46,10 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 			for(String key: localStatusMap.keySet()){
 				ArrayList<String> params = localStatusMap.get(key);
 				//Check if in last 30 seconds
-				if((System.currentTimeMillis() - Long.parseLong(params.get(4))) < 30000){
+				if((System.currentTimeMillis() - Long.parseLong(params.get(1))) < 30000){
 					out.println("<tr>");
 					out.println("<td>"+ key+ "</td>");
-					for(int i = 0; i < 4; i++){
+					for(int i = 0; i < 2; i++){
 						out.println("<td>"+ params.get(i)+ "</td>");
 					}
 					out.println("</tr>");
