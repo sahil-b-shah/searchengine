@@ -24,8 +24,9 @@ public class ShuffleURLMapContext implements Context{
 		this.spoolout = spoolout;
 		workerFiles = new File[workers.length];
 		for(int i = 1; i <= workers.length; i++){
-			String currentWorker = "worker" + i;
+			String currentWorker = "worker" + i +".txt";
 			File tempFile = new File(spoolout, currentWorker);
+			tempFile.createNewFile();
 			workerFiles[i-1] = tempFile;
 		}
 		numWorkers = workerFiles.length;
@@ -51,7 +52,8 @@ public class ShuffleURLMapContext implements Context{
 		int fileNumber = pickNumberBucket(numWorkers, hashedValue);
 		
 		//Pick file based on hash
-		File selectedFile = new File(spoolout, "worker" +fileNumber);
+		File selectedFile = new File(spoolout, "worker" +fileNumber +".txt");
+		
 		
 		
 		try {

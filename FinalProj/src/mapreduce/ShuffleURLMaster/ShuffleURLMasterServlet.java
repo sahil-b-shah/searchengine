@@ -49,7 +49,7 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 				if((System.currentTimeMillis() - Long.parseLong(params.get(1))) < 30000){
 					out.println("<tr>");
 					out.println("<td>"+ key+ "</td>");
-					for(int i = 0; i < 2; i++){
+					for(int i = 0; i < 1; i++){
 						out.println("<td>"+ params.get(i)+ "</td>");
 					}
 					out.println("</tr>");

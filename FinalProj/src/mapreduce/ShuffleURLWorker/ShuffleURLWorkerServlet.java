@@ -85,7 +85,7 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 				}
 				spoolin.delete();
 			}
-			spoolin.mkdir();
+			spoolin.mkdirs();
 
 			if(spoolout.exists() && spoolout.isDirectory()){
 				//Delete directory and file
@@ -95,7 +95,7 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 				}
 				spoolout.delete();
 			}
-			spoolout.mkdir();
+			spoolout.mkdirs();
 
 			//Get files in input directory
 			//File inputDirectory = new File(new File(storageDirectory), input);
@@ -138,6 +138,7 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 			//once all keys read, send a POST to /pushdata for appropriate workers	
 			for(File curWorker: workerFiles){
 				String address = request.getParameter(curWorker.getName());
+				System.out.println("Cur worker: "+curWorker.getName());
 				MyHttpClient client = new MyHttpClient(address, "/ShuffleURLWorker/pushdata");
 				BufferedReader in = new BufferedReader(new FileReader(curWorker));
 				String body= "";
