@@ -27,6 +27,7 @@ public class InvertedIndexWorkerMapThread implements Runnable {
 		try {
 			String line = reader.readLine();
 			while(line != null){
+				System.out.println(Thread.currentThread().getName() + " reading map");
 				String params[] = line.split("\\s+");
 				job.map(params[0], params[1], context);
 				line = reader.readLine();

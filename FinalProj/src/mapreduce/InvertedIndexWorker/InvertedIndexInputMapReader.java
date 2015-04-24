@@ -42,6 +42,7 @@ public class InvertedIndexInputMapReader {
 	public synchronized String readLine() throws IOException{
 		String currentWord = null;
 		if(done | keysRead >= maxKeys){
+			System.out.println("done: " + done + "-----keysRead: " + keysRead + "-----maxKeys: " + maxKeys);
 			return null;
 		}
 
@@ -54,8 +55,11 @@ public class InvertedIndexInputMapReader {
 				words = cleanDocument(document.getContent()).split("\\s+");	
 				keysRead++;
 				System.out.println("Mapping doc " + document.getUrl() + "----keysRead: " + keysRead);
+				currentWord = words[index] + " " +document.getUrl();
+				index++;
 			}
 			else{
+				System.out.println("Doc was null");
 				documentDB.close();
 				done = true;
 			}

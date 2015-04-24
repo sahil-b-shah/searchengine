@@ -48,8 +48,9 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 		mapContext = null;
 		reader = null;
 		storageDirectory = config.getInitParameter("storagedir");
+		
 
-		System.out.println("Worker init");
+		System.out.println("Worker init--storage: " + storageDirectory);
 
 		//Create thread that issues GET every 10 seconds
 		InvertedIndexStatusThread statusObj = new InvertedIndexStatusThread(master, this);
@@ -124,6 +125,11 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 				InvertedIndexWorkerMapThread workerObj = new InvertedIndexWorkerMapThread(reader, mapContext);
 				threads[i] = new Thread(workerObj);
 				threads[i].start();
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 
 
@@ -181,7 +187,6 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 			
 			status = "reducing";
 			int numThreads = Integer.parseInt(request.getParameter("numThreads"));
-			String output = request.getParameter("output");
 
 			//Sort file
 			File spoolin = new File(storageDirectory,"spool-in");
@@ -208,7 +213,7 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 
 			InvertedIndexInputReduceReader reader = new InvertedIndexInputReduceReader(spoolinFile);
 
-			File outputDir = new File(storageDirectory, output);
+			/*File outputDir = new File(storageDirectory, output);
 
 			//Delete directory if there
 			if(outputDir.exists() && outputDir.isDirectory()){
@@ -219,7 +224,7 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 				}
 				outputDir.delete();
 			}
-			outputDir.mkdir();
+			outputDir.mkdir();*/
 
 			//File outputFile = new File(outputDir, "output.txt");
 
