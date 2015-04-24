@@ -5,7 +5,7 @@
      
      <servlet>
          <servlet-name>MasterServlet</servlet-name>
-         <servlet-class>mapreduce.ShuffleURLMaster.ShuffleURLMasterServlet</servlet-class>
+         <servlet-class>mapreduce.InvertedIndexMaster.InvertedIndexMasterServlet</servlet-class>
      </servlet>
 
      <servlet-mapping>

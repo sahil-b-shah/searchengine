@@ -5,14 +5,14 @@
      
      <servlet>
          <servlet-name>WorkerServlet</servlet-name>
-         <servlet-class>mapreduce.ShuffleURLWorker.ShuffleURLWorkerServlet</servlet-class>
+         <servlet-class>mapreduce.InvertedIndexWorker.InvertedIndexWorkerServlet</servlet-class>
          <!--<init-param>
            <param-name>storagedir</param-name>
            <param-value>/home/cis455/storage/</param-value>
          </init-param>-->
          <init-param>
            <param-name>storagedir</param-name>
-           <param-value>/home/cis455/ShuffleWorker1</param-value>
+           <param-value>/home/cis455/InvertedIndexWorker1</param-value>
          </init-param>
          <init-param>
            <param-name>master</param-name>
@@ -23,12 +23,12 @@
            <param-value>8081</param-value>
          </init-param>
          <init-param>
-           <param-name>frontierDirectory</param-name>
-           <param-value>/home/cis455/ShuffleWorker1/frontierdb</param-value>
+           <param-name>documentDirectory</param-name>
+           <param-value>/home/cis455/InvertedIndexWorker1/documentdb</param-value>
          </init-param>
          <init-param>
-           <param-name>unseenLinksDirectory</param-name>
-           <param-value>/home/cis455/ShuffleWorker1/unseenlinksdb</param-value>
+           <param-name>indexDirectory</param-name>
+           <param-value>/home/cis455/InvertedIndexWorker1/indexdb</param-value>
          </init-param>
      </servlet>
 
