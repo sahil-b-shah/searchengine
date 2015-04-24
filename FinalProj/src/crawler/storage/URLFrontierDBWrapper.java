@@ -1,15 +1,12 @@
 package crawler.storage;
 
 import java.io.File;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
-import com.sleepycat.persist.EntityCursor;
 import com.sleepycat.persist.EntityStore;
 import com.sleepycat.persist.PrimaryIndex;
 import com.sleepycat.persist.StoreConfig;
@@ -155,19 +152,6 @@ public class URLFrontierDBWrapper {
 		urlFrontier.put(q_url);
 		System.out.println("Added to frontier: " + (id+1)+"--" + docURL);
 
-	}
-	
-	public Map<Integer, URLFrontierData> getAll() {
-
-		System.out.println(urlFrontier.count());
-		EntityCursor<URLFrontierData> c = urlFrontier.entities();
-		Iterator<URLFrontierData> ir = c.iterator();
-		while (ir.hasNext()) {
-			URLFrontierData data = ir.next();
-			System.out.println("Frontier -- "+data.getId()+": "+data.getUrl());
-		}
-		c.close();
-		return urlFrontier.map();
 	}
 		
 }
