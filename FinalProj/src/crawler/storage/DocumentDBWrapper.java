@@ -14,7 +14,6 @@ import com.sleepycat.je.EnvironmentConfig;
 import com.sleepycat.persist.EntityCursor;
 import com.sleepycat.persist.EntityStore;
 import com.sleepycat.persist.PrimaryIndex;
-import com.sleepycat.persist.SecondaryIndex;
 import com.sleepycat.persist.StoreConfig;
 
 public class DocumentDBWrapper {
@@ -26,8 +25,6 @@ public class DocumentDBWrapper {
 	private EntityStore store;
 	
 	private PrimaryIndex<String, DocumentData> seenContent;
-	private PrimaryIndex<String, CurrentIndex> currentIndex;
-	private SecondaryIndex<Integer, String, DocumentData> secondaryIndex;
 	private Iterator<String> keys;
 	//private int channelId = 0;
 	
@@ -79,9 +76,7 @@ public class DocumentDBWrapper {
 		}
 		
 		try {
-			currentIndex = store.getPrimaryIndex(String.class, CurrentIndex.class);
 			seenContent = store.getPrimaryIndex(String.class, DocumentData.class);
-			secondaryIndex = store.getSecondaryIndex(seenContent, Integer.class, "index");
 			
 		} catch (DatabaseException dbe) {
 			System.err.println("Error making indexes");
@@ -157,19 +152,8 @@ public class DocumentDBWrapper {
 		ce.setContent(content);
 		ce.setLastSeen(String.valueOf(date));
 		ce.setLinks(links);
-		if(currentIndex.count() == 0){
-			currentIndex.put(new CurrentIndex("index"));
-		}
-		int i = currentIndex.get("index").getIndex();
-		System.out.println("Index" + i);
-		ce.setIndex(i);
-		i++;
-		currentIndex.delete("index");
-		CurrentIndex newOne = new CurrentIndex("index");
-		newOne.setIndex(i);
-		currentIndex.put(newOne);
 		seenContent.put(ce);
-		System.out.println("bitches being added" + i);
+		System.out.println("bitches being added");
 
 	}
 	
@@ -197,15 +181,6 @@ public class DocumentDBWrapper {
 		}
 	}
 	
-	
-	public void printInOrder(){
-		int size = (int) seenContent.count();
-		System.out.println("Indedfgsdgx" + currentIndex.get("index").getIndex());
-		for(int i = 0; i < size; i++){
-			System.out.println(secondaryIndex.get(i));
-		}
-		System.out.println(size);
-	}
 
 	
 

@@ -17,10 +17,7 @@ public class InvertedIndexReduceContext implements Context {
 	public synchronized void write(String key, String value) {
 		
 		String entry[] = value.split("\\s+");
-		HashMap<String, Integer> map = indexDB.getUrls(key);
-		if(map == null){
-			map = new HashMap<String, Integer>();
-		}
+		HashMap<String, Integer> map = new HashMap<String, Integer>();
 
 		for(int i = 0; i < entry.length; i++){
 			String tempEntry = entry[i];
