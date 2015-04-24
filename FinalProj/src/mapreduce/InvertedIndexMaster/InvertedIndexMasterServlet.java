@@ -115,7 +115,7 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 				System.out.println("All workers waiting");
 				//Previous reduce code below
 				for(String iport: localStatusMap.keySet()){
-					if((System.currentTimeMillis() - Long.parseLong(params.get(4))) < 30000){
+					if((System.currentTimeMillis() - Long.parseLong(params.get(1))) < 30000){
 						MyHttpClient client = new MyHttpClient(iport, "/InvertedIndexWorker/runreduce");
 						client.addParams("numThreads", numReduceThreads);						
 						client.sendPost();

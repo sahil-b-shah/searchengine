@@ -48,10 +48,12 @@ public class InvertedIndexInputMapReader {
 		if(index >= words.length){
 			words = null;
 			document = documentDB.getNextDocument();
+			System.out.println("Database size " + documentDB.getSize());
 			if(document != null){
 				index = 0;
 				words = cleanDocument(document.getContent()).split("\\s+");	
 				keysRead++;
+				System.out.println("Mapping doc " + document.getUrl() + "----keysRead: " + keysRead);
 			}
 			else{
 				documentDB.close();

@@ -23,11 +23,11 @@
            <param-value>8081</param-value>
          </init-param>
          <init-param>
-           <param-name>frontierDirectory</param-name>
+           <param-name>documentDirectory</param-name>
            <param-value>/home/cis455/InvertedIndexWorker2/documentdb</param-value>
          </init-param>
          <init-param>
-           <param-name>unseenLinksDirectory</param-name>
+           <param-name>indexDirectory</param-name>
            <param-value>/home/cis455/InvertedIndexWorker2/indexdb</param-value>
          </init-param>
      </servlet>
