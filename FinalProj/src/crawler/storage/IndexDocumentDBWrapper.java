@@ -5,9 +5,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
@@ -17,8 +16,9 @@ import com.sleepycat.persist.EntityStore;
 import com.sleepycat.persist.PrimaryIndex;
 import com.sleepycat.persist.StoreConfig;
 
-public class DocumentDBWrapper {
-	
+public class IndexDocumentDBWrapper {
+
+
 	private String envDirectory = null;
 	private File envFile;
 	
@@ -26,20 +26,20 @@ public class DocumentDBWrapper {
 	private EntityStore store;
 	
 	private PrimaryIndex<String, DocumentData> seenContent;
-	private TreeMap<String, DocumentData>  keys;
+	private Iterator<String> keys;
 	//private int channelId = 0;
 	
-	private static DocumentDBWrapper db;
+	private static IndexDocumentDBWrapper db;
 	
-	public synchronized static DocumentDBWrapper getInstance(String homeDirectory) {
+	public synchronized static IndexDocumentDBWrapper getInstance(String homeDirectory) {
 		if (db == null) {
 			System.out.println("Making new db wrapper");
-			db = new DocumentDBWrapper(homeDirectory);
+			db = new IndexDocumentDBWrapper(homeDirectory);
 		}
 		return db;
 	}
 	
-	private DocumentDBWrapper(String homeDirectory) {
+	private IndexDocumentDBWrapper(String homeDirectory) {
 		envDirectory = homeDirectory;
 		System.out.println("Opening environment in: " + envDirectory);
 		envFile = new File(envDirectory);
@@ -126,21 +126,19 @@ public class DocumentDBWrapper {
 	}
 	
 	public synchronized void initIterator(){
-		keys = new TreeMap<String, DocumentData>(seenContent.map());
+		keys = seenContent.keys().iterator();
 	}
 	
 	public synchronized DocumentData getNextDocument(){
+		if(keys == null)
+			return null;
 		
-		if(keys == null || keys.isEmpty()){
+		if(!keys.hasNext()){
+			keys = null;
 			return null;
 		}
-		
-		Entry<String, DocumentData> e = keys.pollFirstEntry();
-		if (e!=null) {
-			seenContent.delete(e.getKey());
-		}
-		return e.getValue();
-		
+
+		return seenContent.get(keys.next());
 		
 	}
 	
@@ -200,6 +198,5 @@ public class DocumentDBWrapper {
 	public long getSize(){
 		return seenContent.count();
 	}
-	
 	
 }
