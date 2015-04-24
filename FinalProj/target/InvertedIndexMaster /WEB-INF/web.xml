@@ -4,12 +4,12 @@
      <display-name>HW3 (Master)</display-name>
      
      <servlet>
-         <servlet-name>MasterServlet</servlet-name>
+         <servlet-name>InvertedIndexMaster</servlet-name>
          <servlet-class>mapreduce.InvertedIndexMaster.InvertedIndexMasterServlet</servlet-class>
      </servlet>
 
      <servlet-mapping>
-         <servlet-name>MasterServlet</servlet-name>
+         <servlet-name>InvertedIndexMaster</servlet-name>
          <url-pattern>/*</url-pattern>
      </servlet-mapping>
 </web-app>

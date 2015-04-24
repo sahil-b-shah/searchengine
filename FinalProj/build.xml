@@ -91,7 +91,7 @@
 	  </target>
 		
 		<target name="compile-InvertedIndexWorker2" depends="init">
-		    <javac srcdir="src" destdir="target/InvertedIndexWorker2/WEB-INF/classes" includes="**/InvertedIndexWorker/*.java,**/ShuffleURLJob.java,**/Job.java,**/Context.java,**/MyHttpClient.java" deprecation="on"
+		    <javac srcdir="src" destdir="target/InvertedIndexWorker2/WEB-INF/classes" includes="**/InvertedIndexWorker/*.java,**/InvertedIndexJob.java,**/Job.java,**/Context.java,**/MyHttpClient.java" deprecation="on"
 		     debug="true" includeantruntime="false">
 		    	<classpath>
 		            <fileset dir="lib/">

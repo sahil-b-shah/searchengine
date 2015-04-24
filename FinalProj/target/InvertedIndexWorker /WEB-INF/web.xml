@@ -4,7 +4,7 @@
      <display-name>HW3 (Worker)</display-name>
      
      <servlet>
-         <servlet-name>WorkerServlet</servlet-name>
+         <servlet-name>InvertedIndexWorkerServlet</servlet-name>
          <servlet-class>mapreduce.InvertedIndexWorker.InvertedIndexWorkerServlet</servlet-class>
          <!--<init-param>
            <param-name>storagedir</param-name>
@@ -20,7 +20,7 @@
          </init-param>
          <init-param>
            <param-name>port</param-name>
-           <param-value>8081</param-value>
+           <param-value>8080</param-value>
          </init-param>
          <init-param>
            <param-name>documentDirectory</param-name>
@@ -33,7 +33,7 @@
      </servlet>
 
      <servlet-mapping>
-         <servlet-name>WorkerServlet</servlet-name>
+         <servlet-name>InvertedIndexWorker</servlet-name>
          <url-pattern>/*</url-pattern>
      </servlet-mapping>
 </web-app>
