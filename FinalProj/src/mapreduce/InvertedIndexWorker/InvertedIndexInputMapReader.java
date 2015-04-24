@@ -15,9 +15,12 @@ public class InvertedIndexInputMapReader {
 	private int index;
 	private boolean done;
 	private DocumentDBWrapper documentDB;
-
-
+	private int maxKeys;
+	private int keysRead;
+	
 	public InvertedIndexInputMapReader(String documentDirectiory) throws FileNotFoundException{
+		maxKeys = 100;
+		keysRead = 0;
 		documentDB = DocumentDBWrapper.getInstance(documentDirectiory);
 		documentDB.initIterator();
 		document = documentDB.getNextDocument();
@@ -38,7 +41,7 @@ public class InvertedIndexInputMapReader {
 	 */
 	public synchronized String readLine() throws IOException{
 		String currentWord = null;
-		if(done){
+		if(done | keysRead >= maxKeys){
 			return null;
 		}
 
@@ -47,7 +50,8 @@ public class InvertedIndexInputMapReader {
 			document = documentDB.getNextDocument();
 			if(document != null){
 				index = 0;
-				words = cleanDocument(document.getContent()).split("\\s+");		
+				words = cleanDocument(document.getContent()).split("\\s+");	
+				keysRead++;
 			}
 			else{
 				documentDB.close();
