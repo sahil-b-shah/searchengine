@@ -3,6 +3,9 @@
     <mkdir dir="target/ShuffleURLMaster/WEB-INF/classes"/>
     <mkdir dir="target/ShuffleURLWorker/WEB-INF/classes"/>
   	<mkdir dir="target/ShuffleURLWorker2/WEB-INF/classes"/>
+  	<mkdir dir="target/InvertedIndexMaster/WEB-INF/classes"/>
+    <mkdir dir="target/InvertedIndexWorker/WEB-INF/classes"/>
+  	<mkdir dir="target/InvertedIndexWorker2/WEB-INF/classes"/>
     <mkdir dir="classes"/>
   </target>
   
@@ -20,7 +23,7 @@
 	
 	
   <target name="compile-jobs" depends="init">
-    <javac srcdir="src" destdir="classes" includes="**/ShuffleURLJob.java,**/Job.java,**/Context.java,**/MyHttpClient.java" deprecation="on"
+    <javac srcdir="src" destdir="classes" includes="**/ShuffleURLJob.java,**/InvertedIndexJob.java,**/Job.java,**/Context.java,**/MyHttpClient.java" deprecation="on"
      debug="true" includeantruntime="false" classpath="classes">
        <compilerarg value="-Xlint"/>
     </javac>
@@ -61,8 +64,45 @@
 	       <compilerarg value="-Xlint"/>
 	    </javac>
 	  </target>
+	
+	
+	  <target name="compile-InvertedIndexMaster" depends="init">
+	    <javac srcdir="src" destdir="target/InvertedIndexMaster/WEB-INF/classes" includes="**/InvertedIndexMaster/*.java" deprecation="on"
+	     debug="true" includeantruntime="false">
+	    	<classpath>
+	            <fileset dir="lib/">
+	                <include name="*.jar"/>
+	            </fileset>
+	  	   	</classpath>
+	    	<compilerarg value="-Xlint"/>
+	    </javac>
+	  </target>
+	  
+	  <target name="compile-InvertedIndexWorker" depends="init">
+	    <javac srcdir="src" destdir="target/InvertedIndexWorker/WEB-INF/classes" includes="**/InvertedIndexWorker/*.java,**/InvertedIndexJob.java,**/Job.java,**/Context.java,**/MyHttpClient.java" deprecation="on"
+	     debug="true" includeantruntime="false">
+	    	<classpath>
+	            <fileset dir="lib/">
+	                <include name="*.jar"/>
+	            </fileset>
+	  	   	</classpath>
+	       <compilerarg value="-Xlint"/>
+	    </javac>
+	  </target>
+		
+		<target name="compile-InvertedIndexWorker2" depends="init">
+		    <javac srcdir="src" destdir="target/InvertedIndexWorker2/WEB-INF/classes" includes="**/InvertedIndexWorker/*.java,**/ShuffleURLJob.java,**/Job.java,**/Context.java,**/MyHttpClient.java" deprecation="on"
+		     debug="true" includeantruntime="false">
+		    	<classpath>
+		            <fileset dir="lib/">
+		                <include name="*.jar"/>
+		            </fileset>
+		  	   	</classpath>
+		       <compilerarg value="-Xlint"/>
+		    </javac>
+		  </target>
 
-  <target name="all" depends="war-ShuffleURLMaster,war-ShuffleURLWorker,war-ShuffleURLWorker2,compile-jobs, compile-storage"/>
+  <target name="all" depends="clean,war-InvertedIndexMaster,war-InvertedIndexWorker,war-InvertedIndexWorker2,war-ShuffleURLMaster,war-ShuffleURLWorker,war-ShuffleURLWorker2,compile-jobs, compile-storage"/>
   
   <target name="war-ShuffleURLMaster" depends="compile-ShuffleURLMaster">
     <jar destfile="ShuffleURLMaster.war">
@@ -87,6 +127,31 @@
 	      <fileset dir="target/ShuffleURLWorker2/" includes="WEB-INF/*.xml"/>
 	    </jar>
 	</target>
+	
+	
+	  <target name="war-InvertedIndexMaster" depends="compile-InvertedIndexMaster">
+	    <jar destfile="InvertedIndexMaster.war">
+	      <fileset dir="target/InvertedIndexMaster/" includes="WEB-INF/classes/**/*.class"/>
+	      <fileset dir="target/InvertedIndexMaster/" includes="WEB-INF/lib/*.jar"/>
+	      <fileset dir="target/InvertedIndexMaster/" includes="WEB-INF/*.xml"/>
+	    </jar>
+	  </target>
+
+	  <target name="war-InvertedIndexWorker" depends="compile-InvertedIndexWorker">
+	  	<jar destfile="InvertedIndexWorker.war">
+	      <fileset dir="target/InvertedIndexWorker/" includes="WEB-INF/classes/**/*.class"/>
+	      <fileset dir="target/InvertedIndexWorker/" includes="WEB-INF/lib/*.jar"/>
+	      <fileset dir="target/InvertedIndexWorker/" includes="WEB-INF/*.xml"/>
+	    </jar>
+	  </target>
+		
+		<target name="war-InvertedIndexWorker2" depends="compile-InvertedIndexWorker2">
+		    <jar destfile="InvertedIndexWorker2.war">
+		      <fileset dir="target/InvertedIndexWorker2/" includes="WEB-INF/classes/**/*.class"/>
+		      <fileset dir="target/InvertedIndexWorker2/" includes="WEB-INF/lib/*.jar"/>
+		      <fileset dir="target/InvertedIndexWorker2/" includes="WEB-INF/*.xml"/>
+		    </jar>
+		</target>
   
   <target name="pack" description="Create an archive for submission">
     <zip destfile="submit-hw3.zip">
@@ -102,5 +167,11 @@
     <delete file="ShuffleURLMaster.war"/>
     <delete file="ShuffleURLWorker.war"/>
   	<delete file="ShuffleURLWorker2.war"/>
+  	<delete dir="target/InvertedIndexMaster/WEB-INF/classes"/>
+    <delete dir="target/InvertedIndexWorker/WEB-INF/classes"/>
+  	<delete dir="target/InvertedIndexWorker2/WEB-INF/classes"/>
+    <delete file="InvertedIndexMaster.war"/>
+    <delete file="InvertedIndexWorker.war"/>
+  	<delete file="InvertedIndexWorker2.war"/>
   </target>
 </project>

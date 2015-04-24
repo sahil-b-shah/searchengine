@@ -23,7 +23,7 @@ public class InvertedIndexStatusThread implements Runnable {
 			while(true){
 
 				//Send POST every 10 seconds
-				MyHttpClient client = new MyHttpClient(IPPort, "/master/workerstatus");
+				MyHttpClient client = new MyHttpClient(IPPort, "/InvertedIndexMaster/workerstatus");
 				if(client.connected()){
 
 					HashMap<String, String> params = workerServlet.getStatusParameters();

@@ -47,10 +47,10 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 			for(String key: localStatusMap.keySet()){
 				ArrayList<String> params = localStatusMap.get(key);
 				//Check if in last 30 seconds
-				if((System.currentTimeMillis() - Long.parseLong(params.get(4))) < 30000){
+				if((System.currentTimeMillis() - Long.parseLong(params.get(1))) < 30000){
 					out.println("<tr>");
 					out.println("<td>"+ key+ "</td>");
-					for(int i = 0; i < 4; i++){
+					for(int i = 0; i < 2; i++){
 						out.println("<td>"+ params.get(i)+ "</td>");
 					}
 					out.println("</tr>");
@@ -116,7 +116,7 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 				//Previous reduce code below
 				for(String iport: localStatusMap.keySet()){
 					if((System.currentTimeMillis() - Long.parseLong(params.get(4))) < 30000){
-						MyHttpClient client = new MyHttpClient(iport, "/worker/runreduce");
+						MyHttpClient client = new MyHttpClient(iport, "/InvertedIndexWorker/runreduce");
 						client.addParams("numThreads", numReduceThreads);						
 						client.sendPost();
 					}
@@ -133,7 +133,7 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 
 			//Post to /runmap on every active worker
 			for(String worker: localStatusMap.keySet()){
-				MyHttpClient client = new MyHttpClient(worker, "/worker/runmap");
+				MyHttpClient client = new MyHttpClient(worker, "/InvertedIndexWorker/runmap");
 				//client.addParams("input", inputDir);
 				client.addParams("numThreads", numMapThreads);
 				client.addParams("numWorkers", localStatusMap.size() + "");

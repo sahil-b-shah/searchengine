@@ -144,7 +144,7 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 			//once all keys read, send a POST to /pushdata for appropriate workers	
 			for(File curWorker: workerFiles){
 				String address = request.getParameter(curWorker.getName());
-				MyHttpClient client = new MyHttpClient(address, "/worker/pushdata");
+				MyHttpClient client = new MyHttpClient(address, "/InvertedIndexWorker/pushdata");
 				BufferedReader in = new BufferedReader(new FileReader(curWorker));
 				String body= "";
 				String line = in.readLine();
@@ -165,7 +165,7 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 			mapContext  =null;
 
 			//Issue /workerstatus
-			MyHttpClient client = new MyHttpClient(IPPort, "/master/workerstatus");
+			MyHttpClient client = new MyHttpClient(IPPort, "/InvertedIndexMaster/workerstatus");
 			if(client.connected()){
 
 				HashMap<String, String> params = getStatusParameters();
@@ -251,7 +251,7 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 
 
 			//Issue workerstatus
-			MyHttpClient client = new MyHttpClient(IPPort, "/master/workerstatus");
+			MyHttpClient client = new MyHttpClient(IPPort, "/InvertedIndexMaster/workerstatus");
 			if(client.connected()){
 
 				HashMap<String, String> params = getStatusParameters();
