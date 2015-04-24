@@ -14,7 +14,7 @@ public class IndexJobInputTest extends TestCase  {
 	private String content;
 	
 	public void test() {
-		content  = "This is a sentence";
+		content  = "This is a sentence a  a a  a a  a  a sentence";
 		DocumentDBWrapper db = null;
 		DocumentDBWrapper db2 = null;
 		try {
@@ -22,10 +22,10 @@ public class IndexJobInputTest extends TestCase  {
 		} catch (DatabaseException e) {}
 		
 		
-		System.out.println("Adding 1000 docs");
+		System.out.println("Adding 10000 docs");
 		ArrayList<String> links = new ArrayList<String>();
 		links.add("adsfasdfa");
-		for(int i = 0; i < 1000; i++){
+		for(int i = 0; i < 10000; i++){
 			db.addContent("url" + i, content, 0, links);
 		}
 		
@@ -38,8 +38,8 @@ public class IndexJobInputTest extends TestCase  {
 		} catch (DatabaseException e) {}
 		
 		
-		System.out.println("Adding 1000 docs");
-		for(int i = 0; i < 1000; i++){
+		System.out.println("Adding 10000 docs");
+		for(int i = 0; i < 10000; i++){
 			db2.addContent("url" + i, content, 0, links);
 		}
 		

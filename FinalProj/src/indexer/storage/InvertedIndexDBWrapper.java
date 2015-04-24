@@ -3,6 +3,7 @@ package indexer.storage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
@@ -122,5 +123,20 @@ public class InvertedIndexDBWrapper {
 	public synchronized Integer getOccurence(String word, String url){
 		return invertedIndex.get(word).getUrls().get(url);
 	}
+	
+	public void printContent() {
+		Set<Entry<String, InvertedIndexData>> seenContentEntries = invertedIndex.map().entrySet();
+		
+		for (Entry<String, InvertedIndexData> e : seenContentEntries) {
+			InvertedIndexData ue = e.getValue();
+			System.out.println(ue.getWord()+"------"+
+					ue.getUrls().toString());
+		}
+	}
+	
+	public long getSize(){
+		return invertedIndex.count();
+	}
+	
 	
 }

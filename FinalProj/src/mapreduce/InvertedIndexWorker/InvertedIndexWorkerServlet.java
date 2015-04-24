@@ -125,11 +125,6 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 				InvertedIndexWorkerMapThread workerObj = new InvertedIndexWorkerMapThread(reader, mapContext);
 				threads[i] = new Thread(workerObj);
 				threads[i].start();
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
 			}
 
 

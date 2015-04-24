@@ -19,7 +19,7 @@ public class InvertedIndexInputMapReader {
 	private int keysRead;
 	
 	public InvertedIndexInputMapReader(String documentDirectiory) throws FileNotFoundException{
-		maxKeys = 100;
+		maxKeys = 9000;
 		keysRead = 0;
 		documentDB = DocumentDBWrapper.getInstance(documentDirectiory);
 		documentDB.initIterator();
