@@ -37,7 +37,6 @@ public class DocumentDBWrapper {
 		if (db == null) {
 			System.out.println("Making new db wrapper");
 			db = new DocumentDBWrapper(homeDirectory);
-			System.out.println("Before add" +db.seenContent.count());
 		}
 		return db;
 	}
@@ -159,7 +158,6 @@ public class DocumentDBWrapper {
 		ce.setLastSeen(String.valueOf(date));
 		ce.setLinks(links);
 		if(currentIndex.count() == 0){
-			System.out.println("BUTTS");
 			currentIndex.put(new CurrentIndex("index"));
 		}
 		int i = currentIndex.get("index").getIndex();
@@ -204,7 +202,7 @@ public class DocumentDBWrapper {
 		int size = (int) seenContent.count();
 		System.out.println("Indedfgsdgx" + currentIndex.get("index").getIndex());
 		for(int i = 0; i < size; i++){
-			System.out.println(secondaryIndex.get(i).getUrl());
+			System.out.println(secondaryIndex.get(i));
 		}
 		System.out.println(size);
 	}

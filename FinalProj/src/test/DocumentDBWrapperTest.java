@@ -15,7 +15,7 @@ public class DocumentDBWrapperTest extends TestCase {
 		} catch (DatabaseException e) {}
 
 		
-		for(int i = 10; i < 20; i++){
+		for(int i = 0; i < 10; i++){
 			db.addContent("Doc" + i, ""+ i, 0, null);
 		}
 		
