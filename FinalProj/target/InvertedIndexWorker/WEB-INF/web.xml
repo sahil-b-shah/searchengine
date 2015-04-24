@@ -4,7 +4,7 @@
      <display-name>HW3 (Worker)</display-name>
      
      <servlet>
-         <servlet-name>InvertedIndexWorkerServlet</servlet-name>
+         <servlet-name>InvertedIndexWorker</servlet-name>
          <servlet-class>mapreduce.InvertedIndexWorker.InvertedIndexWorkerServlet</servlet-class>
          <!--<init-param>
            <param-name>storagedir</param-name>
