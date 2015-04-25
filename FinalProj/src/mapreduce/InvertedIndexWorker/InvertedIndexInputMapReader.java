@@ -1,12 +1,15 @@
 package mapreduce.InvertedIndexWorker;
 
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import crawler.storage.DocumentDBWrapper;
 import crawler.storage.DocumentData;
+import crawler.storage.IndexDocumentDBWrapper;
 
 public class InvertedIndexInputMapReader {
 
@@ -15,18 +18,21 @@ public class InvertedIndexInputMapReader {
 	private int index;
 	private boolean done;
 	private DocumentDBWrapper documentDB;
+	private IndexDocumentDBWrapper indexDocumentDB;
 	private int maxKeys;
 	private int keysRead;
 	
-	public InvertedIndexInputMapReader(String documentDirectiory) throws FileNotFoundException{
+	public InvertedIndexInputMapReader(String documentDirectiory, String indexedDocumentDirectory) throws FileNotFoundException{
 		maxKeys = 5;
 		keysRead = 0;
 		documentDB = DocumentDBWrapper.getInstance(documentDirectiory);
+		indexDocumentDB = IndexDocumentDBWrapper.getInstance(indexedDocumentDirectory);
 		documentDB.initIterator();
 		document = documentDB.getNextDocument();
 
 		done = false;
 		if(document != null){
+			indexDocumentDB.addContent(document.getUrl(), document.getContent(), Long.parseLong(document.getLastSeen()), document.getLinks());
 			index = 0;
 			words = cleanDocument(document.getContent()).split("\\s+");
 		}

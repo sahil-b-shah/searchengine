@@ -30,6 +30,10 @@
            <param-name>indexDirectory</param-name>
            <param-value>/home/cis455/InvertedIndexWorker1/indexdb</param-value>
          </init-param>
+         <init-param>
+           <param-name>indexDocDirectory</param-name>
+           <param-value>/home/cis455/InvertedIndexWorker1/indexdocdb</param-value>
+         </init-param>
      </servlet>
 
      <servlet-mapping>

@@ -35,6 +35,7 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 	private static Thread statusThread;
 	private static String documentDirectory;
 	private static String indexDirectory;
+	private static String indexedDocumentDirectory;
 
 	public void init(ServletConfig config) throws ServletException {
 		String master = config.getInitParameter("master");
@@ -43,6 +44,7 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 		job = "none";
 		documentDirectory = config.getInitParameter("documentDirectory");
 		indexDirectory = config.getInitParameter("indexDirectory");
+		indexedDocumentDirectory = config.getInitParameter("indexDocDirectory");
 
 
 		mapContext = null;
@@ -111,7 +113,7 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 
 
 			//Create reader from input db
-			reader = new InvertedIndexInputMapReader(documentDirectory);
+			reader = new InvertedIndexInputMapReader(documentDirectory, indexedDocumentDirectory);
 
 			//Create emit from Map function implementing context
 			mapContext = new InvertedIndexMapContext(spoolout, workers);
