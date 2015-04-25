@@ -56,6 +56,7 @@ public class InvertedIndexInputReduceReader {
 							tempLine += " " + nextLineValue + ";" + count;
 						}
 						count = 1;
+						value = nextLine.split("\\t")[1];
 					}
 					nextLine = in.readLine();
 				}

@@ -11,6 +11,8 @@ public class InvertedIndexJob implements Job{
 	public void reduce(String key, String[] values, Context context) {
 		String val = "";
 		for(int i = 0; i < values.length; i++){
+			System.out.println(key + "  Value in reduce: "+values[i]);
+
 			if(i == 0)
 				val = values[i];
 			else

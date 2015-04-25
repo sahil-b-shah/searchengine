@@ -24,7 +24,9 @@ public class InvertedIndexReduceContext implements Context {
 			String params [] = tempEntry.split(";");
 			map.put(params[0], Integer.parseInt(params[1]));
 		}
-		
+		System.out.println("Reduce emit " + key + map.size());
+
+				
 		indexDB.addWord(key, map);
 
 	}
