@@ -33,6 +33,7 @@ public class InvertedIndexInputMapReader {
 		done = false;
 		if(document != null){
 			indexDocumentDB.addContent(document.getUrl(), document.getContent(), Long.parseLong(document.getLastSeen()), document.getLinks());
+			System.out.println("New doc size " + indexDocumentDB.getSize());
 			index = 0;
 			words = cleanDocument(document.getContent()).split("\\s+");
 		}
@@ -57,6 +58,8 @@ public class InvertedIndexInputMapReader {
 			document = documentDB.getNextDocument();
 			System.out.println("Database size " + documentDB.getSize());
 			if(document != null){
+				indexDocumentDB.addContent(document.getUrl(), document.getContent(), Long.parseLong(document.getLastSeen()), document.getLinks());
+				System.out.println("New doc size " + indexDocumentDB.getSize());
 				index = 0;
 				words = cleanDocument(document.getContent()).split("\\s+");	
 				keysRead++;
@@ -67,6 +70,8 @@ public class InvertedIndexInputMapReader {
 			else{
 				System.out.println("Doc was null");
 				documentDB.close();
+				indexDocumentDB.close();
+				
 				done = true;
 			}
 		}

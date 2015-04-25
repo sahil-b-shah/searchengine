@@ -66,6 +66,7 @@ public class InvertedIndexInputReduceReader {
 		}
 
 		line = nextLine;
+		System.out.println("Templine" + tempLine);
 		return tempLine;
 
 	}
