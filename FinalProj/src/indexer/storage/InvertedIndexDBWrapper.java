@@ -117,6 +117,8 @@ public class InvertedIndexDBWrapper {
 	}
 		
 	public synchronized HashMap<String, Integer> getUrls(String word){
+		if(invertedIndex.get(word) == null)
+			return null;
 		return invertedIndex.get(word).getUrls();
 	}
 	

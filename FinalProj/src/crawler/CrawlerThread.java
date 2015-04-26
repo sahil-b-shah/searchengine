@@ -20,11 +20,16 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.w3c.dom.Document;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.tidy.Tidy;
+
+import com.cybozu.labs.langdetect.Detector;
+import com.cybozu.labs.langdetect.DetectorFactory;
+import com.cybozu.labs.langdetect.LangDetectException;
 
 import crawler.storage.DocumentDBWrapper;
 import crawler.storage.DocumentData;
@@ -96,7 +101,6 @@ public class CrawlerThread extends Thread {
 						Crawler.deleteCurrentHost(request.getHost());
 					}
 					else{
-						System.out.println("penis");
 						frontierDB.addUrl(urlString);
 					}
 				} else {
@@ -216,18 +220,36 @@ public class CrawlerThread extends Thread {
 		InputStream is2 = new ByteArrayInputStream(baos.toByteArray()); 
 		InputStream is3 = new ByteArrayInputStream(baos.toByteArray());
 
-
 		//InputStream isCopy = new InputStream(is);
 		String contentType = request.getContentType();
 		if (contentType.contains("html")) {
-			ArrayList<String> links = extractUrls(new String(buffer));
-			addContent(is2, links);
+			String content = cleanDocument(new String(buffer));
+			if (checkEnLanguage(content)) {
+				ArrayList<String> links = extractUrls(new String(buffer));
+				addContent(is2, links);
+			}
 		} else if(contentType.contains("xml")) {
 			addContent(is3, null);
 		}
 	}
 
-
+	private boolean checkEnLanguage(String body) {
+		Detector detector = null;
+		String detectedLang = "";
+		System.out.println(System.getProperty("user.dir"));
+		try {
+			DetectorFactory.loadProfile(System.getProperty("user.dir")+"/lib/profiles");
+			detector = DetectorFactory.create();
+			detector.append(body);
+			detectedLang = detector.detect();
+		} catch (LangDetectException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println("Detected language: "+detectedLang);
+		return detectedLang.equals("en");
+	}
 
 	private void addContent(InputStream is, ArrayList<String> links) {
 		byte b[] = new byte[request.getContentLength()];
@@ -262,6 +284,11 @@ public class CrawlerThread extends Thread {
 		}
 
 		return links;
+	}
+	
+	private String cleanDocument(String docString){
+		Document doc = Jsoup.parse(docString);
+		return doc.body().text();
 	}
 
 	private URL makeAbsolute(String urlString, String extractedString) {

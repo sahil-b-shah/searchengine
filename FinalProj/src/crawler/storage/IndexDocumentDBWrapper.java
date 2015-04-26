@@ -154,7 +154,7 @@ public class IndexDocumentDBWrapper {
 		ce.setLastSeen(String.valueOf(date));
 		ce.setLinks(links);
 		seenContent.put(ce);
-		//System.out.println("bitches being added");
+		System.out.println("bitches being added");
 
 	}
 	

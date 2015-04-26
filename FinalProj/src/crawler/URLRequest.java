@@ -239,6 +239,7 @@ public class URLRequest {
 		con.setRequestMethod(method);
 		con.addRequestProperty("Host", hostName);
 		con.addRequestProperty("User-Agent", "cis455crawler");
+		con.addRequestProperty("Accept-Language", "en-US");
 		return con;
 	}
 	
