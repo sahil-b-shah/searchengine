@@ -1,5 +1,6 @@
-<project name="HW3" default="all" basedir="./">
+<project name="FinalProj" default="all" basedir="./">
   <target name="init">
+    <mkdir dir="target/Search/WEB-INF/classes"/>
     <mkdir dir="target/ShuffleURLMaster/WEB-INF/classes"/>
     <mkdir dir="target/ShuffleURLWorker/WEB-INF/classes"/>
   	<mkdir dir="target/ShuffleURLWorker2/WEB-INF/classes"/>
@@ -65,7 +66,18 @@
 	    </javac>
 	  </target>
 	
-	
+	<target name="compile-Search" depends="init">
+            <javac srcdir="src" destdir="target/Search/WEB-INF/classes" includes="**/Search/*.java" deprecation="on"
+             debug="true" includeantruntime="false">
+                <classpath>
+                    <fileset dir="lib/">
+                        <include name="*.jar"/>
+                    </fileset>
+                        </classpath>
+                <compilerarg value="-Xlint"/>
+            </javac>
+          </target>
+
 	  <target name="compile-InvertedIndexMaster" depends="init">
 	    <javac srcdir="src" destdir="target/InvertedIndexMaster/WEB-INF/classes" includes="**/InvertedIndexMaster/*.java" deprecation="on"
 	     debug="true" includeantruntime="false">
@@ -102,13 +114,21 @@
 		    </javac>
 		  </target>
 
-  <target name="all" depends="clean,war-InvertedIndexMaster,war-InvertedIndexWorker,war-InvertedIndexWorker2,war-ShuffleURLMaster,war-ShuffleURLWorker,war-ShuffleURLWorker2,compile-jobs, compile-storage"/>
+  <target name="all" depends="clean,war-Search,war-InvertedIndexMaster,war-InvertedIndexWorker,war-InvertedIndexWorker2,war-ShuffleURLMaster,war-ShuffleURLWorker,war-ShuffleURLWorker2,compile-jobs, compile-storage"/>
   
   <target name="war-ShuffleURLMaster" depends="compile-ShuffleURLMaster">
     <jar destfile="ShuffleURLMaster.war">
       <fileset dir="target/ShuffleURLMaster/" includes="WEB-INF/classes/**/*.class"/>
       <fileset dir="target/ShuffleURLMaster/" includes="WEB-INF/lib/*.jar"/>
       <fileset dir="target/ShuffleURLMaster/" includes="WEB-INF/*.xml"/>
+    </jar>
+  </target>
+
+<target name="war-Search" depends="compile-Search">
+        <jar destfile="Search.war">
+      <fileset dir="target/Search/" includes="WEB-INF/classes/**/*.class"/>
+      <fileset dir="target/Search/" includes="WEB-INF/lib/*.jar"/>
+      <fileset dir="target/Search/" includes="WEB-INF/*.xml"/>
     </jar>
   </target>
 
@@ -166,7 +186,9 @@
     <delete dir="classes"/>
     <delete file="ShuffleURLMaster.war"/>
     <delete file="ShuffleURLWorker.war"/>
+    <delete file="Search.war"/>
   	<delete file="ShuffleURLWorker2.war"/>
+	<delete dir="target/Search/WEB-INF/classes"/>
   	<delete dir="target/InvertedIndexMaster/WEB-INF/classes"/>
     <delete dir="target/InvertedIndexWorker/WEB-INF/classes"/>
   	<delete dir="target/InvertedIndexWorker2/WEB-INF/classes"/>
