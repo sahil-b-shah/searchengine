@@ -89,7 +89,7 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 			//Get query string params
 			String status = request.getParameter("status");
 			String port = request.getParameter("port");
-			String IPPort = request.getLocalAddr() + ":" + port;
+			String IPPort = port;
 			String timeLastReceived = System.currentTimeMillis() + "";			
 
 			Map<String, ArrayList<String>> localStatusMap =  getStatusMap();

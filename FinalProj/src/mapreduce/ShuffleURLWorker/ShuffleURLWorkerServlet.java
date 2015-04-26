@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 
 import javax.servlet.*;
@@ -31,7 +32,12 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 
 	public void init(ServletConfig config) throws ServletException {
 		String master = config.getInitParameter("master");
-		port = config.getInitParameter("port");
+		//port = config.getInitParameter("port");
+		try {
+			port = InetAddress.getLocalHost().getHostAddress() + ":80";
+		} catch (UnknownHostException e) {
+			port = "";
+		}
 		status = "idle";
 		job = "none";
 		frontierDirectory = config.getInitParameter("frontierDirectory");
