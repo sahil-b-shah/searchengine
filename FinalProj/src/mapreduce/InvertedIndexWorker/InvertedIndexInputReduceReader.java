@@ -33,6 +33,7 @@ public class InvertedIndexInputReduceReader {
 		String tempLine  = null;
 		String nextLine = null;
 		if(line != null){
+			System.out.println("Line in reduce reader " + line);
 			int count = 1;
 			String word = line.split("\\t")[0];
 			String value = line.split("\\t")[1];
@@ -53,18 +54,23 @@ public class InvertedIndexInputReduceReader {
 							tempLine = word + "\t" + value+";"+count;
 						}
 						else{
-							tempLine += " " + nextLineValue + ";" + count;
+							tempLine += " " + value + ";" + count;
 						}
 						count = 1;
 						value = nextLine.split("\\t")[1];
 					}
 					nextLine = in.readLine();
+					System.out.println("New next line: " + nextLine + "   " + tempLine);
+					System.out.println(nextLineKey + nextLineValue);
 				}
 				else{
+					System.out.println("In break " + nextLineKey + nextLineValue);
 					break;
 				}
 			}
+			tempLine += " " + value + ";" + count;
 		}
+		
 
 		line = nextLine;
 		System.out.println("Templine" + tempLine);
