@@ -126,7 +126,7 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 					//System.out.println("Posting /runmap to "+ worker);
 					client.sendPost();
 				}
-				
+
 				//Previous reduce code below
 				/*for(String iport: localStatusMap.keySet()){
 					if((System.currentTimeMillis() - Long.parseLong(params.get(4))) < 30000){
@@ -141,24 +141,28 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 		else{
 
 			//inputDir = request.getParameter("input");
-		    //outputDir = request.getParameter("output");
+			//outputDir = request.getParameter("output");
 			numMapThreads = request.getParameter("numMapThreads");
 			//numReduceThreads = request.getParameter("numReduceThreads");
 			Map<String, ArrayList<String>> localStatusMap =  getStatusMap();
 
 			//Post to /runmap on every active worker
 			for(String worker: localStatusMap.keySet()){
-				MyHttpClient client = new MyHttpClient(worker, "/ShuffleURLWorker/runmap");
-				//client.addParams("input", inputDir);
-				client.addParams("numThreads", numMapThreads);
-				client.addParams("numWorkers", localStatusMap.size() + "");
-				int counter = 1;
-				for(String workerID: localStatusMap.keySet()){
-					client.addParams("worker"+counter + ".txt", workerID);
-					counter++;
+				ArrayList<String> params = localStatusMap.get(worker);
+				//Check if in last 30 seconds
+				if((System.currentTimeMillis() - Long.parseLong(params.get(1))) < 30000){
+					MyHttpClient client = new MyHttpClient(worker, "/ShuffleURLWorker/runmap");
+					//client.addParams("input", inputDir);
+					client.addParams("numThreads", numMapThreads);
+					client.addParams("numWorkers", localStatusMap.size() + "");
+					int counter = 1;
+					for(String workerID: localStatusMap.keySet()){
+						client.addParams("worker"+counter + ".txt", workerID);
+						counter++;
+					}
+					System.out.println("Posting /runmap to "+ worker);
+					client.sendPost();
 				}
-				//System.out.println("Posting /runmap to "+ worker);
-				client.sendPost();
 			}
 		}
 

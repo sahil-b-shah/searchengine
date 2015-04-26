@@ -65,7 +65,7 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response) 
 			throws java.io.IOException
 	{
-		String IPPort = InetAddress.getLocalHost() + ":" + port;
+		String IPPort = port;
 
 		if(request.getRequestURI().contains("/runmap")){
 			status = "mapping";
