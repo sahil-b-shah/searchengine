@@ -142,7 +142,7 @@
 		    </javac>
 		  </target>
 
-  <target name="all" depends="clean,war-Search,war-InvertedIndexMaster,war-InvertedIndexWorker,war-InvertedIndexWorker2,war-ShuffleURLMaster,war-ShuffleURLWorker,war-ShuffleURLWorker2,compile-jobs, compile-storage"/>
+  <target name="all" depends="clean,war-Search,war-InvertedIndexMaster,war-InvertedIndexWorker,war-InvertedIndexWorker2,war-ShuffleURLMaster,war-ShuffleURLWorker,war-ShuffleURLWorker2,compile-jobs, compile-storage, build-crawler"/>
   
   <target name="war-ShuffleURLMaster" depends="compile-ShuffleURLMaster">
     <jar destfile="ShuffleURLMaster.war">
