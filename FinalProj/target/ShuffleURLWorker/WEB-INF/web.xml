@@ -30,6 +30,7 @@
            <param-name>unseenLinksDirectory</param-name>
            <param-value>/home/cis455/ShuffleWorker1/unseenlinksdb</param-value>
          </init-param>
+         <load-on-startup>0</load-on-startup>
      </servlet>
 
      <servlet-mapping>
