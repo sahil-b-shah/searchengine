@@ -7,14 +7,35 @@
   	<mkdir dir="target/InvertedIndexMaster/WEB-INF/classes"/>
     <mkdir dir="target/InvertedIndexWorker/WEB-INF/classes"/>
   	<mkdir dir="target/InvertedIndexWorker2/WEB-INF/classes"/>
+  	<mkdir dir="target/Crawler/classes"/>
     <mkdir dir="classes"/>
   </target>
   
-  <target name ="compile-crawler" depends="init">
+  <target name ="build-crawler" depends="compile-crawler">
   	<jar destfile="crawler.jar">
-        <fileset dir="src" includes="crawler/**/*.java"/>
+        <!--<fileset dir="src" includes="crawler/**/*.java"/>-->
+        <fileset dir="target/Crawler/classes" includes="/crawler/**/*.class"/>
+	    <fileset dir="target/Crawler" includes="/lib/*"/>
+  		<!--<zipgroupfileset dir="lib" includes="*.jar"/>-->
+  		<!--<zipgroupfileset dir="lib/profiles" includes="*" excludes=""/>-->
+	    <manifest>
+	  		<attribute name="Main-Class"
+	  			value="crawler.Crawler"/>
+	    </manifest>
   	</jar>
   	</target>
+	
+	<target name="compile-crawler" depends="init">
+	    <javac srcdir="src" destdir="target/Crawler/classes" includes="crawler/**/*.java" deprecation="on"
+	     debug="true" includeantruntime="false">
+	    	<classpath>
+	            <fileset dir="lib/">
+	                <include name="*.jar"/>
+	            </fileset>
+	  	   	</classpath>
+	       <compilerarg value="-Xlint"/>
+	    </javac>
+	  </target>
 
 	
   <target name="compile-storage" depends="init">
@@ -202,5 +223,6 @@
     <delete file="InvertedIndexMaster.war"/>
     <delete file="InvertedIndexWorker.war"/>
   	<delete file="InvertedIndexWorker2.war"/>
+  	<delete file="crawler.jar"/>
   </target>
 </project>
