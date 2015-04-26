@@ -14,9 +14,9 @@
   <target name ="build-crawler" depends="compile-crawler">
   	<jar destfile="crawler.jar">
         <!--<fileset dir="src" includes="crawler/**/*.java"/>-->
-        <fileset dir="target/Crawler/classes" includes="/crawler/**/*.class"/>
+        <fileset dir="target/Crawler/classes/" includes="crawler/**/*.class"/>
 	    <fileset dir="target/Crawler" includes="/lib/*"/>
-  		<!--<zipgroupfileset dir="lib" includes="*.jar"/>-->
+  		<zipgroupfileset dir="target/Crawler/lib" includes="*"/>
   		<!--<zipgroupfileset dir="lib/profiles" includes="*" excludes=""/>-->
 	    <manifest>
 	  		<attribute name="Main-Class"
@@ -220,6 +220,7 @@
   	<delete dir="target/InvertedIndexMaster/WEB-INF/classes"/>
     <delete dir="target/InvertedIndexWorker/WEB-INF/classes"/>
   	<delete dir="target/InvertedIndexWorker2/WEB-INF/classes"/>
+  	<delete dir="target/Crawler/classes"/>
     <delete file="InvertedIndexMaster.war"/>
     <delete file="InvertedIndexWorker.war"/>
   	<delete file="InvertedIndexWorker2.war"/>
