@@ -2,7 +2,6 @@ package crawler;
 
 
 import java.io.FileNotFoundException;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.sleepycat.je.DatabaseException;
 
 import crawler.storage.DocumentDBWrapper;
-import crawler.storage.RobotsDBWrapper;
 import crawler.storage.URLFrontierDBWrapper;
 import crawler.storage.UnseenLinksDBWrapper;
 import crawler.storage.UnseenLinksData;
@@ -77,17 +75,16 @@ public class Crawler {
 			maxFiles = Integer.parseInt(args[3]);
 		}
 		
-		System.out.println("Printing current document");
 		DocumentDBWrapper docDB = DocumentDBWrapper.getInstance(documentDirectory);
-		docDB.getAllContent();
+		System.out.println("Printing current document DB size: "+docDB.getSize());
 		docDB.close();
 		
-		System.out.println("Prinitng unseen links");
+		/*System.out.println("Prinitng unseen links");
 		UnseenLinksDBWrapper unseenDB = UnseenLinksDBWrapper.getInstance(unseenLinksDirectory);
 		unseenDB.getAllContent();
-		unseenDB.close();
+		unseenDB.close();*/
 		
-		seedFromUnseen();
+		//seedFromUnseen();
 		
 		URLFrontierDBWrapper frontierDB = URLFrontierDBWrapper.getInstance(frontierDirectory);
 		frontierDB.addUrl(urlString);

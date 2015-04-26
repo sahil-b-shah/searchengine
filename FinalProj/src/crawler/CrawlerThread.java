@@ -17,16 +17,8 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.tidy.Tidy;
-
 import com.cybozu.labs.langdetect.Detector;
 import com.cybozu.labs.langdetect.DetectorFactory;
 import com.cybozu.labs.langdetect.LangDetectException;
@@ -137,17 +129,17 @@ public class CrawlerThread extends Thread {
 		ArrayList<String> disallowed = robots.getDisallowedLinks();	
 		ArrayList<String> allowed = robots.getAllowedLinks();
 		
-		System.out.println(disallowed.toString());
-		System.out.println(allowed.toString());
+		//System.out.println(disallowed.toString());
+		//System.out.println(allowed.toString());
 		String allowedTestURL = decodeURL(request.getFilePath());
 		System.out.println(allowedTestURL);
 		
 		if(!allowed(allowedTestURL, disallowed, allowed)) {
-			System.out.println("This bitch be disallowed");
+			//System.out.println("This bitch be disallowed");
 			return false;
 		}
 		//System.out.println(disallowed);
-		System.out.println("filepath is not disallowed");
+		//System.out.println("filepath is not disallowed");
 
 		DocumentData ce = docDB.getContentById(request.getHost()+request.getFilePath());
 		//Date lastSeen = checkModifiedDate(ce.getLastSeen());
@@ -163,7 +155,7 @@ public class CrawlerThread extends Thread {
 				e.printStackTrace();
 			}
 		} else {
-			System.out.println("content is not null");
+			//System.out.println("content is not null");
 			//Date lastSeen = new Date(Long.valueOf(ce.getLastSeen()));
 			boolean modified = false;
 
@@ -176,10 +168,10 @@ public class CrawlerThread extends Thread {
 			//System.out.println(request.getHost()+request.getFilePath()+ " last modified"+lastModified);
 			//Check if last seen is less than last modified
 			if (!modified) {
-				System.out.println(request.getFilePath()+" Last modified is before last seen");
+				//System.out.println(request.getFilePath()+" Last modified is before last seen");
 				return false;
 			} else {
-				System.out.println(request.getFilePath()+" Last modified is after last seen");
+				//System.out.println(request.getFilePath()+" Last modified is after last seen");
 				makeRequest = true & makeRequest;
 			}
 		}
@@ -226,7 +218,7 @@ public class CrawlerThread extends Thread {
 			String content = cleanDocument(new String(buffer));
 			if (checkEnLanguage(content)) {
 				ArrayList<String> links = extractUrls(new String(buffer));
-				addContent(is2, links);
+				addContent(content, links);
 			}
 		} else if(contentType.contains("xml")) {
 			addContent(is3, null);
@@ -247,8 +239,13 @@ public class CrawlerThread extends Thread {
 			e.printStackTrace();
 		}
 		
-		System.out.println("Detected language: "+detectedLang);
+		//System.out.println("Detected language: "+detectedLang);
 		return detectedLang.equals("en");
+	}
+
+	private void addContent(String content, ArrayList<String> links) {
+		docDB.addContent(request.getHost()+request.getFilePath(),
+				content, System.currentTimeMillis(), links);
 	}
 
 	private void addContent(InputStream is, ArrayList<String> links) {
@@ -276,7 +273,7 @@ public class CrawlerThread extends Thread {
 			
 			URL url = makeAbsolute(request.getUrlString(), newURL);
 			//add to queue
-			System.out.println("Adding " + url.getProtocol()+"://"+url.getHost()+url.getFile());
+			//System.out.println("Adding " + url.getProtocol()+"://"+url.getHost()+url.getFile()+" to unseen links");
 			unseenLinksDB.addURL(url.getProtocol()+"://"+url.getHost()+url.getFile());
 			links.add(url.getProtocol()+"://"+url.getHost()+url.getFile());
 
@@ -305,9 +302,9 @@ public class CrawlerThread extends Thread {
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
-		System.out.print("Extracted ");
+		/*System.out.print("Extracted ");
 		System.out.print(extracted.getHost()+extracted.getPath());
-		System.out.println(" from "+base.getHost()+base.getPath());
+		System.out.println(" from "+base.getHost()+base.getPath());*/
 
 		return extracted;
 	}

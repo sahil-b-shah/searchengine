@@ -28,6 +28,8 @@ public class ThreadPool {
 			Entry<Integer, QueueEntity> entry1 = db.getNextUrl();
 			System.out.println(entry1.getKey()+": " + entry1.getValue().getUrl());
 		}*/
+		
+		System.out.println("BEFORE document DB size: "+docDB.getSize());
     	
         for(int i=0; i<noOfThreads; i++){
             threads.add(new CrawlerThread(docDB, frontierDB, robotsDB, unseenLinksDB, maxSize));
@@ -50,7 +52,7 @@ public class ThreadPool {
 				System.err.println("Map thread ended unnaturally");
 			}
 		}
-		
+		System.out.println("AFTER document DB size: "+docDB.getSize());
 		System.out.println("Closing entire crawler");
 		frontierDB.close();
 		docDB.close();

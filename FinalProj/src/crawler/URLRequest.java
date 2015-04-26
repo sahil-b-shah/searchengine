@@ -181,7 +181,7 @@ public class URLRequest {
 				String key = m.group(1);
 				key = key.trim();
 				String value = m.group(2);
-				System.out.println("Robots --"+key+": "+value);
+				//System.out.println("Robots --"+key+": "+value);
 				value = value.trim();
 				if (key.equalsIgnoreCase("User-Agent")) {
 					userAgent = value;
