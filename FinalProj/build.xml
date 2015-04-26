@@ -10,6 +10,13 @@
     <mkdir dir="classes"/>
   </target>
   
+  <target name ="compile-crawler" depends="init">
+  	<jar destfile="crawler.jar">
+        <fileset dir="src" includes="crawler/**/*.java"/>
+  	</jar>
+  	</target>
+
+	
   <target name="compile-storage" depends="init">
     <javac srcdir="src" destdir="classes" includes="**/indexer/storage/*.java,**/crawler/storage/*.java" deprecation="on"
      debug="true" includeantruntime="false">
