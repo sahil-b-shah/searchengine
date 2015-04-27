@@ -134,9 +134,10 @@ public class URLRequest {
 
 		if(this.protocol.equals("http")) {
 			InputStream responseStream = sendRequest(hostName, filePath, "HEAD", params);
-			/*if (responseStream.available()==0) {
+			if (responseStream == null) {
 				return false;
-			}*/
+			}
+			
 			BufferedReader br = new BufferedReader(new InputStreamReader(responseStream));
 			if (setResponseHeaders(br)){
 				System.out.println(this.hostName+"---- Content length: "+this.contentLength);
@@ -163,10 +164,9 @@ public class URLRequest {
 		//int responseCode = con.getResponseCode();
 		if(this.protocol.equals("http")) {
 			InputStream responseStream = sendRequest(hostName, filePath, "HEAD", null);
-			/*if(responseStream.available()==0) {
-				System.out.println("Response stream 0");
+			if (responseStream == null) {
 				return false;
-			}*/
+			}
 			BufferedReader br = new BufferedReader(new InputStreamReader(responseStream));
 			if (setResponseHeaders(br)){
 				System.out.println(this.hostName+"---- Content length: "+this.contentLength);
@@ -352,7 +352,7 @@ public class URLRequest {
 			return false;
 		}
 		String[] firstLine = line.split("\\s");
-		System.out.println("First line:" + firstLine);
+		//System.out.println("First line:" + firstLine);
 		if ((Integer.valueOf(firstLine[1]) != 200)) {
 			System.err.println("Response code not 200: "+firstLine[1]);
 			return false;

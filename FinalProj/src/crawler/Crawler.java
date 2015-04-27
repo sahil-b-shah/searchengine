@@ -61,7 +61,7 @@ public class Crawler {
 		
 		currentHosts = new ConcurrentHashMap<String, String>();
 		
-		//urlString = "https://dbappserv.cis.upenn.edu/crawltest/marie/tpc/part.xml";
+		urlString = "https://www.facebook.com/time";
 		//urlString = args[0];
 		String homeDir = args[0];
 		//Directory for stores
@@ -86,8 +86,8 @@ public class Crawler {
 		
 		//seedFromUnseen();
 		
-		/*URLFrontierDBWrapper frontierDB = URLFrontierDBWrapper.getInstance(frontierDirectory);
-		frontierDB.addUrl(urlString);*/
+		URLFrontierDBWrapper frontierDB = URLFrontierDBWrapper.getInstance(frontierDirectory);
+		frontierDB.addUrl(urlString);
 		setup();
 	}
 	
