@@ -6,6 +6,8 @@ import java.util.List;
 
 import mapreduce.ShuffleURLWorker.ShuffleURLMapThread;
 
+import com.cybozu.labs.langdetect.DetectorFactory;
+import com.cybozu.labs.langdetect.LangDetectException;
 import com.sleepycat.je.DatabaseException;
 
 import crawler.storage.DocumentDBWrapper;
@@ -24,7 +26,12 @@ public class ThreadPool {
     	URLFrontierDBWrapper frontierDB = URLFrontierDBWrapper.getInstance(frontierDirectory);
 		RobotsDBWrapper robotsDB = RobotsDBWrapper.getInstance(robotsDirectory);
 		UnseenLinksDBWrapper unseenLinksDB = UnseenLinksDBWrapper.getInstance(unseenLinksDirectory);
-    	/*while (!db.isEmpty()) {
+		try {
+			DetectorFactory.loadProfile(System.getProperty("user.dir")+"/lib/profiles");
+		} catch (LangDetectException e1) {
+			e1.printStackTrace();
+		}
+		/*while (!db.isEmpty()) {
 			Entry<Integer, QueueEntity> entry1 = db.getNextUrl();
 			System.out.println(entry1.getKey()+": " + entry1.getValue().getUrl());
 		}*/

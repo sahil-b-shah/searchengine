@@ -321,7 +321,7 @@ public class URLRequest {
 	}
 	
 	private boolean setResponseHeaders(BufferedReader br) throws IOException {
-		System.out.println("In response");
+		//System.out.println("In response");
 		String line;
 		line = br.readLine();
 		if (line == null) {

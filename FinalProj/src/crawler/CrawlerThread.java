@@ -256,10 +256,10 @@ public class CrawlerThread extends Thread {
 		String detectedLang = "";
 		//System.out.println(System.getProperty("user.dir"));
 		try {
-			DetectorFactory.loadProfile(System.getProperty("user.dir")+"/lib/profiles");
 			detector = DetectorFactory.create();
 			detector.append(body);
 			detectedLang = detector.detect();
+			//detector.getProbabilities();
 		} catch (LangDetectException e) {
 			e.printStackTrace();
 			return false;
