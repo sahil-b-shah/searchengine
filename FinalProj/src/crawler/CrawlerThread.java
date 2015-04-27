@@ -160,6 +160,7 @@ public class CrawlerThread extends Thread {
 				e.printStackTrace();
 			}
 		} else {
+			return false;
 			/*
 			//System.out.println("content is not null");
 			//Date lastSeen = new Date(Long.valueOf(ce.getLastSeen()));
@@ -238,7 +239,7 @@ public class CrawlerThread extends Thread {
 		String contentType = request.getContentType();
 		if (contentType.contains("html")) {
 			String content = cleanDocument(input.toString());
-			System.out.println(content);
+			//System.out.println(content);
 			if (checkEnLanguage(content)) {
 				ArrayList<String> links = extractUrls(input.toString());
 				addContent(content, links);

@@ -206,7 +206,7 @@ public class URLRequest {
 		RobotsTxtInfo robotsTxt = new RobotsTxtInfo();
 		//Get reponse and read headers 
 		if (this.protocol.equals("http")) {
-			InputStream responseStream = sendRequest(hostName, "/robots.txt", "GET", null);
+			InputStream responseStream = sendRequest(this.hostName, "/robots.txt", "GET", null);
 			if (setResponseHeaders(responseStream)){
 				System.out.println(this.hostName+"---- Content length: "+this.contentLength);
 				br = new BufferedReader(new InputStreamReader(responseStream));
@@ -222,6 +222,7 @@ public class URLRequest {
 		}
 		String string;
 		String userAgent = "*";
+		System.out.println("Bitches");
 		while ((string = br.readLine()) != null) {
 			System.out.println(string);
 			if (string.contains("#")) {
@@ -248,25 +249,26 @@ public class URLRequest {
 					robotsTxt.addCrawlDelay(userAgent, Integer.valueOf(value));
 				}
 			}
-			RobotsDBWrapper robotsDB = RobotsDBWrapper.getInstance("/home/cis455/storage");
-			robotsDB.addRobotsTxt(hostName, robotsTxt.getAllowedLinks("cis455crawler"),
-					robotsTxt.getDisallowedLinks("cis455crawler"), robotsTxt.getCrawlDelay("cis455crawler"));
-			
 		}
+		System.out.println("bitches "+string);
+		RobotsDBWrapper robotsDB = RobotsDBWrapper.getInstance("/home/cis455/storage");
+		robotsDB.addRobotsTxt(this.hostName, robotsTxt.getAllowedLinks("cis455crawler"),
+				robotsTxt.getDisallowedLinks("cis455crawler"), robotsTxt.getCrawlDelay("cis455crawler"));
+		
 	}
 	
-	private InputStream sendRequest(String hostName, String filepath) throws IOException {
-		return sendRequest(hostName, filepath, "GET", null);
+	private InputStream sendRequest(String hostname, String filepath) throws IOException {
+		return sendRequest(hostname, filepath, "GET", null);
 	}
 	
 	private InputStream sendRequest(String hostname, String filepath, String method,
 			Map<String, String> params) throws IOException {
 		
-		System.out.println("Sending http "+method+ " request to "+hostName + filepath);
+		System.out.println("Sending http "+method+ " request to "+hostname + filepath);
 		this.delay();
 		Socket s = null;
 		try {
-			s = new Socket(InetAddress.getByName(hostName), getPort());
+			s = new Socket(InetAddress.getByName(hostname), getPort());
 		} catch (UnknownHostException e) {
 			System.err.println("Host could not be resolved");
 			e.printStackTrace();
@@ -280,8 +282,8 @@ public class URLRequest {
 		PrintWriter pw = new PrintWriter(s.getOutputStream());
 		//PrintWriter pw = new PrintWriter(System.out);
 
-		pw.println(method+" "+filePath+" HTTP/1.0");
-		pw.println("Host: " + hostName);
+		pw.println(method+" "+filepath+" HTTP/1.0");
+		pw.println("Host: " + hostname);
 		pw.println("User-Agent: cis455crawler");
 		pw.println("Accept-Language: en-US");
 
@@ -315,9 +317,10 @@ public class URLRequest {
 		}
 		Pattern p = Pattern.compile(HTTP_HEADER_REGEX);
 		while ((line = br.readLine())!=null) {
-			//System.out.println(line);
+			System.out.println(line);
 			if (line.isEmpty()) {
-				break;
+				System.out.println("Empty line");
+				//break;
 			}
 			Matcher m = p.matcher(line);
 			if (m.find()) {

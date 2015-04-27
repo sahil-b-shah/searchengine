@@ -144,4 +144,8 @@ public class UnseenLinksDBWrapper {
 		c.close();
 		return unseenLinksIndex.map();
 	}
+	
+	public synchronized long getSize() {
+		return unseenLinksIndex.count();
+	}
 }
