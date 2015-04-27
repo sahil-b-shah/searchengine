@@ -37,7 +37,7 @@ public class URLRequest {
 	private String protocol;
 	private String hostName;
 	private String filePath;
-	private int port;
+	private int port = -1;
 	private String contentType;
 	private int contentLength = -1;
 	private Date lastModified;
@@ -132,8 +132,11 @@ public class URLRequest {
 		
 		if(this.protocol.equals("http")) {
 			InputStream responseStream = sendRequest(hostName, filePath, "HEAD", params);
-			
-			if (setResponseHeaders(responseStream)){
+			if (responseStream.available()==0) {
+				return false;
+			}
+			BufferedReader br = new BufferedReader(new InputStreamReader(responseStream));
+			if (setResponseHeaders(br)){
 				System.out.println(this.hostName+"---- Content length: "+this.contentLength);
 				return true;
 			}
@@ -158,8 +161,11 @@ public class URLRequest {
 		//int responseCode = con.getResponseCode();
 		if(this.protocol.equals("http")) {
 			InputStream responseStream = sendRequest(hostName, filePath, "HEAD", null);
-			
-			if (setResponseHeaders(responseStream)){
+			if(responseStream.available()==0) {
+				return false;
+			}
+			BufferedReader br = new BufferedReader(new InputStreamReader(responseStream));
+			if (setResponseHeaders(br)){
 				System.out.println(this.hostName+"---- Content length: "+this.contentLength);
 				return true;
 			}
@@ -188,6 +194,11 @@ public class URLRequest {
 			constructRobotsTxt(this.hostName);
 			robotsTxtData = robotsDB.getRobotsTxtData(this.hostName);
 		}
+		if (robotsTxtData == null) {
+			this.delay = 5;
+			return null;
+		}
+		
 		this.delay = (int) robotsTxtData.getCrawlDelay();
 		this.delay = (this.delay == 0) ? 5 : this.delay;
 		return robotsTxtData;
@@ -207,24 +218,31 @@ public class URLRequest {
 		//Get reponse and read headers 
 		if (this.protocol.equals("http")) {
 			InputStream responseStream = sendRequest(this.hostName, "/robots.txt", "GET", null);
-			if (setResponseHeaders(responseStream)){
-				System.out.println(this.hostName+"---- Content length: "+this.contentLength);
-				br = new BufferedReader(new InputStreamReader(responseStream));
+			if (responseStream.available()==0) {
+				return;
 			}
+			br = new BufferedReader(new InputStreamReader(responseStream));
+			if (!setResponseHeaders(br)){
+				//System.out.println(responseStream.available());
+				return;
+			}
+			
+			System.out.println(this.hostName+"---- Content length: "+this.contentLength);
+
 		} else {
 			HttpURLConnection con = sendHttpsRequest(hostName, "/robots.txt", null);
-			
+
 			if(con.getResponseCode() == 200) {
 				this.contentLength = con.getContentLength();
 				this.contentType = con.getContentType();
-				br = new BufferedReader(new InputStreamReader(con.getInputStream()));
 			}
+			br = new BufferedReader(new InputStreamReader(con.getInputStream()));
 		}
 		String string;
 		String userAgent = "*";
-		System.out.println("Bitches");
+		//System.out.println("Bitches");
 		while ((string = br.readLine()) != null) {
-			System.out.println(string);
+			//System.out.println(string);
 			if (string.contains("#")) {
 				string = string.substring(0, string.indexOf("#"));
 			}
@@ -250,7 +268,7 @@ public class URLRequest {
 				}
 			}
 		}
-		System.out.println("bitches "+string);
+		//System.out.println("bitches "+string);
 		RobotsDBWrapper robotsDB = RobotsDBWrapper.getInstance("/home/cis455/storage");
 		robotsDB.addRobotsTxt(this.hostName, robotsTxt.getAllowedLinks("cis455crawler"),
 				robotsTxt.getDisallowedLinks("cis455crawler"), robotsTxt.getCrawlDelay("cis455crawler"));
@@ -301,9 +319,8 @@ public class URLRequest {
 		return s.getInputStream();
 	}
 	
-	private boolean setResponseHeaders(InputStream is) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(is));
-		
+	private boolean setResponseHeaders(BufferedReader br) throws IOException {
+		System.out.println("In response");
 		String line;
 		line = br.readLine();
 		if (line == null) {
@@ -311,16 +328,17 @@ public class URLRequest {
 			return false;
 		}
 		String[] firstLine = line.split("\\s");
+		//System.out.println("First line:" + firstLine);
 		if ((Integer.valueOf(firstLine[1]) != 200)) {
 			System.err.println("Response code not 200: "+firstLine[1]);
 			return false;
 		}
 		Pattern p = Pattern.compile(HTTP_HEADER_REGEX);
 		while ((line = br.readLine())!=null) {
-			System.out.println(line);
+			//System.out.println(line);
 			if (line.isEmpty()) {
-				System.out.println("Empty line");
-				//break;
+				//System.out.print("Empty line");
+				break;
 			}
 			Matcher m = p.matcher(line);
 			if (m.find()) {
@@ -434,20 +452,21 @@ public class URLRequest {
 	 * @return input stream to host or null if response code of response was not 200
 	 * @throws IOException
 	 */
-	public InputStream sendGetRequest() throws IOException {
+	public BufferedReader sendGetRequest() throws IOException {
 		
 		//Get reponse and read headers 
 		if(this.protocol.equals("http")) {
 			InputStream responseStream = sendRequest(hostName, filePath,"GET", null);
-			if (setResponseHeaders(responseStream)){
-				return responseStream;
+			BufferedReader br = new BufferedReader(new InputStreamReader(responseStream));
+			if (setResponseHeaders(br)){
+				return br;
 			}
 		} else {
 			HttpURLConnection con = sendHttpsRequest(hostName, this.filePath, null);
 			if(con.getResponseCode() == 200) {
 				this.contentLength = con.getContentLength();
 				this.contentType = con.getContentType();
-				return con.getInputStream();
+				return new BufferedReader(new InputStreamReader(con.getInputStream()));
 			}
 		}
 		

@@ -129,18 +129,20 @@ public class CrawlerThread extends Thread {
 			return false;
 		}
 
-		//Get set of disallowed paths from robots.txt
-		ArrayList<String> disallowed = robots.getDisallowedLinks();	
-		ArrayList<String> allowed = robots.getAllowedLinks();
-		
-		//System.out.println(disallowed.toString());
-		//System.out.println(allowed.toString());
-		String allowedTestURL = decodeURL(request.getFilePath());
-		System.out.println(allowedTestURL);
-		
-		if(!allowed(allowedTestURL, disallowed, allowed)) {
-			//System.out.println("This bitch be disallowed");
-			return false;
+		if (robots != null) {
+			//Get set of disallowed paths from robots.txt
+			ArrayList<String> disallowed = robots.getDisallowedLinks();	
+			ArrayList<String> allowed = robots.getAllowedLinks();
+			
+			//System.out.println(disallowed.toString());
+			//System.out.println(allowed.toString());
+			String allowedTestURL = decodeURL(request.getFilePath());
+			//System.out.println(allowedTestURL);
+			
+			if(!allowed(allowedTestURL, disallowed, allowed)) {
+				//System.out.println("This bitch be disallowed");
+				return false;
+			}
 		}
 		//System.out.println(disallowed);
 		//System.out.println("filepath is not disallowed");
@@ -200,10 +202,10 @@ public class CrawlerThread extends Thread {
 		return makeRequest;
 	}
 
-	private void parseRequest(InputStream is) {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	private void parseRequest(BufferedReader br) {
+		//ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		
-		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		//BufferedReader br = new BufferedReader(new InputStreamReader(is));
 		StringBuffer input = new StringBuffer();
 		
 		String s;
@@ -259,8 +261,8 @@ public class CrawlerThread extends Thread {
 			detector.append(body);
 			detectedLang = detector.detect();
 		} catch (LangDetectException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		}
 		
 		//System.out.println("Detected language: "+detectedLang);
@@ -325,9 +327,9 @@ public class CrawlerThread extends Thread {
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
-		System.out.print("Extracted ");
-		System.out.print(extracted.getHost()+extracted.getPath());
-		System.out.println(" from "+base.getHost()+base.getPath());
+		//System.out.print("Extracted ");
+		//System.out.print(extracted.getHost()+extracted.getPath());
+		//System.out.println(" from "+base.getHost()+base.getPath());
 
 		return extracted;
 	}
