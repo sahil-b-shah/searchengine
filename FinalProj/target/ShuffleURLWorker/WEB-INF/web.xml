@@ -20,7 +20,7 @@
          </init-param>
          <init-param>
            <param-name>port</param-name>
-           <param-value>80</param-value>
+           <param-value>54.69.183.43:80</param-value>
          </init-param>
          <init-param>
            <param-name>frontierDirectory</param-name>
