@@ -7,9 +7,11 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.text.DateFormat;
@@ -29,7 +31,7 @@ import crawler.storage.RobotsDBWrapper;
 import crawler.storage.RobotsTxtData;
 
 public class URLRequest {
-	
+
 	static final String KEY_VALUE_REGEX = "(.+):\\s*([\\w/\\*\\.-]+);*.*";
 	static final String HTTP_HEADER_REGEX = "(.+):\\s*([\\w/\\*\\.-]+)";
 
@@ -41,25 +43,25 @@ public class URLRequest {
 	private String contentType;
 	private int contentLength = -1;
 	private Date lastModified;
-	
-	
+
+
 	private int delay = 5;
-	
+
 	public int getPort() {
 		return (port == -1) ? 80 : port;
 	}
-	
+
 	public String getUrlString() {
 		return urlString;
 	}
 	public String getProtocol() {
 		return protocol;
 	}
-	
+
 	public String getHost() {
 		return hostName;
 	}
-	
+
 	public String getFilePath() {
 		if (filePath == null) {
 			return "";
@@ -67,27 +69,27 @@ public class URLRequest {
 			return filePath;
 		}
 	}
-	
+
 	public String getContentType() {
 		return contentType;
 	}
-	
+
 	public int getContentLength() {
 		return contentLength;
 	}
-	
+
 	public Date getLastModified() {
 		return (lastModified == null) ? new Date(System.currentTimeMillis()) : lastModified;
 	}
-	
+
 	/*public RobotsTxtInfo getRobots() {
 		return robotsTxt;
 	}*/
-	
+
 	public URLRequest(String urlString) {
 		this.urlString = urlString;
 		System.out.println("Request object being made for " + urlString);
-		
+
 		URL urlObj = null;
 		try {
 			urlObj = new URL(urlString);
@@ -97,7 +99,7 @@ public class URLRequest {
 			System.exit(-1);
 		}
 		hostName = urlObj.getHost();
-		
+
 		port = urlObj.getPort();
 		protocol = urlObj.getProtocol();
 		if (urlObj.getPath().isEmpty()) {
@@ -106,16 +108,16 @@ public class URLRequest {
 			filePath = urlObj.getPath();
 		}
 		//printProperties();
-		
+
 	}
-	
+
 	private void printProperties() {
 		System.out.println(protocol);
 		System.out.println(hostName);
 		System.out.println(filePath);
 		System.out.println(port);
 	}
-	
+
 	/***
 	 * Sends HEAD request with If-Modified-Since header
 	 * @param date
@@ -123,13 +125,13 @@ public class URLRequest {
 	 * @throws IOException 
 	 */
 	public boolean checkModified(long date) throws IOException {
-		
+
 		//Set if modified since header
 		Map<String, String> params = new HashMap<String, String>();
 		SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
 		String dateString = format.format((new Date(date)));
 		params.put("If-Modified-Since", dateString);
-		
+
 		if(this.protocol.equals("http")) {
 			InputStream responseStream = sendRequest(hostName, filePath, "HEAD", params);
 			/*if (responseStream.available()==0) {
@@ -142,7 +144,7 @@ public class URLRequest {
 			}
 		} else {
 			HttpURLConnection con = sendHttpsRequest(hostName, filePath, "HEAD", params);
-			
+
 			if(con.getResponseCode() == 200) {
 				this.contentLength = con.getContentLength();
 				this.contentType = con.getContentType();
@@ -151,7 +153,7 @@ public class URLRequest {
 		}
 		return false;
 	}
-	
+
 	/***
 	 * Sends HEAD request to host
 	 * @return true if response code return success, false otherwise
@@ -172,7 +174,7 @@ public class URLRequest {
 			}
 		} else {
 			HttpURLConnection con = sendHttpsRequest(hostName, filePath, "HEAD", null);
-			
+
 			if(con.getResponseCode() == 200) {
 				this.contentLength = con.getContentLength();
 				this.contentType = con.getContentType();
@@ -181,7 +183,7 @@ public class URLRequest {
 		}
 		return false;
 	}
-	
+
 	/***
 	 * Check the robots txt for host
 	 * @return the robots txt data to be checked by the client
@@ -189,7 +191,7 @@ public class URLRequest {
 	 */
 	public RobotsTxtData checkRobots() throws IOException {
 		RobotsDBWrapper robotsDB = RobotsDBWrapper.getInstance("/home/cis455/storage");
-		
+
 		RobotsTxtData robotsTxtData = robotsDB.getRobotsTxtData(this.hostName);
 		if (robotsTxtData == null) {
 			constructRobotsTxt(this.hostName);
@@ -199,20 +201,20 @@ public class URLRequest {
 			this.delay = 5;
 			return null;
 		}
-		
+
 		this.delay = (int) robotsTxtData.getCrawlDelay();
 		this.delay = (this.delay == 0) ? 5 : this.delay;
 		return robotsTxtData;
 	}
-	
-	
+
+
 	private void constructRobotsTxt(String hostName) throws IOException {
 		/*HttpURLConnection con = sendRequest(hostName, "/robots.txt");
-		
+
 		if(con.getResponseCode() != 200) {
 			return;
 		}*/
-		
+
 		//Get reponse and read headers 
 		BufferedReader br = null;
 		RobotsTxtInfo robotsTxt = new RobotsTxtInfo();
@@ -227,7 +229,7 @@ public class URLRequest {
 				//System.out.println(responseStream.available());
 				return;
 			}
-			
+
 			System.out.println(this.hostName+"---- Content length: "+this.contentLength);
 
 		} else {
@@ -241,13 +243,13 @@ public class URLRequest {
 		}
 		String string;
 		String userAgent = "*";
-		//System.out.println("Bitches");
+		System.out.println("Bitches");
 		while ((string = br.readLine()) != null) {
-			//System.out.println(string);
+			System.out.println(string);
 			if (string.contains("#")) {
 				string = string.substring(0, string.indexOf("#"));
 			}
-			
+
 			//Extract key-values of robot
 			Pattern p = Pattern.compile(KEY_VALUE_REGEX);
 			Matcher m = p.matcher(string);
@@ -273,21 +275,23 @@ public class URLRequest {
 		RobotsDBWrapper robotsDB = RobotsDBWrapper.getInstance("/home/cis455/storage");
 		robotsDB.addRobotsTxt(this.hostName, robotsTxt.getAllowedLinks("cis455crawler"),
 				robotsTxt.getDisallowedLinks("cis455crawler"), robotsTxt.getCrawlDelay("cis455crawler"));
-		
+
 	}
-	
+
 	private InputStream sendRequest(String hostname, String filepath) throws IOException {
 		return sendRequest(hostname, filepath, "GET", null);
 	}
-	
+
 	private InputStream sendRequest(String hostname, String filepath, String method,
 			Map<String, String> params) throws IOException {
-		
+
 		System.out.println("Sending http "+method+ " request to "+hostname + filepath);
 		this.delay();
 		Socket s = null;
 		try {
-			s = new Socket(hostname, getPort());
+			s = new Socket();
+			s.connect(new InetSocketAddress(hostname, getPort()), 2000);
+			//System.out.println("Consdfsa");
 		} catch (UnknownHostException e) {
 			System.err.println("Host could not be resolved");
 			e.printStackTrace();
@@ -297,16 +301,18 @@ public class URLRequest {
 			e.printStackTrace();
 			System.exit(-1);
 		}
-		
+
 		PrintWriter pw = new PrintWriter(s.getOutputStream());
+		//System.out.println("Consdfsa");
 		//PrintWriter pw = new PrintWriter(System.out);
 
 		pw.println(method+" "+filepath+" HTTP/1.0");
 		pw.println("Host: " + hostname);
 		pw.println("User-Agent: cis455crawler");
 		pw.println("Accept-Language: en-US");
+		pw.println("Connection: close");
 
-		
+
 		//Add all headers in params to request
 		if (params != null) {
 			Set<Entry<String, String>> entrySet = params.entrySet();
@@ -314,22 +320,37 @@ public class URLRequest {
 				pw.println(entry.getKey()+": "+entry.getValue());
 			}
 		}
-		
+
 		pw.print("\r\n");
 		pw.flush();
+		//System.out.println("Consdfsa");
 		return s.getInputStream();
 	}
-	
+
 	private boolean setResponseHeaders(BufferedReader br) throws IOException {
 		//System.out.println("In response");
 		String line;
+
+		if (!br.ready()) {
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		if (!br.ready()) {
+			System.out.println("Buffered reader not ready");
+			return false;
+		}
 		line = br.readLine();
+		//System.out.println("line read");
 		if (line == null) {
 			System.err.println("Empty header from" + this.hostName);
 			return false;
 		}
 		String[] firstLine = line.split("\\s");
-		//System.out.println("First line:" + firstLine);
+		System.out.println("First line:" + firstLine);
 		if ((Integer.valueOf(firstLine[1]) != 200)) {
 			System.err.println("Response code not 200: "+firstLine[1]);
 			return false;
@@ -359,12 +380,12 @@ public class URLRequest {
 		}
 		return true;
 	}
-	
+
 	private HttpURLConnection sendHttpsRequest(String hostName, String filepath,
 			Map<String, String> params) throws IOException {
 		return sendHttpsRequest(hostName, filepath, "GET", params);
 	}
-	
+
 	private HttpURLConnection sendHttpsRequest(String hostName, String filepath, String method, Map<String, String> params) 
 			throws IOException {
 		this.delay();
@@ -375,10 +396,10 @@ public class URLRequest {
 		System.out.println("Sending https "+method+" request to "+requestString);
 		HttpURLConnection con = null;
 		URL url = null;
-		
+
 		url = new URL(requestString);		
 		con = (HttpsURLConnection) url.openConnection();
-		
+
 		/*if (this.protocol.equals("http")) {
 			//Connection
 			try {
@@ -399,7 +420,7 @@ public class URLRequest {
 		con.addRequestProperty("Host", hostName);
 		con.addRequestProperty("User-Agent", "cis455crawler");
 		con.addRequestProperty("Accept-Language", "en-US");
-		
+
 		//Add additional params
 		if (params != null) {
 			Set<Entry<String, String>> entrySet = params.entrySet();
@@ -409,7 +430,7 @@ public class URLRequest {
 		}
 		return con;
 	}
-	
+
 	private Date checkModifiedDate(String date) {
 		DateFormat df1 = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
 		DateFormat df2 = new SimpleDateFormat("EEEEE, dd-MMM-yy HH:mm:ss zzz");
@@ -437,7 +458,7 @@ public class URLRequest {
 		}
 		return modDate;
 	}
-	
+
 	private void delay() {
 		//milli = 0; //for testing
 		try {
@@ -447,14 +468,14 @@ public class URLRequest {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @return input stream to host or null if response code of response was not 200
 	 * @throws IOException
 	 */
 	public BufferedReader sendGetRequest() throws IOException {
-		
+
 		//Get reponse and read headers 
 		if(this.protocol.equals("http")) {
 			InputStream responseStream = sendRequest(hostName, filePath,"GET", null);
@@ -470,7 +491,7 @@ public class URLRequest {
 				return new BufferedReader(new InputStreamReader(con.getInputStream()));
 			}
 		}
-		
+
 		System.err.println("Get request failed");
 		return null;
 	}
