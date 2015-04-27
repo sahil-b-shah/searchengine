@@ -1,9 +1,11 @@
 package crawler;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -19,6 +21,7 @@ import java.util.regex.Pattern;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+
 import com.cybozu.labs.langdetect.Detector;
 import com.cybozu.labs.langdetect.DetectorFactory;
 import com.cybozu.labs.langdetect.LangDetectException;
@@ -175,14 +178,7 @@ public class CrawlerThread extends Thread {
 				makeRequest = true & makeRequest;
 			}
 		}
-		//Check content length
-		if (maxLength == -1) {
-			makeRequest = true & makeRequest;
-		} else if (request.getContentLength() == -1) {
-			System.out.println(request.getContentLength()+" is not specified");
-			return false;
-			//makeRequest = false;
-		} else if(request.getContentLength() <= maxLength) {
+		if(request.getContentLength() <= maxLength) {
 			makeRequest = true & makeRequest;
 		} else if (request.getContentLength() > maxLength) {
 			//makeRequest = false;
@@ -194,7 +190,21 @@ public class CrawlerThread extends Thread {
 
 	private void parseRequest(InputStream is) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
+		
+		BufferedReader br = new BufferedReader(InputStreamReader(is));
+		StringBuffer input = new StringBuffer();
+		
+		String s;
+		try {
+			while ((s = br.readLine())!=null) {
+				input.append(s);
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading input stream from host");
+			e.printStackTrace();
+		}
+		
+		/*
 		byte[] buffer = new byte[request.getContentLength()];
 		int len;
 		try {
@@ -206,23 +216,29 @@ public class CrawlerThread extends Thread {
 			System.err.println("Error making new input stream");
 			e1.printStackTrace();
 			System.exit(-1);
-		}
+		}*/
 		
-
+		/*
 		InputStream is2 = new ByteArrayInputStream(baos.toByteArray()); 
 		InputStream is3 = new ByteArrayInputStream(baos.toByteArray());
-
+		*/
+		
 		//InputStream isCopy = new InputStream(is);
 		String contentType = request.getContentType();
 		if (contentType.contains("html")) {
-			String content = cleanDocument(new String(buffer));
+			String content = cleanDocument(input.toString());
 			if (checkEnLanguage(content)) {
-				ArrayList<String> links = extractUrls(new String(buffer));
+				ArrayList<String> links = extractUrls(input.toString());
 				addContent(content, links);
 			}
 		} else if(contentType.contains("xml")) {
-			addContent(is3, null);
+			addContent(input.toString(), null);
 		}
+	}
+
+	private Reader InputStreamReader(InputStream is) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	private boolean checkEnLanguage(String body) {

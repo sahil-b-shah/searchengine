@@ -12,6 +12,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -112,12 +113,12 @@ public class URLRequest {
 		String dateString = format.format((new Date(date)));
 		
 		con.addRequestProperty("If-Modified-Since", dateString);
-		
-		if (con.getResponseCode()==200){
+		int responseCode = con.getResponseCode();
+		if (responseCode==200){
 			this.contentLength = con.getContentLength();
 			this.contentType = con.getContentType();
-			System.out.println("Content length: "+this.contentLength);
-			return true;
+			System.out.println(this.hostName+" Content length: "+this.contentLength+
+					", Reponse code: "+responseCode);			return true;
 		}
 		return false;
 	}
@@ -129,11 +130,13 @@ public class URLRequest {
 	 */
 	public boolean sendHead() throws IOException {
 		HttpURLConnection con = sendRequest(hostName, filePath, "HEAD");
-				
-		if (con.getResponseCode()==200){
+		
+		int responseCode = con.getResponseCode();
+		if (responseCode==200){
 			this.contentLength = con.getContentLength();
 			this.contentType = con.getContentType();
-			System.out.println("Content length: "+this.contentLength);
+			System.out.println(this.hostName+" Content length: "+this.contentLength+
+					", Reponse code: "+responseCode);
 			return true;
 		}
 		return false;
@@ -205,7 +208,8 @@ public class URLRequest {
 		return sendRequest(hostName, filepath, "GET");
 	}
 	
-	private HttpURLConnection sendRequest(String hostName, String filepath, String method) throws ProtocolException {
+	private HttpURLConnection sendRequest(String hostName, String filepath, String method, Map<String, String> params) 
+			throws ProtocolException {
 		this.delay();
 		if (!filepath.startsWith("/")) {
 			filepath = "/"+filepath;
