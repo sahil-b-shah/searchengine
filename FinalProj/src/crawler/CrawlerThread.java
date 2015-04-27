@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -152,17 +153,20 @@ public class CrawlerThread extends Thread {
 			try {
 				if (!request.sendHead()) {
 					System.err.println("Error sending head request");
+					return false;
 				}
 			} catch (IOException e) {
 				System.err.println("Error sending head request: IO Exception caught");
 				e.printStackTrace();
 			}
 		} else {
+			/*
 			//System.out.println("content is not null");
 			//Date lastSeen = new Date(Long.valueOf(ce.getLastSeen()));
 			boolean modified = false;
 
 			try {
+				//System.out.println("Last seen "+new Date(Long.valueOf(ce.getLastSeen())));
 				modified = request.checkModified(Long.valueOf(ce.getLastSeen()));
 			} catch (NumberFormatException | IOException e) {
 				makeRequest = false;
@@ -176,7 +180,7 @@ public class CrawlerThread extends Thread {
 			} else {
 				//System.out.println(request.getFilePath()+" Last modified is after last seen");
 				makeRequest = true & makeRequest;
-			}
+			}*/
 		}
 		if(request.getContentLength() <= maxLength) {
 			makeRequest = true & makeRequest;
@@ -185,13 +189,20 @@ public class CrawlerThread extends Thread {
 			System.out.println(request.getContentLength()+" is more than max");
 			return false;
 		}
+		
+		if (request.getProtocol().equals("https")) {
+			if (request.getContentLength() == -1) {
+				System.err.println("Crawler does not support chunked encoding - content length is null");
+				return false;
+			}
+		}
 		return makeRequest;
 	}
 
 	private void parseRequest(InputStream is) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		
-		BufferedReader br = new BufferedReader(InputStreamReader(is));
+		BufferedReader br = new BufferedReader(new InputStreamReader(is));
 		StringBuffer input = new StringBuffer();
 		
 		String s;
@@ -227,6 +238,7 @@ public class CrawlerThread extends Thread {
 		String contentType = request.getContentType();
 		if (contentType.contains("html")) {
 			String content = cleanDocument(input.toString());
+			System.out.println(content);
 			if (checkEnLanguage(content)) {
 				ArrayList<String> links = extractUrls(input.toString());
 				addContent(content, links);
@@ -236,15 +248,10 @@ public class CrawlerThread extends Thread {
 		}
 	}
 
-	private Reader InputStreamReader(InputStream is) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	private boolean checkEnLanguage(String body) {
 		Detector detector = null;
 		String detectedLang = "";
-		System.out.println(System.getProperty("user.dir"));
+		//System.out.println(System.getProperty("user.dir"));
 		try {
 			DetectorFactory.loadProfile(System.getProperty("user.dir")+"/lib/profiles");
 			detector = DetectorFactory.create();
@@ -260,6 +267,7 @@ public class CrawlerThread extends Thread {
 	}
 
 	private void addContent(String content, ArrayList<String> links) {
+		System.out.println("Adding "+request.getHost()+request.getFilePath());
 		docDB.addContent(request.getHost()+request.getFilePath(),
 				content, System.currentTimeMillis(), links);
 	}
@@ -281,8 +289,6 @@ public class CrawlerThread extends Thread {
 		ArrayList<String> links = new ArrayList<String>();
 		Pattern pattern = Pattern.compile("((?i)href\\s*=\\s*\")(\\S+)(\")");
 
-
-
 		Matcher matcher = pattern.matcher(body);
 		while(matcher.find()){
 			String newURL = matcher.group(2);
@@ -290,10 +296,10 @@ public class CrawlerThread extends Thread {
 			URL url = makeAbsolute(request.getUrlString(), newURL);
 			//add to queue
 			//System.out.println("Adding " + url.getProtocol()+"://"+url.getHost()+url.getFile()+" to unseen links");
-			unseenLinksDB.addURL(url.getProtocol()+"://"+url.getHost()+url.getFile());
-			links.add(url.getProtocol()+"://"+url.getHost()+url.getFile());
-
-
+			if (url != null) {
+				unseenLinksDB.addURL(url.getProtocol()+"://"+url.getHost()+url.getFile());
+				links.add(url.getProtocol()+"://"+url.getHost()+url.getFile());
+			}
 		}
 
 		return links;
@@ -318,9 +324,9 @@ public class CrawlerThread extends Thread {
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
-		/*System.out.print("Extracted ");
+		System.out.print("Extracted ");
 		System.out.print(extracted.getHost()+extracted.getPath());
-		System.out.println(" from "+base.getHost()+base.getPath());*/
+		System.out.println(" from "+base.getHost()+base.getPath());
 
 		return extracted;
 	}

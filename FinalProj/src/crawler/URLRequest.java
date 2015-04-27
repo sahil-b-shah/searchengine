@@ -4,15 +4,22 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
+import java.net.Socket;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,7 +31,8 @@ import crawler.storage.RobotsTxtData;
 public class URLRequest {
 	
 	static final String KEY_VALUE_REGEX = "(.+):\\s*([\\w/\\*\\.-]+);*.*";
-	
+	static final String HTTP_HEADER_REGEX = "(.+):\\s*([\\w/\\*\\.-]+)";
+
 	private String urlString;
 	private String protocol;
 	private String hostName;
@@ -36,6 +44,10 @@ public class URLRequest {
 	
 	
 	private int delay = 5;
+	
+	public int getPort() {
+		return (port == -1) ? 80 : port;
+	}
 	
 	public String getUrlString() {
 		return urlString;
@@ -85,6 +97,7 @@ public class URLRequest {
 			System.exit(-1);
 		}
 		hostName = urlObj.getHost();
+		
 		port = urlObj.getPort();
 		protocol = urlObj.getProtocol();
 		if (urlObj.getPath().isEmpty()) {
@@ -92,10 +105,12 @@ public class URLRequest {
 		} else {
 			filePath = urlObj.getPath();
 		}
+		//printProperties();
 		
 	}
 	
 	private void printProperties() {
+		System.out.println(protocol);
 		System.out.println(hostName);
 		System.out.println(filePath);
 		System.out.println(port);
@@ -108,17 +123,28 @@ public class URLRequest {
 	 * @throws IOException 
 	 */
 	public boolean checkModified(long date) throws IOException {
-		HttpURLConnection con = sendRequest(hostName, filePath, "HEAD");
+		
+		//Set if modified since header
+		Map<String, String> params = new HashMap<String, String>();
 		SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
 		String dateString = format.format((new Date(date)));
+		params.put("If-Modified-Since", dateString);
 		
-		con.addRequestProperty("If-Modified-Since", dateString);
-		int responseCode = con.getResponseCode();
-		if (responseCode==200){
-			this.contentLength = con.getContentLength();
-			this.contentType = con.getContentType();
-			System.out.println(this.hostName+" Content length: "+this.contentLength+
-					", Reponse code: "+responseCode);			return true;
+		if(this.protocol.equals("http")) {
+			InputStream responseStream = sendRequest(hostName, filePath, "HEAD", params);
+			
+			if (setResponseHeaders(responseStream)){
+				System.out.println(this.hostName+"---- Content length: "+this.contentLength);
+				return true;
+			}
+		} else {
+			HttpURLConnection con = sendHttpsRequest(hostName, filePath, "HEAD", params);
+			
+			if(con.getResponseCode() == 200) {
+				this.contentLength = con.getContentLength();
+				this.contentType = con.getContentType();
+				return true;
+			}
 		}
 		return false;
 	}
@@ -129,21 +155,28 @@ public class URLRequest {
 	 * @throws IOException
 	 */
 	public boolean sendHead() throws IOException {
-		HttpURLConnection con = sendRequest(hostName, filePath, "HEAD");
-		
-		int responseCode = con.getResponseCode();
-		if (responseCode==200){
-			this.contentLength = con.getContentLength();
-			this.contentType = con.getContentType();
-			System.out.println(this.hostName+" Content length: "+this.contentLength+
-					", Reponse code: "+responseCode);
-			return true;
+		//int responseCode = con.getResponseCode();
+		if(this.protocol.equals("http")) {
+			InputStream responseStream = sendRequest(hostName, filePath, "HEAD", null);
+			
+			if (setResponseHeaders(responseStream)){
+				System.out.println(this.hostName+"---- Content length: "+this.contentLength);
+				return true;
+			}
+		} else {
+			HttpURLConnection con = sendHttpsRequest(hostName, filePath, "HEAD", null);
+			
+			if(con.getResponseCode() == 200) {
+				this.contentLength = con.getContentLength();
+				this.contentType = con.getContentType();
+				return true;
+			}
 		}
 		return false;
 	}
 	
 	/***
-	 * 
+	 * Check the robots txt for host
 	 * @return the robots txt data to be checked by the client
 	 * @throws IOException
 	 */
@@ -162,17 +195,35 @@ public class URLRequest {
 	
 	
 	private void constructRobotsTxt(String hostName) throws IOException {
-		HttpURLConnection con = sendRequest(hostName, "/robots.txt");
-		RobotsTxtInfo robotsTxt = new RobotsTxtInfo();
+		/*HttpURLConnection con = sendRequest(hostName, "/robots.txt");
 		
 		if(con.getResponseCode() != 200) {
 			return;
+		}*/
+		
+		//Get reponse and read headers 
+		BufferedReader br = null;
+		RobotsTxtInfo robotsTxt = new RobotsTxtInfo();
+		//Get reponse and read headers 
+		if (this.protocol.equals("http")) {
+			InputStream responseStream = sendRequest(hostName, "/robots.txt", "GET", null);
+			if (setResponseHeaders(responseStream)){
+				System.out.println(this.hostName+"---- Content length: "+this.contentLength);
+				br = new BufferedReader(new InputStreamReader(responseStream));
+			}
+		} else {
+			HttpURLConnection con = sendHttpsRequest(hostName, "/robots.txt", null);
+			
+			if(con.getResponseCode() == 200) {
+				this.contentLength = con.getContentLength();
+				this.contentType = con.getContentType();
+				br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			}
 		}
-		BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
 		String string;
 		String userAgent = "*";
 		while ((string = br.readLine()) != null) {
-			 
+			System.out.println(string);
 			if (string.contains("#")) {
 				string = string.substring(0, string.indexOf("#"));
 			}
@@ -204,30 +255,112 @@ public class URLRequest {
 		}
 	}
 	
-	private HttpURLConnection sendRequest(String hostName, String filepath) throws ProtocolException {
-		return sendRequest(hostName, filepath, "GET");
+	private InputStream sendRequest(String hostName, String filepath) throws IOException {
+		return sendRequest(hostName, filepath, "GET", null);
 	}
 	
-	private HttpURLConnection sendRequest(String hostName, String filepath, String method, Map<String, String> params) 
-			throws ProtocolException {
+	private InputStream sendRequest(String hostname, String filepath, String method,
+			Map<String, String> params) throws IOException {
+		
+		System.out.println("Sending http "+method+ " request to "+hostName + filepath);
+		this.delay();
+		Socket s = null;
+		try {
+			s = new Socket(InetAddress.getByName(hostName), getPort());
+		} catch (UnknownHostException e) {
+			System.err.println("Host could not be resolved");
+			e.printStackTrace();
+			System.exit(-1);
+		} catch (IOException e) {
+			System.err.println("Could not create stream socket");
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		
+		PrintWriter pw = new PrintWriter(s.getOutputStream());
+		//PrintWriter pw = new PrintWriter(System.out);
+
+		pw.println(method+" "+filePath+" HTTP/1.0");
+		pw.println("Host: " + hostName);
+		pw.println("User-Agent: cis455crawler");
+		pw.println("Accept-Language: en-US");
+
+		
+		//Add all headers in params to request
+		if (params != null) {
+			Set<Entry<String, String>> entrySet = params.entrySet();
+			for (Entry<String, String> entry : entrySet) {
+				pw.println(entry.getKey()+": "+entry.getValue());
+			}
+		}
+		
+		pw.println();
+		pw.flush();
+		return s.getInputStream();
+	}
+	
+	private boolean setResponseHeaders(InputStream is) throws IOException {
+		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		
+		String line;
+		line = br.readLine();
+		if (line == null) {
+			System.err.println("Empty header from" + this.hostName);
+			return false;
+		}
+		String[] firstLine = line.split("\\s");
+		if ((Integer.valueOf(firstLine[1]) != 200)) {
+			System.err.println("Response code not 200: "+firstLine[1]);
+			return false;
+		}
+		Pattern p = Pattern.compile(HTTP_HEADER_REGEX);
+		while ((line = br.readLine())!=null) {
+			//System.out.println(line);
+			if (line.isEmpty()) {
+				break;
+			}
+			Matcher m = p.matcher(line);
+			if (m.find()) {
+				String key = m.group(1);
+				key = key.trim();
+				String value = m.group(2);
+				value = value.trim();
+				//System.out.println("Response header-- "+key+": "+value);
+				if(key.equalsIgnoreCase("Content-Length")) {
+					this.contentLength = Integer.valueOf(value);
+				} else if(key.equals("Content-Type")) {
+					this.contentType = value;
+				} else if (key.equalsIgnoreCase("Last-Modified")) {
+					this.lastModified = this.checkModifiedDate(value);
+				}
+			}
+		}
+		return true;
+	}
+	
+	private HttpURLConnection sendHttpsRequest(String hostName, String filepath,
+			Map<String, String> params) throws IOException {
+		return sendHttpsRequest(hostName, filepath, "GET", params);
+	}
+	
+	private HttpURLConnection sendHttpsRequest(String hostName, String filepath, String method, Map<String, String> params) 
+			throws IOException {
 		this.delay();
 		if (!filepath.startsWith("/")) {
 			filepath = "/"+filepath;
 		}
 		String requestString = this.protocol+"://"+hostName + filepath;
-		System.out.println("Sending request to "+requestString);
+		System.out.println("Sending https "+method+" request to "+requestString);
 		HttpURLConnection con = null;
 		URL url = null;
-		try {
-			url = new URL(requestString);
-		} catch (MalformedURLException e1) {
-			e1.printStackTrace();
-		}
 		
-		if (this.protocol.equals("http")) {
+		url = new URL(requestString);		
+		con = (HttpsURLConnection) url.openConnection();
+		
+		/*if (this.protocol.equals("http")) {
 			//Connection
 			try {
-				con = (HttpURLConnection) url.openConnection();
+				con = (HttpsURLConnection) url.openConnection();
 			} catch (IOException e1) {
 				System.err.println("Error opening connection to master servlet: http");
 				e1.printStackTrace();
@@ -239,11 +372,19 @@ public class URLRequest {
 				System.err.println("Error opening connection to master servlet: http");
 				e1.printStackTrace();
 			}
-		}
+		}*/
 		con.setRequestMethod(method);
 		con.addRequestProperty("Host", hostName);
 		con.addRequestProperty("User-Agent", "cis455crawler");
 		con.addRequestProperty("Accept-Language", "en-US");
+		
+		//Add additional params
+		if (params != null) {
+			Set<Entry<String, String>> entrySet = params.entrySet();
+			for (Entry<String, String> entry : entrySet) {
+				con.addRequestProperty(entry.getKey(), entry.getValue());
+			}
+		}
 		return con;
 	}
 	
@@ -291,12 +432,23 @@ public class URLRequest {
 	 * @throws IOException
 	 */
 	public InputStream sendGetRequest() throws IOException {
-		HttpURLConnection con = sendRequest(hostName, filePath);
-		int responseCode = con.getResponseCode();
-		if (responseCode==200) {
-			return con.getInputStream();
+		
+		//Get reponse and read headers 
+		if(this.protocol.equals("http")) {
+			InputStream responseStream = sendRequest(hostName, filePath,"GET", null);
+			if (setResponseHeaders(responseStream)){
+				return responseStream;
+			}
+		} else {
+			HttpURLConnection con = sendHttpsRequest(hostName, this.filePath, null);
+			if(con.getResponseCode() == 200) {
+				this.contentLength = con.getContentLength();
+				this.contentType = con.getContentType();
+				return con.getInputStream();
+			}
 		}
-		System.err.println("Get request had response code of "+responseCode);
+		
+		System.err.println("Get request failed");
 		return null;
 	}
 }
