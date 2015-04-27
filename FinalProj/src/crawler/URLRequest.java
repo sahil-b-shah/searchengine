@@ -243,7 +243,7 @@ public class URLRequest {
 		}
 		String string;
 		String userAgent = "*";
-		System.out.println("Bitches");
+		//System.out.println("Bitches");
 		while ((string = br.readLine()) != null) {
 			//System.out.println(string);
 			if (string.contains("#")) {
@@ -295,11 +295,13 @@ public class URLRequest {
 		} catch (UnknownHostException e) {
 			System.err.println("Host could not be resolved");
 			e.printStackTrace();
-			System.exit(-1);
+			return null;
+			//System.exit(-1);
 		} catch (IOException e) {
 			System.err.println("Could not create stream socket");
 			e.printStackTrace();
-			System.exit(-1);
+			return null;
+			//System.exit(-1);
 		}
 
 		PrintWriter pw = new PrintWriter(s.getOutputStream());

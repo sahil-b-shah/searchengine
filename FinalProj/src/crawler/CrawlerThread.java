@@ -97,7 +97,7 @@ public class CrawlerThread extends Thread {
 						Crawler.deleteCurrentHost(request.getHost());
 					}
 					else{
-						frontierDB.addUrl(urlString);
+						unseenLinksDB.addURL(urlString);
 					}
 				} else {
 					try {

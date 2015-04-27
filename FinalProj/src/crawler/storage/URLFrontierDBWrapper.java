@@ -149,6 +149,10 @@ public class URLFrontierDBWrapper {
 		} else {
 			id = getLastUrl().getKey();
 		}
+		if ((id + 1) == Integer.MAX_VALUE) {
+			id = 0;
+		}
+		
 		URLFrontierData q_url = new URLFrontierData();
 		q_url.setId(id+1);
 		q_url.setUrl(docURL);
