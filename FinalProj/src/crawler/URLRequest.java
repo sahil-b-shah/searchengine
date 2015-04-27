@@ -245,7 +245,7 @@ public class URLRequest {
 		String userAgent = "*";
 		System.out.println("Bitches");
 		while ((string = br.readLine()) != null) {
-			System.out.println(string);
+			//System.out.println(string);
 			if (string.contains("#")) {
 				string = string.substring(0, string.indexOf("#"));
 			}
