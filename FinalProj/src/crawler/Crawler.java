@@ -28,7 +28,7 @@ public class Crawler {
 	private static ConcurrentHashMap<String, String> currentHosts;
 	
 	private static void setup() throws DatabaseException, FileNotFoundException {
-		pool = new ThreadPool(10, documentDirectory, frontierDirectory, robotsDirectory, unseenLinksDirectory,  maxSize);
+		pool = new ThreadPool(1, documentDirectory, frontierDirectory, robotsDirectory, unseenLinksDirectory,  maxSize);
 	}
 	
 	
