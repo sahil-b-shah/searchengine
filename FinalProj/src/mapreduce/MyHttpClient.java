@@ -19,10 +19,8 @@ public class MyHttpClient {
 		this.connected = true;
 		String address[] = IPPort.split(":");
 		try {
-			System.out.println(address[0] + "-----" + address[1]);
 			socket = new Socket(address[0], Integer.parseInt(address[1]));
 		} catch (IOException e) {
-			e.printStackTrace();
 			socket = null;
 			connected = false;
 		} 
