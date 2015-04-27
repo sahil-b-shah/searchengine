@@ -481,6 +481,9 @@ public class URLRequest {
 		//Get reponse and read headers 
 		if(this.protocol.equals("http")) {
 			InputStream responseStream = sendRequest(hostName, filePath,"GET", null);
+			if (responseStream == null) {
+				return null;
+			}
 			BufferedReader br = new BufferedReader(new InputStreamReader(responseStream));
 			if (setResponseHeaders(br)){
 				return br;

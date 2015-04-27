@@ -203,6 +203,10 @@ public class CrawlerThread extends Thread {
 	}
 
 	private void parseRequest(BufferedReader br) {
+		
+		if (br == null) {
+			return;
+		}
 		//ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		
 		//BufferedReader br = new BufferedReader(new InputStreamReader(is));
