@@ -61,7 +61,7 @@ public class Crawler {
 		
 		currentHosts = new ConcurrentHashMap<String, String>();
 		
-		urlString = "https://www.facebook.com/time";
+		urlString = "https://dbappserv.cis.upenn.edu/crawltest/";
 		//urlString = args[0];
 		String homeDir = args[0];
 		//Directory for stores
@@ -79,12 +79,12 @@ public class Crawler {
 		System.out.println("Printing current document DB size: "+docDB.getSize());
 		docDB.close();
 		
-		/*System.out.println("Prinitng unseen links");
+		System.out.println("Prinitng unseen links");
 		UnseenLinksDBWrapper unseenDB = UnseenLinksDBWrapper.getInstance(unseenLinksDirectory);
 		unseenDB.getAllContent();
-		unseenDB.close();*/
+		unseenDB.close();
 		
-		//seedFromUnseen();
+		seedFromUnseen();
 		
 		URLFrontierDBWrapper frontierDB = URLFrontierDBWrapper.getInstance(frontierDirectory);
 		frontierDB.addUrl(urlString);
