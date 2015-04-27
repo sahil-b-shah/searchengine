@@ -132,9 +132,9 @@ public class URLRequest {
 		
 		if(this.protocol.equals("http")) {
 			InputStream responseStream = sendRequest(hostName, filePath, "HEAD", params);
-			if (responseStream.available()==0) {
+			/*if (responseStream.available()==0) {
 				return false;
-			}
+			}*/
 			BufferedReader br = new BufferedReader(new InputStreamReader(responseStream));
 			if (setResponseHeaders(br)){
 				System.out.println(this.hostName+"---- Content length: "+this.contentLength);
@@ -161,9 +161,10 @@ public class URLRequest {
 		//int responseCode = con.getResponseCode();
 		if(this.protocol.equals("http")) {
 			InputStream responseStream = sendRequest(hostName, filePath, "HEAD", null);
-			if(responseStream.available()==0) {
+			/*if(responseStream.available()==0) {
+				System.out.println("Response stream 0");
 				return false;
-			}
+			}*/
 			BufferedReader br = new BufferedReader(new InputStreamReader(responseStream));
 			if (setResponseHeaders(br)){
 				System.out.println(this.hostName+"---- Content length: "+this.contentLength);
@@ -218,9 +219,9 @@ public class URLRequest {
 		//Get reponse and read headers 
 		if (this.protocol.equals("http")) {
 			InputStream responseStream = sendRequest(this.hostName, "/robots.txt", "GET", null);
-			if (responseStream.available()==0) {
+			/*if (responseStream.available()==0) {
 				return;
-			}
+			}*/
 			br = new BufferedReader(new InputStreamReader(responseStream));
 			if (!setResponseHeaders(br)){
 				//System.out.println(responseStream.available());
@@ -286,7 +287,7 @@ public class URLRequest {
 		this.delay();
 		Socket s = null;
 		try {
-			s = new Socket(InetAddress.getByName(hostname), getPort());
+			s = new Socket(hostname, getPort());
 		} catch (UnknownHostException e) {
 			System.err.println("Host could not be resolved");
 			e.printStackTrace();
@@ -314,7 +315,7 @@ public class URLRequest {
 			}
 		}
 		
-		pw.println();
+		pw.print("\r\n");
 		pw.flush();
 		return s.getInputStream();
 	}
