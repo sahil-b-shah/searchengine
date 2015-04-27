@@ -16,10 +16,20 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 	static final long serialVersionUID = 455555001;
 	private static Map<String, ArrayList<String>> statusMap; 
 	private static String numMapThreads = "30";
+	private static String workerids []; 
 	//private static String numReduceThreads = "30";
 
 	public void init(ServletConfig config) throws ServletException {
 		statusMap = new HashMap<String, ArrayList<String>>();
+		workerids = new String[8];
+		workerids[0] = "54.149.243.113:80";
+		workerids[1] = "54.191.46.51:80";
+		workerids[2] = "54.191.0.169:80";
+		workerids[3] = "54.201.59.242:80";
+		workerids[4] = "554.200.92.159:80";
+		workerids[5] = "54.213.211.175:80";
+		workerids[6] = "54.69.5.205:80";
+		workerids[7] = "54.201.100.191:80";
 		System.out.println("Master init");
 
 	}
@@ -147,7 +157,8 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 			Map<String, ArrayList<String>> localStatusMap =  getStatusMap();
 
 			//Post to /runmap on every active worker
-			for(String worker: localStatusMap.keySet()){
+			for(int i = 0; i < workerids.length; i++){
+				String worker = workerids[i];
 				ArrayList<String> params = localStatusMap.get(worker);
 				//Check if in last 30 seconds
 				if((System.currentTimeMillis() - Long.parseLong(params.get(1))) < 30000){
@@ -155,10 +166,8 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 					//client.addParams("input", inputDir);
 					client.addParams("numThreads", numMapThreads);
 					client.addParams("numWorkers", localStatusMap.size() + "");
-					int counter = 1;
-					for(String workerID: localStatusMap.keySet()){
-						client.addParams("worker"+counter + ".txt", workerID);
-						counter++;
+					for(int j = 0; j < workerids.length; j++){
+						client.addParams("worker"+j+ ".txt", workerids[j]);
 					}
 					System.out.println("Posting /runmap to "+ worker);
 					client.sendPost();
