@@ -8,6 +8,7 @@
     <mkdir dir="target/InvertedIndexWorker/WEB-INF/classes"/>
   	<mkdir dir="target/InvertedIndexWorker2/WEB-INF/classes"/>
   	<mkdir dir="target/Crawler/classes"/>
+  	<mkdir dir="target/Indexer/classes"/>
     <mkdir dir="classes"/>
   </target>
   
@@ -36,6 +37,34 @@
 	       <compilerarg value="-Xlint"/>
 	    </javac>
 	  </target>
+	
+  <target name ="build-indexer" depends="compile-indexer">
+  	<jar destfile="indexer.jar">
+        <!--<fileset dir="src" includes="crawler/**/*.java"/>-->
+        <fileset dir="target/Indexer/classes/" includes="indexer/**/*.class"/>
+  		<fileset dir="target/Indexer/classes/" includes="crawler/**/*.class"/>
+  		<fileset dir="target/Indexer/classes/" includes="mapreduce/**/*.class"/>
+	    <fileset dir="target/Indexer" includes="/lib/*"/>
+  		<zipgroupfileset dir="target/Indexer/lib" includes="*"/>
+  		<!--<zipgroupfileset dir="lib/profiles" includes="*" excludes=""/>-->
+	    <manifest>
+	  		<attribute name="Main-Class"
+	  			value="indexer.Indexer"/>
+	    </manifest>
+  	</jar>
+  </target>
+	
+  <target name="compile-indexer" depends="init">
+    <javac srcdir="src" destdir="target/Indexer/classes" includes="indexer/**/*.java, crawler/storage/*.java" deprecation="on"
+     debug="true" includeantruntime="false">
+    	<classpath>
+            <fileset dir="lib/">
+                <include name="*.jar"/>
+            </fileset>
+  	   	</classpath>
+       <compilerarg value="-Xlint"/>
+    </javac>
+  </target>
 
 	
   <target name="compile-storage" depends="init">
@@ -225,5 +254,6 @@
     <delete file="InvertedIndexWorker.war"/>
   	<delete file="InvertedIndexWorker2.war"/>
   	<delete file="crawler.jar"/>
+  	<delete file="indexer.jar"/>
   </target>
 </project>
