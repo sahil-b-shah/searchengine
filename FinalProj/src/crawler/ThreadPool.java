@@ -42,15 +42,21 @@ public class ThreadPool {
         for(int i=0; i<noOfThreads; i++){
             threads.add(new CrawlerThread(docDB, frontierDB, robotsDB, unseenLinksDB, maxSize));
         }
+        
+        
+        Thread timer = new TimerThread(docDB, frontierDB, robotsDB, unseenLinksDB);
+        timer.start();
+        
         for(Thread thread : threads){
-            thread.start();
             try {
 				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+            thread.start();
         }
+        
         
 		//Wait until all threads done
 		for(Thread thread : threads){

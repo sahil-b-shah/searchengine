@@ -67,7 +67,7 @@ public class CrawlerThread extends Thread {
 
 			try {
 				Entry<Integer, URLFrontierData> entry = frontierDB.getNextUrl();
-				if (entry != null) {
+				if (entry != null && frontierDB.getSize() > 30) {
 
 					//System.out.println("not null");
 					urlString = entry.getValue().getUrl();
@@ -97,7 +97,7 @@ public class CrawlerThread extends Thread {
 						Crawler.deleteCurrentHost(request.getHost());
 					}
 					else{
-						unseenLinksDB.addURL(urlString);
+						frontierDB.addUrl(urlString);
 					}
 				} else {
 					try {
@@ -111,10 +111,16 @@ public class CrawlerThread extends Thread {
 						isStopped = true;
 					}
 				}
-			} catch (Exception e) {
+			}catch(IllegalStateException e){
+				System.err.println("Illegal State");
+				e.printStackTrace();
+				return;
+			}
+			catch (Exception e) {
 				System.err.println("Error processing link "+request.getUrlString());
 				e.printStackTrace();
 			}
+			
 			//db.close();
 		}
 	}

@@ -92,7 +92,7 @@ public class URLRequest {
 		} else {
 			this.urlString = "http://"+urlString;
 		}
-		System.out.println("Request object being made for " + urlString);
+		//System.out.println("Request object being made for " + urlString);
 
 		URL urlObj = null;
 		try {

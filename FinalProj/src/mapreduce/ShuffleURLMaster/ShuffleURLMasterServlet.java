@@ -28,7 +28,7 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 		workerids[3] = "54.213.211.175:80";
 		workerids[4] = "54.201.59.242:80";
 		workerids[5] = "54.191.0.169:80";
-		workerids[6] = "554.200.92.159:80";
+		workerids[6] = "54.200.92.159:80";
 		workerids[7] = "54.149.243.113:80";
 		System.out.println("Master init");
 
@@ -169,6 +169,7 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 					for(int j = 0; j < workerids.length; j++){
 						client.addParams("worker"+j+ ".txt", workerids[j]);
 					}
+					client.addParams("worker8.txt", workerids[0]);
 					System.out.println("Posting /runmap to "+ worker);
 					client.sendPost();
 				}

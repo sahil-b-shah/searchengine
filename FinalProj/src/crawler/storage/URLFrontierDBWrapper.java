@@ -157,7 +157,7 @@ public class URLFrontierDBWrapper {
 		q_url.setId(id+1);
 		q_url.setUrl(docURL);
 		urlFrontier.put(q_url);
-		System.out.println("Added to frontier: " + (id+1)+"--" + docURL);
+		//System.out.println("Added to frontier: " + (id+1)+"--" + docURL);
 
 	}
 	
@@ -172,6 +172,10 @@ public class URLFrontierDBWrapper {
 		}
 		c.close();
 		return urlFrontier.map();
+	}
+
+	public long getSize() {
+		return urlFrontier.count();
 	}
 		
 }

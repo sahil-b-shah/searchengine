@@ -74,17 +74,16 @@ public class Crawler {
 			maxFiles = Integer.parseInt(args[2]);
 		}
 		
-		/*DocumentDBWrapper docDB = DocumentDBWrapper.getInstance(documentDirectory);
+		DocumentDBWrapper docDB = DocumentDBWrapper.getInstance(documentDirectory);
 		System.out.println("Printing current document DB size: "+docDB.getSize());
 		docDB.close();
-		
+		/*
 		System.out.println("Prinitng unseen links");
 		UnseenLinksDBWrapper unseenDB = UnseenLinksDBWrapper.getInstance(unseenLinksDirectory);
 		unseenDB.getAllContent();
 		unseenDB.close();
 		
 		seedFromUnseen();
-		
 		URLFrontierDBWrapper frontierDB = URLFrontierDBWrapper.getInstance(frontierDirectory);
 		frontierDB.addUrl(urlString);*/
 		setup();
@@ -95,7 +94,7 @@ public class Crawler {
 		Set<String> links = unseenMap.keySet();
 		
 		URLFrontierDBWrapper frontierDB = URLFrontierDBWrapper.getInstance(frontierDirectory);
-		
+		frontierDB.addUrl(urlString);
 		for (String link : links) {
 			frontierDB.addUrl(link);
 		}
