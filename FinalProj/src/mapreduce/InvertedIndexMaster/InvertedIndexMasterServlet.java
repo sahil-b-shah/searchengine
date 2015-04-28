@@ -127,6 +127,7 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 			indexDB.addWord(docData[0], urlMap);
 			line = in.readLine();
 		}
+		System.out.println("Size: " + indexDB.getSize());
 		indexDB.close();
 		
 	}

@@ -26,10 +26,16 @@ public class Indexer{
 			DocumentIndex indexToSend = indexDocument(document);
 			
 			sendIndex(indexToSend, document.getUrl());
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			document = documentDB.getNextDocument();
 		}
 		
-		printIndex();
+		//printIndex();
 		
 		documentDB.closeIterator();
 		documentDB.close();
@@ -57,7 +63,7 @@ public class Indexer{
 		}
 		*/
 		
-		MyHttpClient client = new MyHttpClient(master, "/IndexMaster/pushdata");
+		MyHttpClient client = new MyHttpClient(master, "/InvertedIndexMaster/pushdata");
 		
 		String body = indexToSend.getMaxWord() + " " + indexToSend.getMaxOccurence() + "\n";
 		HashMap<String, Integer> map = indexToSend.getWords();
