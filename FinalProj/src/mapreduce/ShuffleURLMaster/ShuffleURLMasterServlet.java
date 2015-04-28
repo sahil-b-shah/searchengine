@@ -24,9 +24,9 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 		workerids = new String[8];
 		workerids[0] = "54.69.5.205:80";
 		workerids[1] = "54.201.100.191:80";
-		workerids[2] = "54.213.211.175:80";
-		workerids[3] = "54.201.59.242:80";
-		workerids[4] = "54.191.46.51:80";
+		workerids[2] = "54.191.46.51:80";
+		workerids[3] = "54.213.211.175:80";
+		workerids[4] = "54.201.59.242:80";
 		workerids[5] = "54.191.0.169:80";
 		workerids[6] = "554.200.92.159:80";
 		workerids[7] = "54.149.243.113:80";
