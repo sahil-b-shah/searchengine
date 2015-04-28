@@ -60,7 +60,7 @@ public class Crawler {
 		
 		currentHosts = new ConcurrentHashMap<String, String>();
 		
-		urlString = "https://www.yahoo.com/";
+		//urlString = "https://www.yahoo.com/";
 		//urlString = args[0];
 		String homeDir = args[0];
 		//Directory for stores
@@ -74,7 +74,7 @@ public class Crawler {
 			maxFiles = Integer.parseInt(args[2]);
 		}
 		
-		DocumentDBWrapper docDB = DocumentDBWrapper.getInstance(documentDirectory);
+		/*DocumentDBWrapper docDB = DocumentDBWrapper.getInstance(documentDirectory);
 		System.out.println("Printing current document DB size: "+docDB.getSize());
 		docDB.close();
 		
@@ -86,7 +86,7 @@ public class Crawler {
 		seedFromUnseen();
 		
 		URLFrontierDBWrapper frontierDB = URLFrontierDBWrapper.getInstance(frontierDirectory);
-		frontierDB.addUrl(urlString);
+		frontierDB.addUrl(urlString);*/
 		setup();
 	}
 	
