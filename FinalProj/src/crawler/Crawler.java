@@ -28,9 +28,8 @@ public class Crawler {
 	private static ConcurrentHashMap<String, String> currentHosts;
 	
 	private static void setup() throws DatabaseException, FileNotFoundException {
-		pool = new ThreadPool(10, documentDirectory, frontierDirectory, robotsDirectory, unseenLinksDirectory,  maxSize);
+		pool = new ThreadPool(15, documentDirectory, frontierDirectory, robotsDirectory, unseenLinksDirectory,  maxSize);
 	}
-	
 	
 	public static synchronized void deleteCurrentHost(String host){
 		currentHosts.remove(host);
@@ -61,7 +60,7 @@ public class Crawler {
 		
 		currentHosts = new ConcurrentHashMap<String, String>();
 		
-		urlString = "https://dbappserv.cis.upenn.edu/crawltest/";
+		urlString = "https://www.yahoo.com/";
 		//urlString = args[0];
 		String homeDir = args[0];
 		//Directory for stores
