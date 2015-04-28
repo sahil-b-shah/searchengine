@@ -87,16 +87,20 @@ public class URLRequest {
 	}*/
 
 	public URLRequest(String urlString) {
-		this.urlString = urlString;
+		if (urlString.startsWith("http")) {
+			this.urlString = urlString;
+		} else {
+			this.urlString = "http://"+urlString;
+		}
 		System.out.println("Request object being made for " + urlString);
 
 		URL urlObj = null;
 		try {
-			urlObj = new URL(urlString);
+			urlObj = new URL(this.urlString);
 		} catch (MalformedURLException e) {
 			System.err.println("Malformed URL string");
 			e.printStackTrace();
-			System.exit(-1);
+			//System.exit(-1);
 		}
 		hostName = urlObj.getHost();
 
@@ -234,7 +238,7 @@ public class URLRequest {
 
 		} else {
 			HttpURLConnection con = sendHttpsRequest(hostName, "/robots.txt", null);
-
+			
 			if(con.getResponseCode() == 200) {
 				this.contentLength = con.getContentLength();
 				this.contentType = con.getContentType();
@@ -285,7 +289,7 @@ public class URLRequest {
 	private InputStream sendRequest(String hostname, String filepath, String method,
 			Map<String, String> params) throws IOException {
 
-		System.out.println("Sending http "+method+ " request to "+hostname + filepath);
+		System.out.println("Sending http "+method+" request to "+hostname + filepath);
 		this.delay();
 		Socket s = null;
 		try {
@@ -419,6 +423,7 @@ public class URLRequest {
 			}
 		}*/
 		con.setRequestMethod(method);
+		con.setConnectTimeout(3000);
 		con.addRequestProperty("Host", hostName);
 		con.addRequestProperty("User-Agent", "cis455crawler");
 		con.addRequestProperty("Accept-Language", "en-US");

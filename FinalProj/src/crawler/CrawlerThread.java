@@ -303,7 +303,7 @@ public class CrawlerThread extends Thread {
 			URL url = makeAbsolute(request.getUrlString(), newURL);
 			//add to queue
 			//System.out.println("Adding " + url.getProtocol()+"://"+url.getHost()+url.getFile()+" to unseen links");
-			if (url != null) {
+			if (url != null && !url.getProtocol().equalsIgnoreCase("mailto")) {
 				unseenLinksDB.addURL(url.getProtocol()+"://"+url.getHost()+url.getFile());
 				links.add(url.getProtocol()+"://"+url.getHost()+url.getFile());
 			}
