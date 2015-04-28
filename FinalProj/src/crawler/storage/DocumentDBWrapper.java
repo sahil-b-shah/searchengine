@@ -26,7 +26,7 @@ public class DocumentDBWrapper {
 	private EntityStore store;
 	
 	private PrimaryIndex<String, DocumentData> seenContent;
-	private TreeMap<String, DocumentData>  keys;
+	private Iterator<String>  keys;
 	//private int channelId = 0;
 	
 	private static DocumentDBWrapper db;
@@ -126,22 +126,23 @@ public class DocumentDBWrapper {
 	}
 	
 	public synchronized void initIterator(){
-		keys = new TreeMap<String, DocumentData>(seenContent.map());
+		keys = seenContent.map().keySet().iterator();
 	}
 	
 	public synchronized DocumentData getNextDocument(){
 		
-		if(keys == null || keys.isEmpty()){
+		if(keys == null || !keys.hasNext()){
 			return null;
 		}
 		
-		Entry<String, DocumentData> e = keys.pollFirstEntry();
-		if (e!=null) {
-			seenContent.delete(e.getKey());
-		}
-		return e.getValue();
+		DocumentData doc = seenContent.get(keys.next());
+		return doc;
 		
 		
+	}
+	
+	public synchronized void closeIterator(){
+		keys = null;
 	}
 	
 	public synchronized DocumentData getContentById(String id) {
