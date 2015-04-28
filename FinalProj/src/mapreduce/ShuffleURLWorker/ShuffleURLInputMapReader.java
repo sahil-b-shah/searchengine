@@ -12,11 +12,13 @@ public class ShuffleURLInputMapReader {
 
 	private UnseenLinksDBWrapper unseenLinksDB;
 	private boolean done;
+	private int numLinks;
 	
 	
 	public ShuffleURLInputMapReader(String unseenLinksDirectory) throws FileNotFoundException{
 		unseenLinksDB = UnseenLinksDBWrapper.getInstance(unseenLinksDirectory);
 		done = false;
+		numLinks = 0;
 	}
 	
 	/**
@@ -26,7 +28,8 @@ public class ShuffleURLInputMapReader {
 	 */
 	public synchronized String readLine() throws IOException{
 		
-		if(done){
+		if(done || numLinks > 5000){
+			done = true;
 			if(unseenLinksDB != null) 
 				unseenLinksDB.close();
 			return null;
@@ -40,6 +43,7 @@ public class ShuffleURLInputMapReader {
 		}
 		else{
 			line = link.getKey();
+			numLinks++;
 		}
 		
 		return line;
