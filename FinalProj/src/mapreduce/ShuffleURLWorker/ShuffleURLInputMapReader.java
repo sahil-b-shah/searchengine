@@ -28,10 +28,11 @@ public class ShuffleURLInputMapReader {
 	 */
 	public synchronized String readLine() throws IOException{
 		
-		if(done || numLinks > 5000){
+		if(done || numLinks > 2000){
 			done = true;
 			if(unseenLinksDB != null) 
 				unseenLinksDB.close();
+			System.out.println("Done, returning null");
 			return null;
 		}
 		
@@ -44,6 +45,7 @@ public class ShuffleURLInputMapReader {
 		else{
 			line = link.getKey();
 			numLinks++;
+			System.out.println("Numkeys: " + numLinks);
 		}
 		
 		return line;
