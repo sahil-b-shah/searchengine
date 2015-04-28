@@ -225,9 +225,9 @@ public class URLRequest {
 		//Get reponse and read headers 
 		if (this.protocol.equals("http")) {
 			InputStream responseStream = sendRequest(this.hostName, "/robots.txt", "GET", null);
-			/*if (responseStream.available()==0) {
+			if (responseStream==null) {
 				return;
-			}*/
+			}
 			br = new BufferedReader(new InputStreamReader(responseStream));
 			if (!setResponseHeaders(br)){
 				//System.out.println(responseStream.available());
@@ -379,8 +379,6 @@ public class URLRequest {
 					this.contentLength = Integer.valueOf(value);
 				} else if(key.equals("Content-Type")) {
 					this.contentType = value;
-				} else if (key.equalsIgnoreCase("Last-Modified")) {
-					this.lastModified = this.checkModifiedDate(value);
 				}
 			}
 		}
