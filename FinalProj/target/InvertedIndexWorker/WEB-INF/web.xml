@@ -34,6 +34,7 @@
            <param-name>indexDocDirectory</param-name>
            <param-value>/home/cis455/InvertedIndexWorker1/indexdocdb</param-value>
          </init-param>
+		 <load-on-startup>0</load-on-startup>
      </servlet>
 
      <servlet-mapping>

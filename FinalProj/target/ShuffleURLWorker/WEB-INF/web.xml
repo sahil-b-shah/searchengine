@@ -16,11 +16,11 @@
          </init-param>
          <init-param>
            <param-name>master</param-name>
-           <param-value>127.0.0.1:8080</param-value>
+           <param-value>ec2-54-213-18-16.us-west-2.compute.amazonaws.com:80</param-value>
          </init-param>
          <init-param>
            <param-name>port</param-name>
-           <param-value>8081</param-value>
+           <param-value>54.200.92.159:80</param-value>
          </init-param>
          <init-param>
            <param-name>frontierDirectory</param-name>
@@ -30,6 +30,7 @@
            <param-name>unseenLinksDirectory</param-name>
            <param-value>/home/cis455/ShuffleWorker1/unseenlinksdb</param-value>
          </init-param>
+         <load-on-startup>0</load-on-startup>
      </servlet>
 
      <servlet-mapping>

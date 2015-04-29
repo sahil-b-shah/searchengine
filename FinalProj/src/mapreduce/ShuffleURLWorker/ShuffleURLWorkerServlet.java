@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 
 import javax.servlet.*;
@@ -64,7 +65,7 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response) 
 			throws java.io.IOException
 	{
-		String IPPort = InetAddress.getLocalHost() + ":" + port;
+		String IPPort = port;
 
 		if(request.getRequestURI().contains("/runmap")){
 			status = "mapping";
@@ -261,6 +262,7 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 
 		String line = in.readLine();
 		while(line != null){
+			System.out.println("Adding: " + line);
 			frontierDB.addUrl(line);
 			line = in.readLine();
 		}

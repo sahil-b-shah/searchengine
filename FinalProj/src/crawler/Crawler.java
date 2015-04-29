@@ -2,7 +2,6 @@ package crawler;
 
 
 import java.io.FileNotFoundException;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -10,7 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.sleepycat.je.DatabaseException;
 
 import crawler.storage.DocumentDBWrapper;
-import crawler.storage.RobotsDBWrapper;
 import crawler.storage.URLFrontierDBWrapper;
 import crawler.storage.UnseenLinksDBWrapper;
 import crawler.storage.UnseenLinksData;
@@ -30,9 +28,8 @@ public class Crawler {
 	private static ConcurrentHashMap<String, String> currentHosts;
 	
 	private static void setup() throws DatabaseException, FileNotFoundException {
-		pool = new ThreadPool(10, documentDirectory, frontierDirectory, robotsDirectory, unseenLinksDirectory,  maxSize);
+		pool = new ThreadPool(15, documentDirectory, frontierDirectory, robotsDirectory, unseenLinksDirectory,  maxSize);
 	}
-	
 	
 	public static synchronized void deleteCurrentHost(String host){
 		currentHosts.remove(host);
@@ -56,41 +53,39 @@ public class Crawler {
 	 */
 	public static void main(String [] args) throws DatabaseException, FileNotFoundException {
 		
-		if((args.length != 4) && (args.length != 3)) {
+		if((args.length != 3) && (args.length != 2)) {
 			System.err.println("Incorrect number of arguments");
 			System.exit(-1);
 		}
 		
 		currentHosts = new ConcurrentHashMap<String, String>();
 		
-		//urlString = "https://dbappserv.cis.upenn.edu/crawltest/marie/tpc/part.xml";
-		urlString = args[0];
-		String homeDir = args[1];
+		//urlString = "https://www.yahoo.com/";
+		//urlString = args[0];
+		String homeDir = args[0];
 		//Directory for stores
 		documentDirectory = homeDir+"/documentdb";
 		frontierDirectory = homeDir+"/frontierdb";
 		robotsDirectory = homeDir+"/robotsdb";
 		unseenLinksDirectory = homeDir+"/unseenlinksdb";
 		
-		maxSize = Integer.parseInt(args[2]);
-		if (args.length == 4) {
-			maxFiles = Integer.parseInt(args[3]);
+		maxSize = Integer.parseInt(args[1]);
+		if (args.length == 3) {
+			maxFiles = Integer.parseInt(args[2]);
 		}
 		
-		System.out.println("Printing current document");
 		DocumentDBWrapper docDB = DocumentDBWrapper.getInstance(documentDirectory);
-		docDB.getAllContent();
+		System.out.println("Printing current document DB size: "+docDB.getSize());
 		docDB.close();
-		
+		/*
 		System.out.println("Prinitng unseen links");
 		UnseenLinksDBWrapper unseenDB = UnseenLinksDBWrapper.getInstance(unseenLinksDirectory);
 		unseenDB.getAllContent();
 		unseenDB.close();
 		
 		seedFromUnseen();
-		
 		URLFrontierDBWrapper frontierDB = URLFrontierDBWrapper.getInstance(frontierDirectory);
-		frontierDB.addUrl(urlString);
+		frontierDB.addUrl(urlString);*/
 		setup();
 	}
 	
@@ -99,7 +94,7 @@ public class Crawler {
 		Set<String> links = unseenMap.keySet();
 		
 		URLFrontierDBWrapper frontierDB = URLFrontierDBWrapper.getInstance(frontierDirectory);
-		
+		frontierDB.addUrl(urlString);
 		for (String link : links) {
 			frontierDB.addUrl(link);
 		}

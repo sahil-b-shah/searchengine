@@ -21,14 +21,15 @@ public class UnseenLinksDBWrapper {
 
 	private Environment myEnv;
 	private EntityStore unseenLinksStore;
-	
+
 	private PrimaryIndex<String, UnseenLinksData> unseenLinksIndex;
-	
+	private Iterator<String>  keys;
+
 	private static UnseenLinksDBWrapper wrapper = null;
 
 	private UnseenLinksDBWrapper(String directory) throws DatabaseException, FileNotFoundException {
 		envDirectory = directory;
-		
+
 		File file = new File(envDirectory);
 		if (!file.exists()) {
 			if(file.mkdirs()){
@@ -37,25 +38,25 @@ public class UnseenLinksDBWrapper {
 			else{
 				System.out.println("Failed creating directory " + file.getAbsolutePath());
 			}
-			
+
 		}
 		else{
 			System.out.println("Database directory exists");
 		}
-		
+
 		EnvironmentConfig envConfig = new EnvironmentConfig();
 		envConfig.setAllowCreate(true);
-		
+
 		StoreConfig storeConfig = new StoreConfig();
 		storeConfig.setAllowCreate(true);
-		
+
 
 		myEnv = new Environment(file, envConfig);	   
-		
+
 		//URL Database
 		unseenLinksStore = new EntityStore(myEnv, "unseenLinks", storeConfig);
 		unseenLinksIndex = unseenLinksStore.getPrimaryIndex(String.class, UnseenLinksData.class);
-		
+
 
 	}
 
@@ -69,7 +70,7 @@ public class UnseenLinksDBWrapper {
 				System.exit(-1);
 			}
 		}
-		
+
 		if (myEnv != null) {
 			try {
 				myEnv.close();
@@ -80,11 +81,11 @@ public class UnseenLinksDBWrapper {
 		}
 		wrapper = null;
 	}
-	
+
 	public synchronized Environment getEnvironment(){
 		return myEnv;
 	}
-	
+
 	/**
 	 * Add robots.txt data to database
 	 * @param hostname - host for robots.txt file
@@ -95,7 +96,7 @@ public class UnseenLinksDBWrapper {
 	public synchronized void addURL(String url){
 		unseenLinksIndex.put(new UnseenLinksData(url));
 	}
-	
+
 	/**
 	 * Get UnseenLinksData from url
 	 * @param url - link to look at
@@ -104,7 +105,7 @@ public class UnseenLinksDBWrapper {
 	public synchronized UnseenLinksData getUnseenLinksData(String url){
 		return unseenLinksIndex.get(url);
 	}
-	
+
 	/**
 	 * Delete UnseenLinksData 
 	 * @param hostname - link just seen
@@ -112,15 +113,15 @@ public class UnseenLinksDBWrapper {
 	public synchronized void deleteUnseenLinksData(String url){
 		unseenLinksIndex.delete(url);
 	}
-	
+
 	public static synchronized UnseenLinksDBWrapper getInstance(String directory) throws DatabaseException, FileNotFoundException {
 		if(wrapper == null) {
 			wrapper = new UnseenLinksDBWrapper(directory);
 		}
 		return wrapper;
 	}
-	
-	public synchronized Entry<String, UnseenLinksData> getNextUrl() {
+
+	/*public synchronized Entry<String, UnseenLinksData> getNextUrl() {
 		TreeMap<String, UnseenLinksData> orderedFrontier = new TreeMap<String, UnseenLinksData>(unseenLinksIndex.map());
 		Entry<String, UnseenLinksData> e = orderedFrontier.firstEntry();
 		if (e!=null) {
@@ -128,12 +129,32 @@ public class UnseenLinksDBWrapper {
 			//System.out.println(e.getValue().getUrl()+": "+success);
 		}
 		return e;
+	}*/
+
+	public synchronized UnseenLinksData getNextUrl(){
+
+		if(keys == null){
+			keys = unseenLinksIndex.map().keySet().iterator();
+		}
+
+		if(!keys.hasNext()){
+			return null;
+		}
+
+		UnseenLinksData data = unseenLinksIndex.get(keys.next());
+		if(data != null){
+			deleteUnseenLinksData(data.getUrl());
+		}
+		return data;
+
+
 	}
-	
+
+
 	public synchronized boolean isEmpty() {
 		return (unseenLinksIndex.count() == 0);
 	}
-	
+
 	public synchronized Map<String, UnseenLinksData> getAllContent() {
 		EntityCursor<UnseenLinksData> c = unseenLinksIndex.entities();
 		Iterator<UnseenLinksData> ir = c.iterator();
@@ -143,5 +164,9 @@ public class UnseenLinksDBWrapper {
 		}
 		c.close();
 		return unseenLinksIndex.map();
+	}
+
+	public synchronized long getSize() {
+		return unseenLinksIndex.count();
 	}
 }

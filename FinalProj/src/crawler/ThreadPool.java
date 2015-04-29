@@ -6,6 +6,8 @@ import java.util.List;
 
 import mapreduce.ShuffleURLWorker.ShuffleURLMapThread;
 
+import com.cybozu.labs.langdetect.DetectorFactory;
+import com.cybozu.labs.langdetect.LangDetectException;
 import com.sleepycat.je.DatabaseException;
 
 import crawler.storage.DocumentDBWrapper;
@@ -24,23 +26,38 @@ public class ThreadPool {
     	URLFrontierDBWrapper frontierDB = URLFrontierDBWrapper.getInstance(frontierDirectory);
 		RobotsDBWrapper robotsDB = RobotsDBWrapper.getInstance(robotsDirectory);
 		UnseenLinksDBWrapper unseenLinksDB = UnseenLinksDBWrapper.getInstance(unseenLinksDirectory);
-    	/*while (!db.isEmpty()) {
+		try {
+			DetectorFactory.loadProfile(System.getProperty("user.dir")+"/lib/profiles");
+		} catch (LangDetectException e1) {
+			e1.printStackTrace();
+		}
+		/*while (!db.isEmpty()) {
 			Entry<Integer, QueueEntity> entry1 = db.getNextUrl();
 			System.out.println(entry1.getKey()+": " + entry1.getValue().getUrl());
 		}*/
+		
+		System.out.println("BEFORE document DB size: "+docDB.getSize());
+		System.out.println("BEFORE unseen links size: "+unseenLinksDB.getSize());
+		System.out.println("BEFORE unseen links size: "+frontierDB.getSize());
     	
         for(int i=0; i<noOfThreads; i++){
             threads.add(new CrawlerThread(docDB, frontierDB, robotsDB, unseenLinksDB, maxSize));
         }
+        
+        
+        Thread timer = new TimerThread(docDB, frontierDB, robotsDB, unseenLinksDB);
+        timer.start();
+        
         for(Thread thread : threads){
-            thread.start();
             try {
 				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+            thread.start();
         }
+        
         
 		//Wait until all threads done
 		for(Thread thread : threads){
@@ -50,12 +67,17 @@ public class ThreadPool {
 				System.err.println("Map thread ended unnaturally");
 			}
 		}
-		
+		System.out.println("AFTER document DB size: "+docDB.getSize());
+		System.out.println("AFTER document DB size: "+frontierDB.getSize());
+		System.out.println("AFTER unseen links size: "+unseenLinksDB.getSize());
 		System.out.println("Closing entire crawler");
 		frontierDB.close();
 		docDB.close();
 		unseenLinksDB.close();
 		robotsDB.close();
+		if(timer.isAlive()){
+			timer.interrupt();
+		}
 
     }
 

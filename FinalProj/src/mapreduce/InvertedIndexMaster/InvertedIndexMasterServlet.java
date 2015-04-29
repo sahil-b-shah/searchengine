@@ -1,26 +1,34 @@
 package mapreduce.InvertedIndexMaster;
 
 
-import java.io.*;
+/*import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Map;*/
+
+import indexer.storage.InvertedIndexDBWrapper;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.HashMap;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
 
-import mapreduce.MyHttpClient;
+//import crawler.storage.URLFrontierDBWrapper;
+
+//import mapreduce.MyHttpClient;
 
 public class InvertedIndexMasterServlet extends HttpServlet {
 
 	static final long serialVersionUID = 455555001;
-	private static Map<String, ArrayList<String>> statusMap; 
+	/*private static Map<String, ArrayList<String>> statusMap; 
 	private static String numMapThreads = "20";
-	private static String numReduceThreads = "20";
+	private static String numReduceThreads = "20";*/
 
 	public void init(ServletConfig config) throws ServletException {
-		statusMap = new HashMap<String, ArrayList<String>>();
+		//statusMap = new HashMap<String, ArrayList<String>>();
 		System.out.println("Master init");
 
 	}
@@ -28,7 +36,7 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 			throws java.io.IOException
 	{
 
-		//Status page
+		/*//Status page
 		if(request.getRequestURI().contains("/status")){
 			response.setContentType("text/html");
 			PrintWriter out = response.getWriter();
@@ -78,13 +86,56 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 		}
 
 
-
+		 */
 
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response) 
 			throws java.io.IOException
 	{
+		if(request.getRequestURI().contains("/pushdata")){
+			System.out.println("Data received");
+			addData(request);
+		}
+	}
+
+
+	/**
+	 * Append data from POST into index DB
+	 * @param request from POST
+	 * @throws IOException
+	 */
+	public synchronized void addData(HttpServletRequest request) throws IOException{
+		BufferedReader in = request.getReader();
+		InvertedIndexDBWrapper indexDB = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb");
+
+		String line = in.readLine();
+		if(line == null)
+			return;
+
+		//String[] docData = line.split("\\s+");
+		//Add this part for tf
+
+		line = in.readLine();
+		while(line != null){
+			String[] docData = line.split("\\s+");
+			HashMap<String, Integer> urlMap= indexDB.getUrls(docData[0]); //look up by word
+			if(urlMap == null){
+				urlMap = new HashMap<String, Integer>();
+			}
+			urlMap.put(docData[1], Integer.parseInt(docData[2]));
+			indexDB.addWord(docData[0], urlMap);
+			line = in.readLine();
+		}
+		System.out.println("Size: " + indexDB.getSize());
+		indexDB.close();
+		
+	}
+
+
+
+	/*
+		{
 		//Status update url
 		if(request.getRequestURI().contains("/workerstatus")){
 			//Get query string params
@@ -145,35 +196,35 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 				//System.out.println("Posting /runmap to "+ worker);
 				client.sendPost();
 			}
-		}
+		}*/
 
-	}
+	//}
 
 
-	/**
-	 * Gets the current status map synchronously and copies it to a new one
-	 * @return a copy of the map
-	 */
-	private Map<String, ArrayList<String>> getStatusMap(){
-		Map<String, ArrayList<String>> copyMap =  new HashMap<String, ArrayList<String>>();
-		synchronized(statusMap){
-			for(String key: statusMap.keySet()){
-				copyMap.put(key, statusMap.get(key));
-			}
-		}
-		return copyMap;
-	}
-
-	/**
-	 * Updates the status map synchronously
-	 * @param key to add
-	 * @param value to add 
-	 */
-	private void updateStatusMap(String key, ArrayList<String> value){
-		synchronized(statusMap){
-			statusMap.put(key, value);
-		}
-	}
+	//	/**
+	//	 * Gets the current status map synchronously and copies it to a new one
+	//	 * @return a copy of the map
+	//	 */
+	//	private Map<String, ArrayList<String>> getStatusMap(){
+	//		Map<String, ArrayList<String>> copyMap =  new HashMap<String, ArrayList<String>>();
+	//		synchronized(statusMap){
+	//			for(String key: statusMap.keySet()){
+	//				copyMap.put(key, statusMap.get(key));
+	//			}
+	//		}
+	//		return copyMap;
+	//	}
+	//
+	//	/**
+	//	 * Updates the status map synchronously
+	//	 * @param key to add
+	//	 * @param value to add 
+	//	 */
+	//	private void updateStatusMap(String key, ArrayList<String> value){
+	//		synchronized(statusMap){
+	//			statusMap.put(key, value);
+	//		}
+	//	}
 
 }
 
