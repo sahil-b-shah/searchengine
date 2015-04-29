@@ -142,6 +142,9 @@ public class UnseenLinksDBWrapper {
 		}
 
 		UnseenLinksData data = unseenLinksIndex.get(keys.next());
+		if(data != null){
+			deleteUnseenLinksData(data.getUrl());
+		}
 		return data;
 
 
