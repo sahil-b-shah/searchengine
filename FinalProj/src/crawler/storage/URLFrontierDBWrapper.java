@@ -22,6 +22,9 @@ public class URLFrontierDBWrapper {
 	private EntityStore store;
 	
 	private PrimaryIndex<Integer, URLFrontierData> urlFrontier;
+	private TreeMap<Integer, URLFrontierData> orderedFrontier;
+
+	private int count = 0;
 	//private int channelId = 0;
 	
 	private static URLFrontierDBWrapper db;
@@ -72,6 +75,7 @@ public class URLFrontierDBWrapper {
 		
 		try {
 			urlFrontier = store.getPrimaryIndex(Integer.class, URLFrontierData.class);
+			this.count = (int) urlFrontier.count();
 			
 		} catch (DatabaseException dbe) {
 			System.err.println("Error making indexes");
@@ -108,22 +112,20 @@ public class URLFrontierDBWrapper {
 		return store;
 	}
 	
-	
-	public synchronized Entry<Integer, URLFrontierData> getLastUrl() {
-		TreeMap<Integer, URLFrontierData> orderedFrontier = new TreeMap<Integer, URLFrontierData>(urlFrontier.map());
-		Entry<Integer, URLFrontierData> e = orderedFrontier.lastEntry();
-		
-		return e;
-	}
-	
 	public synchronized Entry<Integer, URLFrontierData> getNextUrl() {
-		TreeMap<Integer, URLFrontierData> orderedFrontier = new TreeMap<Integer, URLFrontierData>(urlFrontier.map());
-		Entry<Integer, URLFrontierData> e = orderedFrontier.firstEntry();
-		if (e!=null) {
-			urlFrontier.delete(e.getKey());
-			//System.out.println(e.getValue().getUrl()+": "+success);
+		
+		if ((this.orderedFrontier == null) || (this.orderedFrontier.isEmpty())) {
+			if (urlFrontier.count() != 0) {
+				this.orderedFrontier = new TreeMap<Integer, URLFrontierData>(urlFrontier.map());
+			} else {
+				// URL frontier empty
+				return null;
+			}
 		}
-		return e;
+		
+		Entry<Integer, URLFrontierData> data = this.orderedFrontier.pollFirstEntry();
+		urlFrontier.delete(data.getKey());
+		return data;
 	}
 	
 	public synchronized boolean isEmpty() {
@@ -142,21 +144,16 @@ public class URLFrontierDBWrapper {
 		if (docURL.isEmpty()) {
 			return;
 		}*/
-		
-		int id;
-		if(getLastUrl() == null) {
-			id = 0;
-		} else {
-			id = getLastUrl().getKey();
-		}
-		if ((id + 1) == Integer.MAX_VALUE) {
+		Integer id = this.count;
+		if ((this.count) == (Integer.MAX_VALUE-3)) {
 			id = 0;
 		}
 		
 		URLFrontierData q_url = new URLFrontierData();
-		q_url.setId(id+1);
+		q_url.setId(id);
 		q_url.setUrl(docURL);
 		urlFrontier.put(q_url);
+		this.count++;
 		//System.out.println("Added to frontier: " + (id+1)+"--" + docURL);
 
 	}
