@@ -1,4 +1,4 @@
-package frontend;
+package search;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -17,6 +17,7 @@ public class SearchServlet extends HttpServlet {
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response){
 		PrintWriter out;
+		System.out.println("here");
 		try {
 			out = response.getWriter();
 			out.println("<html><body>");
