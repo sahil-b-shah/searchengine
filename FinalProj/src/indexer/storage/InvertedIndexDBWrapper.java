@@ -3,6 +3,7 @@ package indexer.storage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.Map.Entry;
@@ -104,7 +105,7 @@ public class InvertedIndexDBWrapper {
 		return (invertedIndex.count() == 0);
 	}
 	
-	public synchronized void addWord(String w, HashMap<String, Integer> map) {
+	public synchronized void addWord(String w, HashMap<String, URLMetrics> map) {
 		InvertedIndexData ce = new InvertedIndexData();
 		ce.setWord(w);
 		ce.setMap(map);
@@ -116,14 +117,26 @@ public class InvertedIndexDBWrapper {
 		return ce;
 	}
 		
-	public synchronized HashMap<String, Integer> getUrls(String word){
+	public synchronized HashMap<String, URLMetrics> getUrls(String word){
 		if(invertedIndex.get(word) == null)
 			return null;
 		return invertedIndex.get(word).getUrls();
 	}
 	
-	public synchronized Integer getOccurence(String word, String url){
-		return invertedIndex.get(word).getUrls().get(url);
+	public synchronized Integer getOccurences(String word, String url){
+		return invertedIndex.get(word).getUrls().get(url).getOccurences();
+	}
+	
+	public synchronized Double getTF(String word, String url, double tf){
+		return invertedIndex.get(word).getUrls().get(url).getTF();
+	}
+	
+	public synchronized Double getIDF(String word, String url, double idf){
+		return invertedIndex.get(word).getUrls().get(url).getIDF();
+	}
+	
+	public synchronized Iterator<Entry<String, URLMetrics>> getWordIterator(String word){
+		return invertedIndex.get(word).getUrls().entrySet().iterator();
 	}
 	
 	public void printContent() {
