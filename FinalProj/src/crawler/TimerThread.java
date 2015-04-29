@@ -24,7 +24,7 @@ public class TimerThread extends Thread {
 		// TODO Auto-generated method stub
 		try {
 			System.out.println("Time started");
-			Thread.sleep(14400000);
+			Thread.sleep(7200000);
 			System.out.println("Done time");
 			System.out.println("AFTER document DB size: "+docDB.getSize());
 			System.out.println("AFTER unseen links size: "+unseenLinksDB.getSize());
