@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;*/
 
 import indexer.storage.InvertedIndexDBWrapper;
+import indexer.storage.URLMetrics;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -119,11 +120,11 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 		line = in.readLine();
 		while(line != null){
 			String[] docData = line.split("\\s+");
-			HashMap<String, Integer> urlMap= indexDB.getUrls(docData[0]); //look up by word
+			HashMap<String, URLMetrics> urlMap= indexDB.getUrls(docData[0]); //look up by word
 			if(urlMap == null){
-				urlMap = new HashMap<String, Integer>();
+				urlMap = new HashMap<String, URLMetrics>();
 			}
-			urlMap.put(docData[1], Integer.parseInt(docData[2]));
+			urlMap.put(docData[1], new URLMetrics(Integer.parseInt(docData[2]),0,0));
 			indexDB.addWord(docData[0], urlMap);
 			line = in.readLine();
 		}

@@ -1,10 +1,9 @@
 package indexer;
 
-import java.io.IOException;
-import java.net.Socket;
 import java.util.HashMap;
 
 import mapreduce.MyHttpClient;
+import crawler.CrawlerThread;
 import crawler.storage.DocumentDBWrapper;
 import crawler.storage.DocumentData;
 
@@ -20,25 +19,34 @@ public class Indexer{
 		DocumentDBWrapper documentDB = DocumentDBWrapper.getInstance(documentDirectory);
 		documentDB.initIterator();
 		
-		DocumentData document = documentDB.getNextDocument();
-		
-		while(document != null){
-			DocumentIndex indexToSend = indexDocument(document);
-			
-			sendIndex(indexToSend, document.getUrl());
-			try {
-				Thread.sleep(100);
+		Thread threadpool[] = new Thread[15];
+        for(int i=0; i<threadpool.length; i++){
+        	threadpool[i] = (new IndexerThread(documentDB));
+        }
+        
+        for(int i=0; i<threadpool.length; i++){
+            try {
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			document = documentDB.getNextDocument();
+            threadpool[i].start();
+        }
+        
+        
+		//Wait until all threads done
+        for(int i=0; i<threadpool.length; i++){
+			try {
+				threadpool[i].join();
+			} catch (InterruptedException e) {
+				System.err.println("Index thread ended unnaturally");
+			}
 		}
+        
+        System.out.println("Indexing done");
+        documentDB.close();
 		
-		//printIndex();
-		
-		documentDB.closeIterator();
-		documentDB.close();
 	}
 	
 	

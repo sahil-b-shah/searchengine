@@ -1,6 +1,8 @@
 package mapreduce;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.HashMap;
@@ -86,6 +88,17 @@ public class MyHttpClient {
 	 * @return true if connected
 	 */
 	public boolean connected(){
+		return connected;
+	}
+	
+	public boolean getResponse() throws IOException{
+		if(socket == null)
+			return false;
+		BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		String line = in.readLine();
+		while(line != null){
+			line = in.readLine();
+		}
 		return connected;
 	}
 	

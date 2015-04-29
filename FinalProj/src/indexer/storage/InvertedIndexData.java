@@ -10,7 +10,7 @@ public class InvertedIndexData {
 
 	@PrimaryKey
 	private String word;
-	private HashMap<String, Integer> document;
+	private HashMap<String, URLMetrics> document;
 	
 	public void setWord (String data) {
 		word = data;
@@ -20,11 +20,11 @@ public class InvertedIndexData {
 		return word;
 	}
 	
-	public void setMap(HashMap<String, Integer> map){
+	public void setMap(HashMap<String, URLMetrics> map){
 		document = map;
 	}
 	
-	public HashMap<String, Integer> getUrls() {
+	public HashMap<String, URLMetrics> getUrls() {
 		return document;
 	}
 	
