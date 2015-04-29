@@ -2,7 +2,6 @@ package mapreduce.ShuffleURLWorker;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Map.Entry;
 
 import crawler.storage.UnseenLinksDBWrapper;
 import crawler.storage.UnseenLinksData;
@@ -36,16 +35,15 @@ public class ShuffleURLInputMapReader {
 			return null;
 		}
 		
-		Entry<String, UnseenLinksData> link = unseenLinksDB.getNextUrl();
+		UnseenLinksData link = unseenLinksDB.getNextUrl();
 		String line = null;
 		
 		if(link == null){
 			done = true;
 		}
 		else{
-			line = link.getKey();
+			line = link.getUrl();
 			numLinks++;
-			System.out.println("Numkeys: " + numLinks);
 		}
 		
 		return line;
