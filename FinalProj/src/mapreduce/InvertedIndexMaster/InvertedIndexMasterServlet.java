@@ -11,6 +11,7 @@ import indexer.storage.URLMetrics;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 
 import javax.servlet.ServletConfig;
@@ -97,6 +98,8 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 		if(request.getRequestURI().contains("/pushdata")){
 			System.out.println("Data received");
 			addData(request);
+			PrintWriter writer = response.getWriter();
+			writer.close();
 		}
 	}
 
@@ -123,15 +126,19 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 		line = in.readLine();
 		while(line != null){
 			String[] docData = line.split("\\s+");
-			HashMap<String, URLMetrics> urlMap= indexDB.getUrls(docData[0]); //look up by word
+			System.out.println("url: " + docData[0]);
+			HashMap<String, URLMetrics> urlMap= indexDB.getUrls(docData[1]); //look up by word
 			if(urlMap == null){
 				urlMap = new HashMap<String, URLMetrics>();
 			}
-			urlMap.put(docData[1], new URLMetrics(Integer.parseInt(docData[2]),0,0));
-			indexDB.addWord(docData[0], urlMap);
+			urlMap.put(docData[0], new URLMetrics(Integer.parseInt(docData[2]),0,0));
+			indexDB.addWord(docData[1], urlMap);
 			line = in.readLine();
 		}
-		System.out.println("Size: " + indexDB.getSize());
+		System.out.println("Index DB Size: " + indexDB.getSize());
+		System.out.println("Links that have a: " + indexDB.getUrls("a").size());
+		System.out.println("occurs of a in url1: " + indexDB.getUrls("a").get("url1").getOccurences());
+		System.out.println();
 		indexDB.close();
 		
 	}

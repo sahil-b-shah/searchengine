@@ -19,7 +19,7 @@ public class Indexer{
 		DocumentDBWrapper documentDB = DocumentDBWrapper.getInstance(documentDirectory);
 		documentDB.initIterator();
 		
-		Thread threadpool[] = new Thread[15];
+		Thread threadpool[] = new Thread[10];
         for(int i=0; i<threadpool.length; i++){
         	threadpool[i] = (new IndexerThread(documentDB));
         }
