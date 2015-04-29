@@ -38,7 +38,7 @@ public class ThreadPool {
 		
 		System.out.println("BEFORE document DB size: "+docDB.getSize());
 		System.out.println("BEFORE unseen links size: "+unseenLinksDB.getSize());
-		System.out.println("BEFORE unseen links size: "+frontierDB.getSize());
+		System.out.println("BEFORE frontier links size: "+frontierDB.getSize());
     	
         for(int i=0; i<noOfThreads; i++){
             threads.add(new CrawlerThread(docDB, frontierDB, robotsDB, unseenLinksDB, maxSize));
@@ -68,7 +68,7 @@ public class ThreadPool {
 			}
 		}
 		System.out.println("AFTER document DB size: "+docDB.getSize());
-		System.out.println("AFTER document DB size: "+frontierDB.getSize());
+		System.out.println("AFTER frontier DB size: "+frontierDB.getSize());
 		System.out.println("AFTER unseen links size: "+unseenLinksDB.getSize());
 		System.out.println("Closing entire crawler");
 		frontierDB.close();

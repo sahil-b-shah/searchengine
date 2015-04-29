@@ -9,9 +9,34 @@
   	<mkdir dir="target/InvertedIndexWorker2/WEB-INF/classes"/>
   	<mkdir dir="target/Crawler/classes"/>
   	<mkdir dir="target/Indexer/classes"/>
+  	<mkdir dir="target/DocDBPrinter/classes"/>
     <mkdir dir="classes"/>
   </target>
   
+	<target name ="build-dbprinter" depends="compile-dbprinter">
+		<jar destfile="db_printer.jar">
+			<fileset dir="target/DocDBPrinter/classes/" includes="**/*.class"/>
+			<fileset dir="target/DocDBPrinter" includes="/lib/*"/>
+	  		<zipgroupfileset dir="target/DocDBPrinter/lib" includes="*"/>
+			<manifest>
+				<attribute name="Main-Class"
+				 	value="test.DocumentDBTest"/>
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="compile-dbprinter" depends="init">
+	    <javac srcdir="src" destdir="target/DocDBPrinter/classes" includes="test/DocumentDBTest.java" deprecation="on"
+	     debug="true" includeantruntime="false">
+	    	<classpath>
+	            <fileset dir="lib/">
+	                <include name="*.jar"/>
+	            </fileset>
+	  	   	</classpath>
+	       <compilerarg value="-Xlint"/>
+	    </javac>
+	</target>
+	
   <target name ="build-crawler" depends="compile-crawler">
   	<jar destfile="crawler.jar">
         <!--<fileset dir="src" includes="crawler/**/*.java"/>-->
@@ -255,5 +280,8 @@
   	<delete file="InvertedIndexWorker2.war"/>
   	<delete file="crawler.jar"/>
   	<delete file="indexer.jar"/>
+  	<delete dir="target/DocDBPrinter/classes"/>
+  	<delete file="db_printer.jar"/>
+
   </target>
 </project>

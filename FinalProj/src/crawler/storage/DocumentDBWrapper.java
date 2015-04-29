@@ -114,12 +114,18 @@ public class DocumentDBWrapper {
 		return store;
 	}
 	
-	public synchronized Map<String, DocumentData> getAllContent() {
+	public synchronized Map<String, DocumentData> printAllContent() {
 		EntityCursor<DocumentData> c = seenContent.entities();
 		Iterator<DocumentData> ir = c.iterator();
 		while (ir.hasNext()) {
 			DocumentData ce = ir.next();
+			System.out.println("---------------------------------------------------------------------");
 			System.out.println(ce.getUrl()+": "+new Date(Long.valueOf(ce.getLastSeen())));
+			try {
+				System.out.println(ce.getContent().substring(0, 1000));
+			} catch (IndexOutOfBoundsException e) {
+				System.err.println("Index out of bounds");
+			}
 		}
 		c.close();
 		return seenContent.map();
