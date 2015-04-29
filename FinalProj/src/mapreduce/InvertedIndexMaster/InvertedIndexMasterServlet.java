@@ -118,6 +118,9 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 		//Add this part for tf
 
 		line = in.readLine();
+		System.out.println("Line 1:" + line);
+		//TODO: add to other db here
+		line = in.readLine();
 		while(line != null){
 			String[] docData = line.split("\\s+");
 			HashMap<String, URLMetrics> urlMap= indexDB.getUrls(docData[0]); //look up by word

@@ -59,12 +59,12 @@ public class IndexerThread extends Thread {
 		
 		String body = indexToSend.getMaxWord() + " " + indexToSend.getMaxOccurence() + "\n";
 		HashMap<String, Integer> map = indexToSend.getWords();
+		body += indexToSend.getMaxOccurence() + "\n";
 		for(String wordToAdd: map.keySet()){
 			body += url + " " + wordToAdd + " " + map.get(wordToAdd) + "\n";
 		}
 		client.setBody(body);
 		client.sendPost();
 		client.getResponse();
-
 	}
 }

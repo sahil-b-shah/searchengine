@@ -1,9 +1,16 @@
 package indexer.storage;
 
+import com.sleepycat.persist.model.Persistent;
+
+@Persistent
 public class URLMetrics {
 	private int numOccurrences;
 	private double tf;
 	private double idf;
+	
+	public URLMetrics(){
+		
+	}
 	
 	public URLMetrics(int occur, int tf, int idf){
 		this.numOccurrences = occur;
