@@ -13,7 +13,6 @@ public class IndexerThread extends Thread {
 	private DocumentDBWrapper documentDB;
 
 	public IndexerThread(DocumentDBWrapper documentDB) {
-		// TODO Auto-generated constructor stub
 		this.documentDB = documentDB;
 	}
 
@@ -36,10 +35,7 @@ public class IndexerThread extends Thread {
 			document = documentDB.getNextDocument();
 		}
 		
-		//printIndex();
-		
-		documentDB.closeIterator();
-		documentDB.close();
+
 	}
 	
 	public static DocumentIndex indexDocument(DocumentData document){
@@ -49,17 +45,14 @@ public class IndexerThread extends Thread {
 			index.addWord(word);
 		}
 		return index;
-		
-		
 	}
 	
 	
 	private static void sendIndex(DocumentIndex indexToSend, String url) throws IOException {
 		MyHttpClient client = new MyHttpClient(master, "/InvertedIndexMaster/pushdata");
 		
-		String body = indexToSend.getMaxWord() + " " + indexToSend.getMaxOccurence() + "\n";
+		String body = url + " " + indexToSend.getMaxOccurence() + "\n";
 		HashMap<String, Integer> map = indexToSend.getWords();
-		body += indexToSend.getMaxOccurence() + "\n";
 		for(String wordToAdd: map.keySet()){
 			body += url + " " + wordToAdd + " " + map.get(wordToAdd) + "\n";
 		}

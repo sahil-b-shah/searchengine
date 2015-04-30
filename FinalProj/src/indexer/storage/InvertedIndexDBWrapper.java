@@ -1,11 +1,9 @@
 package indexer.storage;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import com.sleepycat.je.DatabaseException;
@@ -14,8 +12,6 @@ import com.sleepycat.je.EnvironmentConfig;
 import com.sleepycat.persist.EntityStore;
 import com.sleepycat.persist.PrimaryIndex;
 import com.sleepycat.persist.StoreConfig;
-
-import crawler.storage.DocumentData;
 
 public class InvertedIndexDBWrapper {
 	private String envDirectory = null;
@@ -124,18 +120,32 @@ public class InvertedIndexDBWrapper {
 	}
 	
 	public synchronized Integer getOccurences(String word, String url){
+		if(invertedIndex.get(word) == null)
+			return null;
+		if(invertedIndex.get(word).getUrls().get(url) == null)
+			return null;
 		return invertedIndex.get(word).getUrls().get(url).getOccurences();
 	}
 	
 	public synchronized Double getTF(String word, String url, double tf){
+		if(invertedIndex.get(word) == null)
+			return null;
+		if(invertedIndex.get(word).getUrls().get(url) == null)
+			return null;
 		return invertedIndex.get(word).getUrls().get(url).getTF();
 	}
 	
 	public synchronized Double getIDF(String word, String url, double idf){
+		if(invertedIndex.get(word) == null)
+			return null;
+		if(invertedIndex.get(word).getUrls().get(url) == null)
+			return null;
 		return invertedIndex.get(word).getUrls().get(url).getIDF();
 	}
 	
 	public synchronized Iterator<Entry<String, URLMetrics>> getWordIterator(String word){
+		if(invertedIndex.get(word) == null)
+			return null;
 		return invertedIndex.get(word).getUrls().entrySet().iterator();
 	}
 	
