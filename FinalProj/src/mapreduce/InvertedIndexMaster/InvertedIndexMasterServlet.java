@@ -115,36 +115,46 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 		InvertedIndexDBWrapper indexDB = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb");
 		WordCountDBWrapper numWordsDB = WordCountDBWrapper.getInstance("/home/cis455/Index/numwordsdb");
 
-		
+
 		String line = in.readLine();
 		if(line == null)
 			return;
 
 		String[] firstLine = line.split("\\s+");
 		int num = Integer.parseInt(firstLine[1]);
+		String url = firstLine[0];
 
 		System.out.println("url adding:" + firstLine[0] + " " + num);
 		numWordsDB.addWord(firstLine[0], num);
 		System.out.println("Size of num words" + numWordsDB.getSize());
 
 		numWordsDB.close();
-		
+
 		line = in.readLine();
 		while(line != null){
-			String[] docData = line.split("\\s+");
-			//System.out.println("url: " + docData[0]);
-			HashMap<String, URLMetrics> urlMap= indexDB.getUrls(docData[1]); //look up by word
-			if(urlMap == null){
-				urlMap = new HashMap<String, URLMetrics>();
+			try{
+
+				String[] docData = line.split("\\s+");
+				System.out.println("docData: " + line);
+				HashMap<String, URLMetrics> urlMap= indexDB.getUrls(docData[0]); //look up by word
+				if(urlMap == null){
+					urlMap = new HashMap<String, URLMetrics>();
+				}
+				urlMap.put(url, new URLMetrics(Integer.parseInt(docData[1]),0,0));
+
+				indexDB.addWord(docData[0], urlMap);
+			}catch(Exception e){
+				//Caught exception
+				System.out.println("<---Caught Exception--->: " + e);
 			}
-			urlMap.put(docData[0], new URLMetrics(Integer.parseInt(docData[2]),0,0));
-			indexDB.addWord(docData[1], urlMap);
-			line = in.readLine();
+				line = in.readLine();
+
+			
 		}
 		System.out.println("Index DB Size: " + indexDB.getSize());
 		System.out.println();
 		indexDB.close();
-		
+
 	}
 
 
