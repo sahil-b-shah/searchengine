@@ -36,54 +36,71 @@ public class SearchServlet extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) {
 		InvertedIndexDBWrapper database = InvertedIndexDBWrapper.getInstance(getServletContext().getInitParameter("InvertedIndexDBstore"));
-		String s = request.getParameter("search");
-		String[] elements = s.split("\\s+");
+		String query = request.getParameter("search");
+		String[] elements = query.split("\\s+");
 		wordsInQuery = elements.length;
+		PrintWriter out;
 		
-		for(String token : elements){
-			if(stopList.contains(token)){
-				//System.out.println("Ignoring:" + token);
-			}else{
-				InvertedIndexData data;
-				if((data = database.getContentById(token)) != null){
-					HashMap<String, URLMetrics> hm = data.getUrls();
-					for(String url : hm.keySet()){
-						if(searchMap.containsKey(url)){
-							System.out.println("Document Found Again:" + url);
-							searchMap.get(url).incrementQueryHits();
-						}else{
-							SearchData newData = new SearchData(0.0,1);
-							double tempTF = hm.get(url).getTF();
-							double tempIDF = hm.get(url).getIDF();
-							newData.setScore(tempTF * tempIDF);
-							// Some way to set PageRank as well
-							searchMap.put(url, newData);
-						}
-					}
+		try{
+			out = response.getWriter();
+			out.println("<html><body>");
+			out.println("<h1>You searched for:" + query +  "</h1>");
+			out.println("<h2>Here are your results:</h2>");
+			for(String token : elements){
+				if(stopList.contains(token)){
+					//System.out.println("Ignoring:" + token);
 				}else{
-					System.out.println(token + " not in database");
+					InvertedIndexData data;
+					if((data = database.getContentById(token)) != null){
+						HashMap<String, URLMetrics> hm = data.getUrls();
+						for(String url : hm.keySet()){
+							if(searchMap.containsKey(url)){
+								System.out.println("Document Found Again:" + url);
+								searchMap.get(url).incrementQueryHits();
+							}else{
+								SearchData newData = new SearchData(0.0,1);
+								double tempTF = hm.get(url).getTF();
+								double tempIDF = hm.get(url).getIDF();
+								newData.setScore(tempTF * tempIDF);
+								// Some way to set PageRank as well
+								searchMap.put(url, newData);
+							}
+						}
+					}else{
+						System.out.println(token + " not in database");
+					}
 				}
 			}
-		}
-		int numFound = 0;
-		while(wordsInQuery > 0){
-			HashMap<String,Double> tempMap = new HashMap<String,Double>();
-			for(String url : searchMap.keySet()){
-				if(searchMap.get(url).getQueryHits() == wordsInQuery){
-					tempMap.put(url, searchMap.get(url).getScore());
+			int numFound = 0;
+			while(wordsInQuery > 0){
+				HashMap<String,Double> tempMap = new HashMap<String,Double>();
+				for(String url : searchMap.keySet()){
+					if(searchMap.get(url).getQueryHits() == wordsInQuery){
+						tempMap.put(url, searchMap.get(url).getScore());
+					}
 				}
+				wordsInQuery--;
+				
+				tempMap = sortMapByScore(tempMap);
+				Iterator it = tempMap.entrySet().iterator();
+			    while (it.hasNext()) {
+			        Map.Entry pair = (Map.Entry)it.next();
+					out.println("<h3>" + pair.getKey() +  "</h3>");
+			        //System.out.println(wordsInQuery + ":" + pair.getKey() + " = " + pair.getValue());
+			        //it.remove(); // avoids a ConcurrentModificationException
+			    }
 			}
-			wordsInQuery--;
-			
-			tempMap = sortMapByScore(tempMap);
-			Iterator it = tempMap.entrySet().iterator();
-		    while (it.hasNext()) {
-		        Map.Entry pair = (Map.Entry)it.next();
-		        System.out.println(wordsInQuery + ":" + pair.getKey() + " = " + pair.getValue());
-		        //it.remove(); // avoids a ConcurrentModificationException
-		    }
+			out.println("<form action='searchResults' method='POST'>");
+	    	out.println("Try Another Search:<br>");
+	    	out.println("<input type='text' name='search' value=''>");
+	    	out.println("<br>");
+	    	out.print("<input type='submit' value='Submit'>");
+			out.println("</body></html>");
+			database.close();
+		}catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		database.close();
 	}
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response){
