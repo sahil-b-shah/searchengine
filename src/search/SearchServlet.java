@@ -55,14 +55,14 @@ public class SearchServlet extends HttpServlet {
 						HashMap<String, URLMetrics> hm = data.getUrls();
 						for(String url : hm.keySet()){
 							if(searchMap.containsKey(url)){
-								System.out.println("Document Found Again:" + url);
+								//System.out.println("Document Found Again:" + url);
 								searchMap.get(url).incrementQueryHits();
 							}else{
 								SearchData newData = new SearchData(0.0,1);
 								double tempTF = hm.get(url).getTF();
 								double tempIDF = hm.get(url).getIDF();
-								newData.setScore(tempTF * tempIDF);
 								// Some way to set PageRank as well
+								newData.setScore(tempTF * tempIDF);
 								searchMap.put(url, newData);
 							}
 						}
@@ -71,7 +71,7 @@ public class SearchServlet extends HttpServlet {
 					}
 				}
 			}
-			int numFound = 0;
+			int numFound = 1;
 			while(wordsInQuery > 0){
 				HashMap<String,Double> tempMap = new HashMap<String,Double>();
 				for(String url : searchMap.keySet()){
@@ -85,11 +85,15 @@ public class SearchServlet extends HttpServlet {
 				Iterator it = tempMap.entrySet().iterator();
 			    while (it.hasNext()) {
 			        Map.Entry pair = (Map.Entry)it.next();
-					out.println("<h3>" + pair.getKey() +  "</h3>");
-			        //System.out.println(wordsInQuery + ":" + pair.getKey() + " = " + pair.getValue());
+					out.println("<h3>Search Result " + numFound +  "</h3>");
+					out.println("<a href='" + pair.getKey()+ "'>"+pair.getKey()+"</a>");
+			        numFound++;
+					//System.out.println(wordsInQuery + ":" + pair.getKey() + " = " + pair.getValue());
 			        //it.remove(); // avoids a ConcurrentModificationException
 			    }
 			}
+			out.println("<br>");
+			out.println("<br>");
 			out.println("<form action='searchResults' method='POST'>");
 	    	out.println("Try Another Search:<br>");
 	    	out.println("<input type='text' name='search' value=''>");
@@ -115,26 +119,26 @@ public class SearchServlet extends HttpServlet {
 			URLMetrics temp4 = new URLMetrics(30,4,8);
 			URLMetrics temp5 = new URLMetrics(44,3,2);
 			
-			hm1.put("Document1", temp1);
-			hm1.put("Document2", temp2);
-			hm1.put("Document8", temp3);
+			hm1.put("http://www.google.com", temp1);
+			hm1.put("http://www.yahoo.com", temp2);
+			hm1.put("http://www.reddit.com", temp3);
 			database.addWord("carlie", hm1);
 			
 			// Adding stuff to Database
 			HashMap<String,URLMetrics> hm2 = new HashMap<String,URLMetrics>();
-			hm2.put("Document2", temp1);
-			hm2.put("Document3", temp2);
-			hm2.put("Document7", temp3);
-			hm2.put("Document4", temp4);
+			hm2.put("http://www.yahoo.com", temp1);
+			hm2.put("http://www.piazza.com", temp2);
+			hm2.put("http://www.linkedin.com", temp3);
+			hm2.put("http://www.stackoverflow.com", temp4);
 			database.addWord("aadu", hm2);
 			
 			// Adding stuff to Database
 			HashMap<String,URLMetrics> hm3 = new HashMap<String,URLMetrics>();
-			hm3.put("Document2", temp1);
-			hm3.put("Document3", temp2);
-			hm3.put("Document1", temp3);
-			hm3.put("Document7", temp4);
-			hm3.put("Document4", temp5);
+			hm3.put("http://www.yahoo.com", temp1);
+			hm3.put("http://www.piazza.com", temp2);
+			hm3.put("http://www.google.com", temp3);
+			hm3.put("http://www.linkedin.com", temp4);
+			hm3.put("http://www.stackoverflow.com", temp5);
 			database.addWord("vig", hm3);
 			
 			out = response.getWriter();

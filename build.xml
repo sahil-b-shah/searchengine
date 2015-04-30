@@ -148,7 +148,7 @@
 	    </javac>
 	  </target>
 	
-	<target name="compile-Search" depends="init">
+	<target name="compile-search" depends="init">
             <javac srcdir="src" destdir="target/search/WEB-INF/classes" includes="**/search/*.java" deprecation="on"
              debug="true" includeantruntime="false">
                 <classpath>
@@ -196,7 +196,7 @@
 		    </javac>
 		  </target>
 
-  <target name="all" depends="clean,war-Search,war-InvertedIndexMaster,war-InvertedIndexWorker,war-InvertedIndexWorker2,war-ShuffleURLMaster,war-ShuffleURLWorker,war-ShuffleURLWorker2,compile-jobs, compile-storage, build-crawler"/>
+  <target name="all" depends="clean,war-search,war-InvertedIndexMaster,war-InvertedIndexWorker,war-InvertedIndexWorker2,war-ShuffleURLMaster,war-ShuffleURLWorker,war-ShuffleURLWorker2,compile-jobs, compile-storage, build-crawler"/>
   
   <target name="war-ShuffleURLMaster" depends="compile-ShuffleURLMaster">
     <jar destfile="ShuffleURLMaster.war">
@@ -206,7 +206,7 @@
     </jar>
   </target>
 
-<target name="war-Search" depends="compile-Search">
+<target name="war-search" depends="compile-search">
       <jar destfile="search.war">
       <fileset dir="target/search/" includes="WEB-INF/classes/**/*.class"/>
       <fileset dir="target/search/" includes="WEB-INF/lib/*.jar"/>
