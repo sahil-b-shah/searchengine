@@ -9,7 +9,7 @@ import crawler.storage.DocumentData;
 
 
 public class IndexerThread extends Thread {
-	private static String master = "54.213.18.16:80";
+	private static String master = "52.10.8.98:80";
 	private DocumentDBWrapper documentDB;
 
 	public IndexerThread(DocumentDBWrapper documentDB) {
