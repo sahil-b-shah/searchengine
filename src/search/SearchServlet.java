@@ -44,7 +44,7 @@ public class SearchServlet extends HttpServlet {
 		try{
 			out = response.getWriter();
 			out.println("<html><body>");
-			out.println("<h1>You searched for:" + query +  "</h1>");
+			out.println("<h1>You searched for: " + query +  "</h1>");
 			out.println("<h2>Here are your results:</h2>");
 			for(String token : elements){
 				if(stopList.contains(token)){
@@ -72,7 +72,8 @@ public class SearchServlet extends HttpServlet {
 				}
 			}
 			int numFound = 1;
-			while(wordsInQuery > 0){
+			// Limit to 10 on the page?
+			while(wordsInQuery > 0 && numFound < 10){
 				HashMap<String,Double> tempMap = new HashMap<String,Double>();
 				for(String url : searchMap.keySet()){
 					if(searchMap.get(url).getQueryHits() == wordsInQuery){
@@ -92,13 +93,16 @@ public class SearchServlet extends HttpServlet {
 			        //it.remove(); // avoids a ConcurrentModificationException
 			    }
 			}
+			if(numFound == 1){
+				out.println("<img src='http://www.quickmeme.com/img/68/6802d88e153ab306ca7679a9260cce1b2842c3967362ddaeb8b57a0af900b6d3.jpg' >");
+			}
 			out.println("<br>");
 			out.println("<br>");
 			out.println("<form action='searchResults' method='POST'>");
 	    	out.println("Try Another Search:<br>");
 	    	out.println("<input type='text' name='search' value=''>");
 	    	out.println("<br>");
-	    	out.print("<input type='submit' value='Submit'>");
+	    	out.print("<input type='submit' value='Return to Search!'>");
 			out.println("</body></html>");
 			database.close();
 		}catch (IOException e) {
@@ -141,14 +145,17 @@ public class SearchServlet extends HttpServlet {
 			hm3.put("http://www.stackoverflow.com", temp5);
 			database.addWord("vig", hm3);
 			
+			database.close();
+			
 			out = response.getWriter();
 			out.println("<html><body>");
-			//out.println("<h1> Search page </h1>");
+			out.println("<h1> Welcome to AaduSearch! </h1>");
+			out.println("<h2> Find things you never thought you needed! </h2>");
 	    	out.println("<form action='searchResults' method='POST'>");
-	    	out.println("Search Terms:<br>");
+	    	out.println("Enter your Search!!!<br>");
 	    	out.println("<input type='text' name='search' value=''>");
 	    	out.println("<br>");
-	    	out.print("<input type='submit' value='Submit'>");
+	    	out.print("<input type='submit' value='Search!'>");
 	    	out.println("</body></html>");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
