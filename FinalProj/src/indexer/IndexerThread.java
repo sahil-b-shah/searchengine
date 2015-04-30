@@ -40,9 +40,9 @@ public class IndexerThread extends Thread {
 	
 	public static DocumentIndex indexDocument(DocumentData document){
 		DocumentIndex index = new DocumentIndex();
-		String words []  = document.getContent().split("\\s+");
+		String words []  = document.getContent().split("[^\\w']+");
 		for(String word: words){
-			index.addWord(word);
+			index.addWord(word.toLowerCase());
 		}
 		return index;
 	}
@@ -54,9 +54,10 @@ public class IndexerThread extends Thread {
 		String body = url + " " + indexToSend.getMaxOccurence() + "\n";
 		HashMap<String, Integer> map = indexToSend.getWords();
 		for(String wordToAdd: map.keySet()){
-			body += url + " " + wordToAdd + " " + map.get(wordToAdd) + "\n";
+			body += wordToAdd + " " + map.get(wordToAdd) + "\n";
 		}
 		client.setBody(body);
+		System.out.println(body);
 		client.sendPost();
 		client.getResponse();
 	}
