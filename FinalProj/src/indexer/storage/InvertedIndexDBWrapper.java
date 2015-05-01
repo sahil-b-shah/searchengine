@@ -462,8 +462,7 @@ public class InvertedIndexDBWrapper {
 		keys = null;
 	}
 
-	public HashMap<String, URLMetrics> getURLMap(String word) {
-		// TODO Auto-generated method stub
+	public synchronized HashMap<String, URLMetrics> getURLMap(String word) {
 		return invertedIndex.get(word).getUrls();
 	}
 	

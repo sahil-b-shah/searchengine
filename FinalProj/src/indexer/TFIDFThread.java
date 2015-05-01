@@ -35,7 +35,7 @@ public class TFIDFThread extends Thread {
 			String word = document.getWord();
 			if(word != null && !stopWords.contains(word)){
 				HashMap<String, URLMetrics> map = indexDB.getURLMap(word);
-				HashMap<String, URLMetrics> newMap = new HashMap<String, URLMetrics>();;
+				HashMap<String, URLMetrics> newMap = new HashMap<String, URLMetrics>();
 
 				for(Entry<String, URLMetrics> entry: map.entrySet()){
 					try{
