@@ -61,16 +61,6 @@ public class PageRankMasterServlet extends HttpServlet {
 		PageRankDBWrapper indexDB = PageRankDBWrapper.getInstance("/home/cis455/PageRank/pagerankdb");
 
 		String line = in.readLine();
-		if(line == null)
-			return;
-
-		//String[] docData = line.split("\\s+");
-		//Add this part for tf
-
-		line = in.readLine();
-		System.out.println("Line 1:" + line);
-		//TODO: add to other db here
-		line = in.readLine();
 		while(line != null){
 			String[] docData = line.split("\\s+");
 			System.out.println("url: " + docData[0]);
@@ -79,7 +69,9 @@ public class PageRankMasterServlet extends HttpServlet {
 				urlMap = new HashMap<String, Integer>();
 			}
 			urlMap.put(docData[0], Integer.valueOf(docData[1]));
+			System.out.println("Incoming: " + docData[0] + ", Outgoign Count: " + docData[1]);
 			indexDB.addUrl(docData[2], urlMap);
+			System.out.println("Storing for: " + docData[2]);
 			line = in.readLine();
 		}
 		System.out.println("PR DB Size: " + indexDB.getSize());
