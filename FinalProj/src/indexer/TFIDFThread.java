@@ -40,7 +40,7 @@ public class TFIDFThread extends Thread {
 				for(Entry<String, URLMetrics> entry: map.entrySet()){
 					try{
 						String url = entry.getKey();
-						double tf = 0.5 + (1- 0.5)*(entry.getValue().getOccurences()/maxDB.getNumberWords(url));
+						double tf = 0.5 + (1- 0.5)*((double)entry.getValue().getOccurences()/maxDB.getNumberWords(url));
 						double idf = (numDocs/indexDB.getURLMapSize(word));
 						idf = Math.log(idf)/Math.log(2.0);
 						URLMetrics urlMetrics = new URLMetrics(entry.getValue().getOccurences(),0,0);
@@ -52,7 +52,8 @@ public class TFIDFThread extends Thread {
 						System.out.println(word + "---" + e );
 					}
 				}
-				System.out.println("Adding" + word + "seen on thread: " +seen);
+				seen++;
+				System.out.println("Adding " + word + " seen " +seen + " on thread: " + Thread.currentThread().getName());
 				indexDB.addWord(word, newMap);
 
 			}
