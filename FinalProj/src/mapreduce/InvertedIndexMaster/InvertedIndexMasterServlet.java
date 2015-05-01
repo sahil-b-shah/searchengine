@@ -42,57 +42,7 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 			throws java.io.IOException
 	{
 
-		/*//Status page
-		if(request.getRequestURI().contains("/status")){
-			response.setContentType("text/html");
-			PrintWriter out = response.getWriter();
-			out.println("<html><head><title>Master</title></head><body>");
-			out.println("<h1>Name: Daniel Salowe</h1>");
-			out.println("<h1>Pennkey: salowed</h1>");
-			out.println("<table border='1' style='width:100%'>");
-			out.println("<tr>");
-			out.println("<td>IP:port</td>");
-			out.println("<td>Status</td>");
-			out.println("</tr>");
-
-			Map<String, ArrayList<String>> localStatusMap =  getStatusMap();
-
-			//Add full rows with stored data
-			for(String key: localStatusMap.keySet()){
-				ArrayList<String> params = localStatusMap.get(key);
-				//Check if in last 30 seconds
-				if((System.currentTimeMillis() - Long.parseLong(params.get(1))) < 30000){
-					out.println("<tr>");
-					out.println("<td>"+ key+ "</td>");
-					for(int i = 0; i < 2; i++){
-						out.println("<td>"+ params.get(i)+ "</td>");
-					}
-					out.println("</tr>");
-				}
-
-			}
-
-
-			out.println("</table>");
-
-
-			//Post to itself first
-			out.println("<form style='text-align:center;'  method='post'>");
-			out.println("<p align='center'>Input directory: </p><input type='text' name='input'></br>");
-			out.println("<p align='center'>Output directory: </p><input type='text' name='output'></br>");
-			out.println("<p align='center'>Number of map threads: </p><input type='text' name='numMapThreads'></br>");
-			out.println("<p align='center'>Number of reduce threads: </p><input type='text' name='numReduceThreads'></br>");
-			out.println("<input type='submit' value='Start Job'></form>");
-			out.println("</body></html>");
-
-
-			out.flush();
-
-
-		}
-
-
-		 */
+		
 
 	}
 
@@ -155,8 +105,9 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 				System.out.println("docData: " + line);
 				
 				//Hash key using SHA-1
-				String hashedURL = DigestUtils.sha1Hex(url);			
-				int fileNumber = pickNumberBucket(10, hashedURL);
+				String hashedWord = DigestUtils.sha1Hex(docData[0]);			
+				int fileNumber = pickNumberBucket(10, hashedWord);
+				//System.out.println("Hashed value was: " + fileNumber);
 				
 				HashMap<String, URLMetrics> urlMap = null;
 				switch(fileNumber){
