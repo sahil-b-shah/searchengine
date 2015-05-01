@@ -13,6 +13,8 @@ import com.sleepycat.persist.EntityStore;
 import com.sleepycat.persist.PrimaryIndex;
 import com.sleepycat.persist.StoreConfig;
 
+import crawler.storage.DocumentData;
+
 public class InvertedIndexDBWrapper {
 	private String envDirectory = null;
 	private File envFile;
@@ -21,9 +23,20 @@ public class InvertedIndexDBWrapper {
 	private EntityStore store;
 	
 	private PrimaryIndex<String, InvertedIndexData> invertedIndex;
+	private Iterator<String>  keys;
 	//private int channelId = 0;
 	
 	private static InvertedIndexDBWrapper db;
+	private static InvertedIndexDBWrapper db2;
+	private static InvertedIndexDBWrapper db3;
+	private static InvertedIndexDBWrapper db4;
+	private static InvertedIndexDBWrapper db5;
+	private static InvertedIndexDBWrapper db6;
+	private static InvertedIndexDBWrapper db7;
+	private static InvertedIndexDBWrapper db8;
+	private static InvertedIndexDBWrapper db9;
+	private static InvertedIndexDBWrapper db10;
+	
 	
 	public synchronized static InvertedIndexDBWrapper getInstance(String homeDirectory) {
 		if (db == null) {
@@ -31,6 +44,78 @@ public class InvertedIndexDBWrapper {
 			db = new InvertedIndexDBWrapper(homeDirectory);
 		}
 		return db;
+	}
+	
+	public synchronized static InvertedIndexDBWrapper getInstance2(String homeDirectory) {
+		if (db2 == null) {
+			System.out.println("Making new db wrapper");
+			db2 = new InvertedIndexDBWrapper(homeDirectory);
+		}
+		return db2;
+	}
+	
+	public synchronized static InvertedIndexDBWrapper getInstance3(String homeDirectory) {
+		if (db3 == null) {
+			System.out.println("Making new db wrapper");
+			db3 = new InvertedIndexDBWrapper(homeDirectory);
+		}
+		return db3;
+	}
+	
+	public synchronized static InvertedIndexDBWrapper getInstance4(String homeDirectory) {
+		if (db4 == null) {
+			System.out.println("Making new db wrapper");
+			db4 = new InvertedIndexDBWrapper(homeDirectory);
+		}
+		return db4;
+	}
+	
+	public synchronized static InvertedIndexDBWrapper getInstance5(String homeDirectory) {
+		if (db5 == null) {
+			System.out.println("Making new db wrapper");
+			db5 = new InvertedIndexDBWrapper(homeDirectory);
+		}
+		return db5;
+	}
+	
+	public synchronized static InvertedIndexDBWrapper getInstance6(String homeDirectory) {
+		if (db6 == null) {
+			System.out.println("Making new db wrapper");
+			db6 = new InvertedIndexDBWrapper(homeDirectory);
+		}
+		return db6;
+	}
+	
+	public synchronized static InvertedIndexDBWrapper getInstance7(String homeDirectory) {
+		if (db7 == null) {
+			System.out.println("Making new db wrapper");
+			db7 = new InvertedIndexDBWrapper(homeDirectory);
+		}
+		return db7;
+	}
+	
+	public synchronized static InvertedIndexDBWrapper getInstance8(String homeDirectory) {
+		if (db8 == null) {
+			System.out.println("Making new db wrapper");
+			db8 = new InvertedIndexDBWrapper(homeDirectory);
+		}
+		return db8;
+	}
+	
+	public synchronized static InvertedIndexDBWrapper getInstance9(String homeDirectory) {
+		if (db9 == null) {
+			System.out.println("Making new db wrapper");
+			db9 = new InvertedIndexDBWrapper(homeDirectory);
+		}
+		return db9;
+	}
+	
+	public synchronized static InvertedIndexDBWrapper getInstance10(String homeDirectory) {
+		if (db10 == null) {
+			System.out.println("Making new db wrapper");
+			db10 = new InvertedIndexDBWrapper(homeDirectory);
+		}
+		return db10;
 	}
 	
 	private InvertedIndexDBWrapper(String homeDirectory) {
@@ -161,6 +246,26 @@ public class InvertedIndexDBWrapper {
 	
 	public long getSize(){
 		return invertedIndex.count();
+	}
+	
+	public synchronized void initIterator(){
+		keys = invertedIndex.map().keySet().iterator();
+	}
+	
+	public synchronized InvertedIndexData getNextWord(){
+		
+		if(keys == null || !keys.hasNext()){
+			return null;
+		}
+		
+		InvertedIndexData doc = invertedIndex.get(keys.next());
+		return doc;
+		
+		
+	}
+	
+	public synchronized void closeIterator(){
+		keys = null;
 	}
 	
 	

@@ -67,15 +67,15 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 		BufferedReader in = request.getReader();
 		
 		InvertedIndexDBWrapper indexDB1 = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb1");
-		InvertedIndexDBWrapper indexDB2 = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb2");
-		InvertedIndexDBWrapper indexDB3 = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb3");
-		InvertedIndexDBWrapper indexDB4 = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb4");
-		InvertedIndexDBWrapper indexDB5 = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb5");
-		InvertedIndexDBWrapper indexDB6 = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb6");
-		InvertedIndexDBWrapper indexDB7 = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb7");
-		InvertedIndexDBWrapper indexDB8 = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb8");
-		InvertedIndexDBWrapper indexDB9 = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb9");
-		InvertedIndexDBWrapper indexDB10 = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb10");
+		InvertedIndexDBWrapper indexDB2 = InvertedIndexDBWrapper.getInstance2("/home/cis455/Index/indexdb2");
+		InvertedIndexDBWrapper indexDB3 = InvertedIndexDBWrapper.getInstance3("/home/cis455/Index/indexdb3");
+		InvertedIndexDBWrapper indexDB4 = InvertedIndexDBWrapper.getInstance4("/home/cis455/Index/indexdb4");
+		InvertedIndexDBWrapper indexDB5 = InvertedIndexDBWrapper.getInstance5("/home/cis455/Index/indexdb5");
+		InvertedIndexDBWrapper indexDB6 = InvertedIndexDBWrapper.getInstance6("/home/cis455/Index/indexdb6");
+		InvertedIndexDBWrapper indexDB7 = InvertedIndexDBWrapper.getInstance7("/home/cis455/Index/indexdb7");
+		InvertedIndexDBWrapper indexDB8 = InvertedIndexDBWrapper.getInstance8("/home/cis455/Index/indexdb8");
+		InvertedIndexDBWrapper indexDB9 = InvertedIndexDBWrapper.getInstance9("/home/cis455/Index/indexdb9");
+		InvertedIndexDBWrapper indexDB10 = InvertedIndexDBWrapper.getInstance10("/home/cis455/Index/indexdb10");
 
 		//	WordCountDBWrapper numWordsDB = WordCountDBWrapper.getInstance("/home/cis455/Index/numwordsdb");
 		
