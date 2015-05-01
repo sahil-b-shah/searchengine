@@ -23,6 +23,8 @@ import javax.servlet.http.*;
 
 public class PageRankMasterServlet extends HttpServlet {
 
+	static int counter;
+	
 	static final long serialVersionUID = 455555001;
 	/*private static Map<String, ArrayList<String>> statusMap; 
 	private static String numMapThreads = "20";
@@ -30,6 +32,7 @@ public class PageRankMasterServlet extends HttpServlet {
 
 	public void init(ServletConfig config) throws ServletException {
 		System.out.println("Master init");
+		counter = 0;
 
 	}
 	public void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -43,7 +46,7 @@ public class PageRankMasterServlet extends HttpServlet {
 			throws java.io.IOException
 	{
 		if(request.getRequestURI().contains("/pushdata")){
-			System.out.println("Page received");
+			//System.out.println("Page received");
 			addData(request);
 			PrintWriter writer = response.getWriter();
 			writer.close();
@@ -63,19 +66,22 @@ public class PageRankMasterServlet extends HttpServlet {
 		String line = in.readLine();
 		while(line != null){
 			String[] docData = line.split("\\s+");
-			System.out.println("url: " + docData[0]);
+			//System.out.println("url: " + docData[0]);
 			HashMap<String, Integer> urlMap= indexDB.getUrls(docData[2]); //look up by word
 			if(urlMap == null){
 				urlMap = new HashMap<String, Integer>();
 			}
 			urlMap.put(docData[0], Integer.valueOf(docData[1]));
-			System.out.println("Incoming: " + docData[0] + ", Outgoign Count: " + docData[1]);
+			//System.out.println("Incoming: " + docData[0] + ", Outgoign Count: " + docData[1]);
 			indexDB.addUrl(docData[2], urlMap);
-			System.out.println("Storing for: " + docData[2]);
+			//System.out.println("Storing for: " + docData[2]);
 			line = in.readLine();
+
 		}
-		System.out.println("PR DB Size: " + indexDB.getSize());
-		System.out.println();
+		counter ++;
+		System.out.println("# of Docs seen: " + counter);
+		//System.out.println("PR DB Size: " + indexDB.getSize());
+		//System.out.println();
 		indexDB.close();
 		
 	}
