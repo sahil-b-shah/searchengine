@@ -173,6 +173,195 @@ public class InvertedIndexDBWrapper {
 		db = null;
 	}
 	
+	public synchronized void close2() {
+		if (store != null) {
+			try {
+				store.close();
+			} catch (DatabaseException dbe) {
+				System.err.println("Error closing store: " + dbe.toString());
+				System.exit(-1);
+			}
+		}
+		
+		if (myEnv != null) {
+			try {
+				myEnv.close();
+			} catch (DatabaseException dbe) {
+				System.err.println("Error closing environment: " + dbe.toString());
+				System.exit(-1);
+			}
+		}
+		db2 = null;
+	}
+	
+	public synchronized void close3() {
+		if (store != null) {
+			try {
+				store.close();
+			} catch (DatabaseException dbe) {
+				System.err.println("Error closing store: " + dbe.toString());
+				System.exit(-1);
+			}
+		}
+		
+		if (myEnv != null) {
+			try {
+				myEnv.close();
+			} catch (DatabaseException dbe) {
+				System.err.println("Error closing environment: " + dbe.toString());
+				System.exit(-1);
+			}
+		}
+		db3 = null;
+	}
+	
+	public synchronized void close4() {
+		if (store != null) {
+			try {
+				store.close();
+			} catch (DatabaseException dbe) {
+				System.err.println("Error closing store: " + dbe.toString());
+				System.exit(-1);
+			}
+		}
+		
+		if (myEnv != null) {
+			try {
+				myEnv.close();
+			} catch (DatabaseException dbe) {
+				System.err.println("Error closing environment: " + dbe.toString());
+				System.exit(-1);
+			}
+		}
+		db4 = null;
+	}
+	
+	public synchronized void close5() {
+		if (store != null) {
+			try {
+				store.close();
+			} catch (DatabaseException dbe) {
+				System.err.println("Error closing store: " + dbe.toString());
+				System.exit(-1);
+			}
+		}
+		
+		if (myEnv != null) {
+			try {
+				myEnv.close();
+			} catch (DatabaseException dbe) {
+				System.err.println("Error closing environment: " + dbe.toString());
+				System.exit(-1);
+			}
+		}
+		db5 = null;
+	}
+	
+	public synchronized void close6() {
+		if (store != null) {
+			try {
+				store.close();
+			} catch (DatabaseException dbe) {
+				System.err.println("Error closing store: " + dbe.toString());
+				System.exit(-1);
+			}
+		}
+		
+		if (myEnv != null) {
+			try {
+				myEnv.close();
+			} catch (DatabaseException dbe) {
+				System.err.println("Error closing environment: " + dbe.toString());
+				System.exit(-1);
+			}
+		}
+		db6 = null;
+	}
+	
+	public synchronized void close7() {
+		if (store != null) {
+			try {
+				store.close();
+			} catch (DatabaseException dbe) {
+				System.err.println("Error closing store: " + dbe.toString());
+				System.exit(-1);
+			}
+		}
+		
+		if (myEnv != null) {
+			try {
+				myEnv.close();
+			} catch (DatabaseException dbe) {
+				System.err.println("Error closing environment: " + dbe.toString());
+				System.exit(-1);
+			}
+		}
+		db7 = null;
+	}
+	
+	public synchronized void close8() {
+		if (store != null) {
+			try {
+				store.close();
+			} catch (DatabaseException dbe) {
+				System.err.println("Error closing store: " + dbe.toString());
+				System.exit(-1);
+			}
+		}
+		
+		if (myEnv != null) {
+			try {
+				myEnv.close();
+			} catch (DatabaseException dbe) {
+				System.err.println("Error closing environment: " + dbe.toString());
+				System.exit(-1);
+			}
+		}
+		db8 = null;
+	}
+	
+	public synchronized void close9() {
+		if (store != null) {
+			try {
+				store.close();
+			} catch (DatabaseException dbe) {
+				System.err.println("Error closing store: " + dbe.toString());
+				System.exit(-1);
+			}
+		}
+		
+		if (myEnv != null) {
+			try {
+				myEnv.close();
+			} catch (DatabaseException dbe) {
+				System.err.println("Error closing environment: " + dbe.toString());
+				System.exit(-1);
+			}
+		}
+		db9 = null;
+	}
+	
+	public synchronized void close10() {
+		if (store != null) {
+			try {
+				store.close();
+			} catch (DatabaseException dbe) {
+				System.err.println("Error closing store: " + dbe.toString());
+				System.exit(-1);
+			}
+		}
+		
+		if (myEnv != null) {
+			try {
+				myEnv.close();
+			} catch (DatabaseException dbe) {
+				System.err.println("Error closing environment: " + dbe.toString());
+				System.exit(-1);
+			}
+		}
+		db10 = null;
+	}
+	
 	public synchronized final Environment getEnvironment() {
 		return myEnv;
 	}

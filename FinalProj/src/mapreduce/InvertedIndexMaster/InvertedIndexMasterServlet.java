@@ -201,15 +201,15 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 		
 		System.out.println();
 		indexDB1.close();
-		indexDB2.close();
-		indexDB3.close();
-		indexDB4.close();
-		indexDB5.close();
-		indexDB6.close();
-		indexDB7.close();
-		indexDB8.close();
-		indexDB9.close();
-		indexDB10.close();
+		indexDB2.close2();
+		indexDB3.close3();
+		indexDB4.close4();
+		indexDB5.close5();
+		indexDB6.close6();
+		indexDB7.close7();
+		indexDB8.close8();
+		indexDB9.close9();
+		indexDB10.close10();
 	}
 
 
