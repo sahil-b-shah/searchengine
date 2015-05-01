@@ -40,11 +40,12 @@ public class PageRankThread extends Thread {
 	}
 	
 	private static void sendList(ArrayList<String> outurls, String url) throws IOException {
-		MyHttpClient client = new MyHttpClient(master, "/InvertedPRMaster/pushdata");
+		MyHttpClient client = new MyHttpClient(master, "/PageRankMaster/pushdata");
 		int outgoingCount = outurls.size();
 		
 		String body = "";
 		for(String outgoing: outurls){
+			//Incoming -- Outgoing count for Incoming Link -- URL
 			body += url + " " + outgoingCount + outgoing + "\n";
 		}
 		client.setBody(body);

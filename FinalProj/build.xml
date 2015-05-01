@@ -9,6 +9,7 @@
   	<mkdir dir="target/InvertedIndexWorker2/WEB-INF/classes"/>
   	<mkdir dir="target/Crawler/classes"/>
   	<mkdir dir="target/Indexer/classes"/>
+  	<mkdir dir="target/PageRank/classes"/>
   	<mkdir dir="target/DocDBPrinter/classes"/>
     <mkdir dir="classes"/>
   </target>
@@ -79,22 +80,6 @@
   	</jar>
   </target>
 	
-  <target name ="build-prank" depends="compile-indexer">
-  	<jar destfile="page.jar">
-        <!--<fileset dir="src" includes="crawler/**/*.java"/>-->
-        <fileset dir="target/Indexer/classes/" includes="pagerank/**/*.class"/>
-  		<fileset dir="target/Indexer/classes/" includes="crawler/**/*.class"/>
-  		<fileset dir="target/Indexer/classes/" includes="mapreduce/**/*.class"/>
-	    <fileset dir="target/Indexer" includes="/lib/*"/>
-  		<zipgroupfileset dir="target/Indexer/lib" includes="*"/>
-  		<!--<zipgroupfileset dir="lib/profiles" includes="*" excludes=""/>-->
-	    <manifest>
-	  		<attribute name="Main-Class"
-	  			value="pagerank.PageRank"/>
-	    </manifest>
-  	</jar>
-  </target>
-	
   <target name="compile-indexer" depends="init">
     <javac srcdir="src" destdir="target/Indexer/classes" includes="indexer/**/*.java, crawler/storage/*.java" deprecation="on"
      debug="true" includeantruntime="false">
@@ -107,6 +92,33 @@
     </javac>
   </target>
 
+  <target name ="build-prank" depends="compile-indexer">
+  	<jar destfile="page.jar">
+        <!--<fileset dir="src" includes="crawler/**/*.java"/>-->
+        <fileset dir="target/PageRank/classes/" includes="pagerank/**/*.class"/>
+  		<fileset dir="target/PageRank/classes/" includes="crawler/**/*.class"/>
+  		<fileset dir="target/PageRank/classes/" includes="mapreduce/**/*.class"/>
+	    <fileset dir="target/PageRank" includes="/lib/*"/>
+  		<zipgroupfileset dir="target/PageRank/lib" includes="*"/>
+  		<!--<zipgroupfileset dir="lib/profiles" includes="*" excludes=""/>-->
+	    <manifest>
+	  		<attribute name="Main-Class"
+	  			value="pagerank.PageRank"/>
+	    </manifest>
+  	</jar>
+  </target>
+
+  <target name="compile-pagerank" depends="init">
+    <javac srcdir="src" destdir="target/PageRank/classes" includes="pagerank/**/*.java, crawler/storage/*.java" deprecation="on"
+     debug="true" includeantruntime="false">
+    	<classpath>
+            <fileset dir="lib/">
+                <include name="*.jar"/>
+            </fileset>
+  	   	</classpath>
+       <compilerarg value="-Xlint"/>
+    </javac>
+  </target>	
 	
   <target name="compile-storage" depends="init">
     <javac srcdir="src" destdir="classes" includes="**/indexer/storage/*.java,**/crawler/storage/*.java" deprecation="on"
@@ -290,6 +302,8 @@
   	<delete dir="target/InvertedIndexMaster/WEB-INF/classes"/>
     <delete dir="target/InvertedIndexWorker/WEB-INF/classes"/>
   	<delete dir="target/InvertedIndexWorker2/WEB-INF/classes"/>
+    <delete dir="target/PageRankWorker/WEB-INF/classes"/>
+  	<delete dir="target/PageRankMaster/WEB-INF/classes"/>
   	<delete dir="target/Crawler/classes"/>
     <delete file="InvertedIndexMaster.war"/>
     <delete file="InvertedIndexWorker.war"/>

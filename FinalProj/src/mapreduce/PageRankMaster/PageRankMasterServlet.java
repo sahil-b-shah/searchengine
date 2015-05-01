@@ -74,12 +74,12 @@ public class PageRankMasterServlet extends HttpServlet {
 		while(line != null){
 			String[] docData = line.split("\\s+");
 			System.out.println("url: " + docData[0]);
-			HashMap<String, Integer> urlMap= indexDB.getUrls(docData[1]); //look up by word
+			HashMap<String, Integer> urlMap= indexDB.getUrls(docData[2]); //look up by word
 			if(urlMap == null){
 				urlMap = new HashMap<String, Integer>();
 			}
-			urlMap.put(docData[0], Integer.valueOf(docData[2]));
-			indexDB.addUrl(docData[1], urlMap);
+			urlMap.put(docData[0], Integer.valueOf(docData[1]));
+			indexDB.addUrl(docData[2], urlMap);
 			line = in.readLine();
 		}
 		System.out.println("PR DB Size: " + indexDB.getSize());
