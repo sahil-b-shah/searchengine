@@ -79,6 +79,22 @@
   	</jar>
   </target>
 	
+  <target name ="build-prank" depends="compile-indexer">
+  	<jar destfile="page.jar">
+        <!--<fileset dir="src" includes="crawler/**/*.java"/>-->
+        <fileset dir="target/Indexer/classes/" includes="pagerank/**/*.class"/>
+  		<fileset dir="target/Indexer/classes/" includes="crawler/**/*.class"/>
+  		<fileset dir="target/Indexer/classes/" includes="mapreduce/**/*.class"/>
+	    <fileset dir="target/Indexer" includes="/lib/*"/>
+  		<zipgroupfileset dir="target/Indexer/lib" includes="*"/>
+  		<!--<zipgroupfileset dir="lib/profiles" includes="*" excludes=""/>-->
+	    <manifest>
+	  		<attribute name="Main-Class"
+	  			value="pagerank.PageRank"/>
+	    </manifest>
+  	</jar>
+  </target>
+	
   <target name="compile-indexer" depends="init">
     <javac srcdir="src" destdir="target/Indexer/classes" includes="indexer/**/*.java, crawler/storage/*.java" deprecation="on"
      debug="true" includeantruntime="false">

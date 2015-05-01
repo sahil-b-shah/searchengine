@@ -1,4 +1,4 @@
-package mapreduce.PageRankWorker;
+package pagerank;
 
 import java.io.IOException;
 import java.util.ArrayList;

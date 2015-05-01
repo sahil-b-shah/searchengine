@@ -1,4 +1,4 @@
-package mapreduce.PageRankWorker;
+package pagerank;
 
 
 import crawler.storage.DocumentDBWrapper;

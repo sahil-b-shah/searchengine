@@ -13,11 +13,14 @@ import indexer.storage.WordCountDBWrapper;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 import java.util.HashMap;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
+
+import org.apache.commons.codec.digest.DigestUtils;
 
 //import crawler.storage.URLFrontierDBWrapper;
 
@@ -112,9 +115,20 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 	 */
 	public synchronized void addData(HttpServletRequest request) throws IOException{
 		BufferedReader in = request.getReader();
-		InvertedIndexDBWrapper indexDB = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb");
-		WordCountDBWrapper numWordsDB = WordCountDBWrapper.getInstance("/home/cis455/Index/numwordsdb");
+		
+		InvertedIndexDBWrapper indexDB1 = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb1");
+		InvertedIndexDBWrapper indexDB2 = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb2");
+		InvertedIndexDBWrapper indexDB3 = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb3");
+		InvertedIndexDBWrapper indexDB4 = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb4");
+		InvertedIndexDBWrapper indexDB5 = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb5");
+		InvertedIndexDBWrapper indexDB6 = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb6");
+		InvertedIndexDBWrapper indexDB7 = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb7");
+		InvertedIndexDBWrapper indexDB8 = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb8");
+		InvertedIndexDBWrapper indexDB9 = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb9");
+		InvertedIndexDBWrapper indexDB10 = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb10");
 
+		//	WordCountDBWrapper numWordsDB = WordCountDBWrapper.getInstance("/home/cis455/Index/numwordsdb");
+		
 
 		String line = in.readLine();
 		if(line == null)
@@ -125,6 +139,9 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 		String url = firstLine[0];
 
 		System.out.println("url adding:" + firstLine[0] + " " + num);
+		WordCountDBWrapper numWordsDB = WordCountDBWrapper.getInstance("/home/cis455/Index/numwordsdb");
+
+		
 		numWordsDB.addWord(firstLine[0], num);
 		System.out.println("Size of num words" + numWordsDB.getSize());
 
@@ -136,13 +153,81 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 
 				String[] docData = line.split("\\s+");
 				System.out.println("docData: " + line);
-				HashMap<String, URLMetrics> urlMap= indexDB.getUrls(docData[0]); //look up by word
+				
+				//Hash key using SHA-1
+				String hashedURL = DigestUtils.sha1Hex(url);			
+				int fileNumber = pickNumberBucket(10, hashedURL);
+				
+				HashMap<String, URLMetrics> urlMap = null;
+				switch(fileNumber){
+				case 1:
+					urlMap= indexDB1.getUrls(docData[0]); //look up by word
+					break;
+				case 2:
+					urlMap= indexDB2.getUrls(docData[0]); //look up by word
+					break;
+				case 3:
+					urlMap= indexDB3.getUrls(docData[0]); //look up by word
+					break;
+				case 4:
+					urlMap= indexDB4.getUrls(docData[0]); //look up by word
+					break;
+				case 5:
+					urlMap= indexDB5.getUrls(docData[0]); //look up by word
+					break;
+				case 6:
+					urlMap= indexDB6.getUrls(docData[0]); //look up by word
+					break;
+				case 7:
+					urlMap= indexDB7.getUrls(docData[0]); //look up by word
+					break;
+				case 8:
+					urlMap= indexDB8.getUrls(docData[0]); //look up by word
+					break;
+				case 9:
+					urlMap= indexDB9.getUrls(docData[0]); //look up by word
+					break;
+				default:
+					urlMap= indexDB10.getUrls(docData[0]); //look up by word
+					break;
+				}
 				if(urlMap == null){
 					urlMap = new HashMap<String, URLMetrics>();
 				}
 				urlMap.put(url, new URLMetrics(Integer.parseInt(docData[1]),0,0));
 
-				indexDB.addWord(docData[0], urlMap);
+				switch(fileNumber){
+				case 1:
+					indexDB1.addWord(docData[0], urlMap);
+					break;
+				case 2:
+					indexDB2.addWord(docData[0], urlMap);
+					break;
+				case 3:
+					indexDB3.addWord(docData[0], urlMap);
+					break;
+				case 4:
+					indexDB4.addWord(docData[0], urlMap);
+					break;
+				case 5:
+					indexDB5.addWord(docData[0], urlMap);
+					break;
+				case 6:
+					indexDB6.addWord(docData[0], urlMap);
+					break;
+				case 7:
+					indexDB7.addWord(docData[0], urlMap);
+					break;
+				case 8:
+					indexDB8.addWord(docData[0], urlMap);
+					break;
+				case 9:
+					indexDB9.addWord(docData[0], urlMap);
+					break;
+				default:
+					indexDB10.addWord(docData[0], urlMap);
+					break;
+				}
 			}catch(Exception e){
 				//Caught exception
 				System.out.println("<---Caught Exception--->: " + e);
@@ -151,10 +236,29 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 
 			
 		}
-		System.out.println("Index DB Size: " + indexDB.getSize());
-		System.out.println();
-		indexDB.close();
+		System.out.println("Index DB Size: " + indexDB1.getSize());
+		System.out.println("Index DB Size: " + indexDB2.getSize());
+		System.out.println("Index DB Size: " + indexDB3.getSize());
+		System.out.println("Index DB Size: " + indexDB4.getSize());
+		System.out.println("Index DB Size: " + indexDB5.getSize());
+		System.out.println("Index DB Size: " + indexDB6.getSize());
+		System.out.println("Index DB Size: " + indexDB7.getSize());
+		System.out.println("Index DB Size: " + indexDB8.getSize());
+		System.out.println("Index DB Size: " + indexDB9.getSize());
+		System.out.println("Index DB Size: " + indexDB10.getSize());
 
+		
+		System.out.println();
+		indexDB1.close();
+		indexDB2.close();
+		indexDB3.close();
+		indexDB4.close();
+		indexDB5.close();
+		indexDB6.close();
+		indexDB7.close();
+		indexDB8.close();
+		indexDB9.close();
+		indexDB10.close();
 	}
 
 
@@ -251,5 +355,25 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 	//		}
 	//	}
 
+	/**
+	 * Picks which bucket hash value goes in
+	 * @param numWorkers - number of ranges to split
+	 * @param hashedValue - value to place
+	 * @return
+	 */
+	private int pickNumberBucket(int numWorkers, String hashedValue) {
+		String maxValue = "";
+		for(int i = 0; i < 40; i++){
+			maxValue += "f";
+		}
+		BigInteger hash = new BigInteger(hashedValue, 16);
+		BigInteger bigMax = new BigInteger(maxValue, 16).add(BigInteger.ONE);
+		
+		BigInteger rangeSize = bigMax.divide(BigInteger.valueOf(numWorkers));
+		
+		int bucket = hash.divide(rangeSize).intValue() + 1;
+		return bucket;
+	}
+	
 }
 
