@@ -19,10 +19,10 @@ public class PageRankThread extends Thread {
 
 	public void run(){
 		DocumentData document = documentDB.getNextDocument();
-		
+
 		while(document != null){
 			ArrayList<String> outurls = document.getLinks();
-			
+
 			try {
 				sendList(outurls, document.getUrl());
 				Thread.sleep(10);
@@ -35,18 +35,21 @@ public class PageRankThread extends Thread {
 			}
 			document = documentDB.getNextDocument();
 		}
-		
+
 
 	}
-	
+
 	private static void sendList(ArrayList<String> outurls, String url) throws IOException {
 		MyHttpClient client = new MyHttpClient(master, "/PageRankMaster/pushdata");
+
+		if(outurls == null) return;
 		int outgoingCount = outurls.size();
-		
+
+
 		String body = "";
 		for(String outgoing: outurls){
 			//Incoming -- Outgoing count for Incoming Link -- URL
-			body += url + " " + outgoingCount + outgoing + "\n";
+			body += url + " " + outgoingCount + " " + outgoing + "\n";
 		}
 		client.setBody(body);
 		client.sendPost();

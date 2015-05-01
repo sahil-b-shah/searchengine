@@ -99,7 +99,6 @@ public class MyHttpClient {
 		System.out.println(line);
 		while(line != null){
 			System.out.println(line);
-			line = in.readLine();
 		}
 		return connected;
 	}

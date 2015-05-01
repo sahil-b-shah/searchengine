@@ -393,6 +393,11 @@ public class InvertedIndexDBWrapper {
 		return invertedIndex.get(word).getUrls();
 	}
 	
+	public synchronized int getURLMapSize(String word){
+		if(invertedIndex.get(word) == null) return 0;
+		return invertedIndex.get(word).getUrls().size();
+	}
+	
 	public synchronized Integer getOccurences(String word, String url){
 		if(invertedIndex.get(word) == null)
 			return null;
@@ -455,6 +460,11 @@ public class InvertedIndexDBWrapper {
 	
 	public synchronized void closeIterator(){
 		keys = null;
+	}
+
+	public HashMap<String, URLMetrics> getURLMap(String word) {
+		// TODO Auto-generated method stub
+		return invertedIndex.get(word).getUrls();
 	}
 	
 	
