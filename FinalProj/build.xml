@@ -14,6 +14,7 @@
   	<mkdir dir="target/PageRank/classes"/>
   	<mkdir dir="target/DocDBPrinter/classes"/>
     <mkdir dir="classes"/>
+  	<mkdir dir="target/search/WEB-INF/classes"/>
   </target>
   
 	<target name ="build-dbprinter" depends="compile-dbprinter">
@@ -265,8 +266,20 @@
 		       <compilerarg value="-Xlint"/>
 		    </javac>
 		  </target>
+	
+	<target name="compile-search" depends="init">
+            <javac srcdir="src" destdir="target/search/WEB-INF/classes" includes="**/search/*.java" deprecation="on"
+             debug="true" includeantruntime="false">
+                <classpath>
+                    <fileset dir="lib/">
+                        <include name="*.jar"/>
+                    </fileset>
+                        </classpath>
+                <compilerarg value="-Xlint"/>
+            </javac>
+          </target>
 
-  <target name="all" depends="clean,war-Search, war-PageRankMaster, war-InvertedIndexMaster,war-InvertedIndexWorker,war-InvertedIndexWorker2,war-ShuffleURLMaster,war-ShuffleURLWorker,war-ShuffleURLWorker2,compile-jobs, compile-storage, build-crawler"/>
+  <target name="all" depends="clean,war-search, war-PageRankMaster, war-InvertedIndexMaster,war-InvertedIndexWorker,war-InvertedIndexWorker2,war-ShuffleURLMaster,war-ShuffleURLWorker,war-ShuffleURLWorker2,compile-jobs, compile-storage, build-crawler"/>
   
   <target name="war-ShuffleURLMaster" depends="compile-ShuffleURLMaster">
     <jar destfile="ShuffleURLMaster.war">
@@ -276,13 +289,13 @@
     </jar>
   </target>
 
-<target name="war-Search" depends="compile-Search">
-        <jar destfile="Search.war">
-      <fileset dir="target/Search/" includes="WEB-INF/classes/**/*.class"/>
-      <fileset dir="target/Search/" includes="WEB-INF/lib/*.jar"/>
-      <fileset dir="target/Search/" includes="WEB-INF/*.xml"/>
-    </jar>
-  </target>
+	<target name="war-search" depends="compile-search">
+	      <jar destfile="search.war">
+	      <fileset dir="target/search/" includes="WEB-INF/classes/**/*.class"/>
+	      <fileset dir="target/search/" includes="WEB-INF/lib/*.jar"/>
+	      <fileset dir="target/search/" includes="WEB-INF/*.xml"/>
+	    </jar>
+	  </target>
 
   <target name="war-ShuffleURLWorker" depends="compile-ShuffleURLWorker">
   	<jar destfile="ShuffleURLWorker.war">
@@ -362,6 +375,8 @@
   	<delete file="indexer.jar"/>
   	<delete dir="target/DocDBPrinter/classes"/>
   	<delete file="db_printer.jar"/>
+	<delete dir="target/search/WEB-INF/classes"/>
+    <delete file="search.war"/>
 
   </target>
 </project>
