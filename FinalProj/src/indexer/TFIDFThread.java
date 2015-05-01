@@ -53,8 +53,10 @@ public class TFIDFThread extends Thread {
 					}
 				}
 				seen++;
-				System.out.println("Adding " + word + " seen " +seen + " on thread: " + Thread.currentThread().getName());
 				indexDB.addWord(word, newMap);
+				System.out.println("Adding " + word + " seen " +seen + " on thread: " + Thread.currentThread().getName());
+				System.out.println("DB SIZE " + indexDB.getSize());
+
 
 			}
 			indexDB.getNextWord();
