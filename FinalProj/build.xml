@@ -5,6 +5,7 @@
     <mkdir dir="target/ShuffleURLWorker/WEB-INF/classes"/>
   	<mkdir dir="target/ShuffleURLWorker2/WEB-INF/classes"/>
   	<mkdir dir="target/InvertedIndexMaster/WEB-INF/classes"/>
+  	<mkdir dir="target/PageRankMaster/WEB-INF/classes"/>
     <mkdir dir="target/InvertedIndexWorker/WEB-INF/classes"/>
   	<mkdir dir="target/InvertedIndexWorker2/WEB-INF/classes"/>
   	<mkdir dir="target/Crawler/classes"/>
@@ -92,7 +93,7 @@
     </javac>
   </target>
 
-  <target name ="build-prank" depends="compile-indexer">
+  <target name ="build-prank" depends="compile-pagerank">
   	<jar destfile="page.jar">
         <!--<fileset dir="src" includes="crawler/**/*.java"/>-->
         <fileset dir="target/PageRank/classes/" includes="pagerank/**/*.class"/>
@@ -188,6 +189,18 @@
             </javac>
           </target>
 
+	  <target name="compile-PageRankMaster" depends="init">
+	    <javac srcdir="src" destdir="target/PageRankMaster/WEB-INF/classes" includes="**/PageRankMaster/*.java" deprecation="on"
+	     debug="true" includeantruntime="false">
+	    	<classpath>
+	            <fileset dir="lib/">
+	                <include name="*.jar"/>
+	            </fileset>
+	  	   	</classpath>
+	    	<compilerarg value="-Xlint"/>
+	    </javac>
+	  </target>	
+	
 	  <target name="compile-InvertedIndexMaster" depends="init">
 	    <javac srcdir="src" destdir="target/InvertedIndexMaster/WEB-INF/classes" includes="**/InvertedIndexMaster/*.java" deprecation="on"
 	     debug="true" includeantruntime="false">
@@ -267,6 +280,14 @@
 	    </jar>
 	  </target>
 
+	  <target name="war-PageRankMaster" depends="compile-PageRankMaster">
+	    <jar destfile="PageRankMaster.war">
+	      <fileset dir="target/PageRankMaster/" includes="WEB-INF/classes/**/*.class"/>
+	      <fileset dir="target/PageRankMaster/" includes="WEB-INF/lib/*.jar"/>
+	      <fileset dir="target/PageRankMaster/" includes="WEB-INF/*.xml"/>
+	    </jar>
+	  </target>	
+	
 	  <target name="war-InvertedIndexWorker" depends="compile-InvertedIndexWorker">
 	  	<jar destfile="InvertedIndexWorker.war">
 	      <fileset dir="target/InvertedIndexWorker/" includes="WEB-INF/classes/**/*.class"/>
@@ -299,11 +320,11 @@
     <delete file="Search.war"/>
   	<delete file="ShuffleURLWorker2.war"/>
 	<delete dir="target/Search/WEB-INF/classes"/>
+  	<delete dir="target/PageRankMaster/WEB-INF/classes"/>
   	<delete dir="target/InvertedIndexMaster/WEB-INF/classes"/>
     <delete dir="target/InvertedIndexWorker/WEB-INF/classes"/>
   	<delete dir="target/InvertedIndexWorker2/WEB-INF/classes"/>
-    <delete dir="target/PageRankWorker/WEB-INF/classes"/>
-  	<delete dir="target/PageRankMaster/WEB-INF/classes"/>
+    <delete dir="page.jar"/>
   	<delete dir="target/Crawler/classes"/>
     <delete file="InvertedIndexMaster.war"/>
     <delete file="InvertedIndexWorker.war"/>
