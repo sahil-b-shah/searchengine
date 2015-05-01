@@ -57,6 +57,7 @@ public class TFIDFThread extends Thread {
 				indexDB.addWord(word, newMap);
 
 			}
+			indexDB.getNextWord();
 		}
 	}
 
