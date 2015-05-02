@@ -96,9 +96,8 @@ public class MyHttpClient {
 			return false;
 		BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		String line = in.readLine();
-		System.out.println(line);
 		while(line != null){
-			System.out.println(line);
+			line = in.readLine();
 		}
 		return connected;
 	}
