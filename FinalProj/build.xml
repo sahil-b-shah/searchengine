@@ -11,6 +11,7 @@
   	<mkdir dir="target/Crawler/classes"/>
   	<mkdir dir="target/Indexer/classes"/>
   	<mkdir dir="target/tfidf/classes"/>
+  	<mkdir dir="target/prcalc/classes"/>
   	<mkdir dir="target/PageRank/classes"/>
   	<mkdir dir="target/DocDBPrinter/classes"/>
     <mkdir dir="classes"/>
@@ -94,6 +95,34 @@
        <compilerarg value="-Xlint"/>
     </javac>
   </target>
+	
+	  <target name ="build-prcalc" depends="compile-prcalc">
+	  	<jar destfile="prcalc.jar">
+	        <!--<fileset dir="src" includes="crawler/**/*.java"/>-->
+	        <fileset dir="target/prcalc/classes/" includes="pagerank/**/*.class"/>
+	  		<fileset dir="target/prcalc/classes/" includes="crawler/**/*.class"/>
+	  		<fileset dir="target/prcalc/classes/" includes="mapreduce/**/*.class"/>
+		    <fileset dir="target/prcalc" includes="/lib/*"/>
+	  		<zipgroupfileset dir="target/prcalc/lib" includes="*"/>
+	  		<!--<zipgroupfileset dir="lib/profiles" includes="*" excludes=""/>-->
+		    <manifest>
+		  		<attribute name="Main-Class"
+		  			value="pagerank.PRCalc"/>
+		    </manifest>
+	  	</jar>
+	  </target>
+		
+	  <target name="compile-prcalc" depends="init">
+	    <javac srcdir="src" destdir="target/prcalc/classes" includes="pagerank/**/*.java, crawler/storage/*.java" deprecation="on"
+	     debug="true" includeantruntime="false">
+	    	<classpath>
+	            <fileset dir="lib/">
+	                <include name="*.jar"/>
+	            </fileset>
+	  	   	</classpath>
+	       <compilerarg value="-Xlint"/>
+	    </javac>
+	  </target>	
 	
 	  <target name ="build-indexer" depends="compile-indexer">
 	  	<jar destfile="indexer.jar">
@@ -367,6 +396,7 @@
     <delete dir="target/InvertedIndexWorker/WEB-INF/classes"/>
   	<delete dir="target/InvertedIndexWorker2/WEB-INF/classes"/>
     <delete dir="page.jar"/>
+    <delete dir="prcalc.jar"/>
   	<delete dir="target/Crawler/classes"/>
     <delete file="InvertedIndexMaster.war"/>
     <delete file="InvertedIndexWorker.war"/>
