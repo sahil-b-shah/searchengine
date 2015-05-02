@@ -33,7 +33,7 @@ public class TFIDFThread extends Thread {
 		InvertedIndexData document = indexDB.getNextWord();
 		while(document != null){
 			String word = document.getWord();
-			if(word != null && !stopWords.contains(word)){
+			if(word != null){
 				HashMap<String, URLMetrics> map = indexDB.getURLMap(word);
 				HashMap<String, URLMetrics> newMap = new HashMap<String, URLMetrics>();
 
@@ -59,7 +59,7 @@ public class TFIDFThread extends Thread {
 
 
 			}
-			indexDB.getNextWord();
+			document = indexDB.getNextWord();
 		}
 	}
 
