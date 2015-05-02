@@ -26,30 +26,36 @@ public class PRCalcThread extends Thread {
 		PageInfo document = prDB.getNextWord();
 		while(document != null){
 			String url = document.getURL();
-
+			System.out.println("NEW URL: " + url);
 			if(url != null){
-		//		try{
-					HashMap<String, Integer> map = prDB.getUrls(url);
-					double pagerank = 1 - damping;
-					for(Entry<String, Integer> entry: map.entrySet()){
-						try{
-							String incoming = entry.getKey();
-							double incPR = prDB.getRank(incoming);
-							pagerank += damping * (incPR/entry.getValue());
-						}catch(NullPointerException e){
-							System.out.println(url + "---" + e );
-						}
+				//		try{
+				HashMap<String, Integer> map = prDB.getUrls(url);
+				double pagerank = 1 - damping;
+				String incoming = "";
+				for(Entry<String, Integer> entry: map.entrySet()){
+
+					incoming = entry.getKey();
+					System.out.println("INC: " + incoming);
+					double incPR = 1.0;
+					try{
+						incPR = prDB.getRank(incoming);
+					}catch(NullPointerException e){
+						System.out.println(e);
 					}
-					seen++;
-					prDB.addRank(url, pagerank);
-					System.out.println("Adding " + url + " seen " +seen + " on thread: " + Thread.currentThread().getName());
-					System.out.println("DB SIZE " + prDB.getSize());
-	/*			}
+					pagerank += damping * (incPR/entry.getValue());
+
+				}
+				prDB.addRank(url, pagerank);
+				//System.out.println("Adding " + url + " seen " +seen + " on thread: " + Thread.currentThread().getName());
+				//ystem.out.println("DB SIZE " + prDB.getSize());
+				/*			}
 				catch(NullPointerException e1){
 					System.out.println("prDB doesn't have that url");
 				}*/
 			}
-
+			seen++;
+			System.out.println("PageRank is: " + prDB.getRank(url));
+			System.out.println("Seen: " + seen);
 			prDB.getNextWord();
 		}
 	}
