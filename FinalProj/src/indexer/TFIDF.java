@@ -2,6 +2,7 @@ package indexer;
 
 import java.util.HashSet;
 
+import crawler.TimerThread;
 import indexer.storage.InvertedIndexDBWrapper;
 import indexer.storage.WordCountDBWrapper;
 
@@ -10,9 +11,16 @@ public class TFIDF {
 	public static void main(String args[]){
 		String indexDirectory = args[0];
 		String maxDirectory = args[1];
+		int startIndex = Integer.parseInt(args[2]);
 		InvertedIndexDBWrapper indexDB = InvertedIndexDBWrapper.getInstance(indexDirectory);
 		WordCountDBWrapper maxOccurences = WordCountDBWrapper.getInstance(maxDirectory);
 		indexDB.initIterator();
+		
+		for(int i = 0; i <startIndex; i++){
+			indexDB.getNextWord();
+		}
+		
+		System.out.println("Starting threads");
 		
 		Thread threadpool[] = new Thread[10];
 		HashSet<String> stopWords = new HashSet<String>();
@@ -20,6 +28,9 @@ public class TFIDF {
         for(int i=0; i<threadpool.length; i++){
         	threadpool[i] = (new TFIDFThread(indexDB,maxOccurences, stopWords));
         }
+        
+        Thread timer = new IndexTimerThread(indexDB,maxOccurences);
+        timer.start();
         
         for(int i=0; i<threadpool.length; i++){
             try {
@@ -45,7 +56,9 @@ public class TFIDF {
         indexDB.closeIterator();;
 		indexDB.close();
 		maxOccurences.close();
-		
+		if(timer.isAlive()){
+			timer.interrupt();
+		}
 	}
 	
 	public static HashSet<String> fillHash(HashSet<String> hs){
