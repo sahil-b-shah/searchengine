@@ -20,6 +20,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import pagerank.storage.PageRankDBWrapper;
+
 @SuppressWarnings("serial")
 public class SearchServlet extends HttpServlet {
 
@@ -37,6 +39,7 @@ public class SearchServlet extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) {
 		InvertedIndexDBWrapper database = InvertedIndexDBWrapper.getInstance(getServletContext().getInitParameter("InvertedIndexDBstore"));
+		PageRankDBWrapper pageDB = PageRankDBWrapper.getInstance(getServletContext().getInitParameter("PageRankDBstore"));
 		String query = request.getParameter("search");
 		String[] elements = query.split("\\s+");
 		wordsInQuery = elements.length;
@@ -62,8 +65,9 @@ public class SearchServlet extends HttpServlet {
 								SearchData newData = new SearchData(0.0,1);
 								double tempTF = hm.get(url).getTF();
 								double tempIDF = hm.get(url).getIDF();
+								double pr = pageDB.getRank(url);
 								// Some way to set PageRank as well
-								newData.setScore(tempTF * tempIDF);
+								newData.setScore(tempTF * tempIDF * pr);
 								searchMap.put(url, newData);
 							}
 						}
@@ -113,10 +117,10 @@ public class SearchServlet extends HttpServlet {
 	}
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response){
-		InvertedIndexDBWrapper database = InvertedIndexDBWrapper.getInstance(getServletContext().getInitParameter("InvertedIndexDBstore"));
+		//InvertedIndexDBWrapper database = InvertedIndexDBWrapper.getInstance(getServletContext().getInitParameter("InvertedIndexDBstore"));
 		PrintWriter out;
 		try {
-			// Adding stuff to Database
+			/*// Adding stuff to Database
 			HashMap<String,URLMetrics> hm1 = new HashMap<String,URLMetrics>();
 			URLMetrics temp1 = new URLMetrics(100,1,3);
 			URLMetrics temp2 = new URLMetrics(50,2,5);
@@ -146,7 +150,7 @@ public class SearchServlet extends HttpServlet {
 			hm3.put("http://www.stackoverflow.com", temp5);
 			database.addWord("vig", hm3);
 			
-			database.close();
+			database.close();*/
 			
 			out = response.getWriter();
 			out.println("<html><body>");
