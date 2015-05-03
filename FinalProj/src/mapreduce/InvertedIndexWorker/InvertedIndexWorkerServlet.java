@@ -210,21 +210,6 @@ public class InvertedIndexWorkerServlet extends HttpServlet {
 
 			InvertedIndexInputReduceReader reader = new InvertedIndexInputReduceReader(spoolinFile);
 
-			/*File outputDir = new File(storageDirectory, output);
-
-			//Delete directory if there
-			if(outputDir.exists() && outputDir.isDirectory()){
-				//Delete directory and file
-				File files[] = outputDir.listFiles();
-				for(File file: files){
-					file.delete();
-				}
-				outputDir.delete();
-			}
-			outputDir.mkdir();*/
-
-			//File outputFile = new File(outputDir, "output.txt");
-
 			InvertedIndexReduceContext reduceContext = new InvertedIndexReduceContext(indexDirectory);
 
 			//Create numThread threads to run map

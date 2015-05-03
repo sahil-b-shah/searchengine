@@ -1,14 +1,9 @@
 package pagerank.storage;
 
-import indexer.storage.InvertedIndexData;
-import indexer.storage.URLMetrics;
-
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import com.sleepycat.je.DatabaseException;
@@ -17,8 +12,6 @@ import com.sleepycat.je.EnvironmentConfig;
 import com.sleepycat.persist.EntityStore;
 import com.sleepycat.persist.PrimaryIndex;
 import com.sleepycat.persist.StoreConfig;
-
-import crawler.storage.DocumentData;
 
 public class PageRankDBWrapper {
 	private String envDirectory = null;
