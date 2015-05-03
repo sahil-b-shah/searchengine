@@ -51,14 +51,12 @@ public class SearchServlet extends HttpServlet {
 		try{
 			out = response.getWriter();
 			out.println("<html><body>");
-			//out.println("<h1>You searched for: " + query +  "</h1>");
-			out.println("<h1 style=\"margin-top:10px;font-size:45px\"> AaduSearch </h1>");
-			out.println("<h2>Here are your results:</h2>");
+			out.println("<h1 style=\"margin-top:10px;font-size:45px;text-align:center\"> AaduSearch </h1>");
 			out.println("<form action='searchResults' method='POST'>");
-	    	out.println("Try Another Search:<br>");
 	    	out.println("<input type='text' name='search' size='45' value='"+query+"'>");
-	    	//out.println("<br>");
 	    	out.print("<input type='submit' value='Search!'>");
+			out.println("<h2>Here are your results:</h2>");
+
 			for(String token : elements){
 				if(stopList.contains(token)){
 					//System.out.println("Ignoring:" + token);
@@ -134,19 +132,19 @@ public class SearchServlet extends HttpServlet {
 			        Map.Entry pair = (Map.Entry)it.next();
 			        System.out.println("Printing url: " + pair.getKey());
 					//out.println("<h3>Search Result " + numFound +  "</h3>");
-					out.println("<a href='http://" + pair.getKey()+ "'>"+pair.getKey()+"</a>");
+					out.println("<br><a href='http://" + pair.getKey()+ "'>"+pair.getKey()+"</a><br>");
 			        numFound++;
 					//System.out.println(wordsInQuery + ":" + pair.getKey() + " = " + pair.getValue());
 			        //it.remove(); // avoids a ConcurrentModificationException
 			    }
 			}
 			if(numFound == 1){
-				out.println("<img src='http://www.quickmeme.com/img/68/6802d88e153ab306ca7679a9260cce1b2842c3967362ddaeb8b57a0af900b6d3.jpg' >");
+				out.println("<img src='http://i.imgur.com/mtEZOZk.jpg' >");
 			}
-			out.println("<br>");
+		//	out.println("<br>");
 			out.println("<br>");
 			out.println("<form action='searchResults' method='POST'>");
-	    	out.println("Try Another Search:<br>");
+	    	//out.println("Try Another Search:<br>");
 	    	out.println("<input type='text' name='search' value=''>");
 	    	out.println("<br>");
 	    	out.print("<input type='submit' value='Return to Search!'>");
@@ -163,37 +161,6 @@ public class SearchServlet extends HttpServlet {
 		//InvertedIndexDBWrapper database = InvertedIndexDBWrapper.getInstance(getServletContext().getInitParameter("InvertedIndexDBstore"));
 		PrintWriter out;
 		try {
-			/*// Adding stuff to Database
-			HashMap<String,URLMetrics> hm1 = new HashMap<String,URLMetrics>();
-			URLMetrics temp1 = new URLMetrics(100,1,3);
-			URLMetrics temp2 = new URLMetrics(50,2,5);
-			URLMetrics temp3 = new URLMetrics(75,5,2);
-			URLMetrics temp4 = new URLMetrics(30,4,8);
-			URLMetrics temp5 = new URLMetrics(44,3,2);
-			
-			hm1.put("http://www.google.com", temp1);
-			hm1.put("http://www.yahoo.com", temp2);
-			hm1.put("http://www.reddit.com", temp3);
-			database.addWord("carlie", hm1);
-			
-			// Adding stuff to Database
-			HashMap<String,URLMetrics> hm2 = new HashMap<String,URLMetrics>();
-			hm2.put("http://www.yahoo.com", temp1);
-			hm2.put("http://www.piazza.com", temp2);
-			hm2.put("http://www.linkedin.com", temp3);
-			hm2.put("http://www.stackoverflow.com", temp4);
-			database.addWord("aadu", hm2);
-			
-			// Adding stuff to Database
-			HashMap<String,URLMetrics> hm3 = new HashMap<String,URLMetrics>();
-			hm3.put("http://www.yahoo.com", temp1);
-			hm3.put("http://www.piazza.com", temp2);
-			hm3.put("http://www.google.com", temp3);
-			hm3.put("http://www.linkedin.com", temp4);
-			hm3.put("http://www.stackoverflow.com", temp5);
-			database.addWord("vig", hm3);
-			
-			database.close();*/
 			
 			out = response.getWriter();
 			out.println("<html><body><center>");
