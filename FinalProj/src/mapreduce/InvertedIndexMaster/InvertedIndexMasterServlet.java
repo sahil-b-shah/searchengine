@@ -29,6 +29,8 @@ import org.apache.commons.codec.digest.DigestUtils;
 public class InvertedIndexMasterServlet extends HttpServlet {
 
 	static final long serialVersionUID = 455555001;
+	static InvertedIndexDBWrapper indexDB;
+	static WordCountDBWrapper numWordsDB;
 	/*private static Map<String, ArrayList<String>> statusMap; 
 	private static String numMapThreads = "20";
 	private static String numReduceThreads = "20";*/
@@ -36,6 +38,10 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 	public void init(ServletConfig config) throws ServletException {
 		//statusMap = new HashMap<String, ArrayList<String>>();
 		System.out.println("Master init");
+		indexDB = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb");
+		numWordsDB = WordCountDBWrapper.getInstance("/home/cis455/Index/numwordsdb");
+
+
 
 	}
 	public void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -55,6 +61,11 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 			PrintWriter writer = response.getWriter();
 			writer.close();
 		}
+		else if(request.getRequestURI().contains("/close")){
+			System.out.println("Closing db");
+			indexDB.close();
+			numWordsDB.close();
+		}
 	}
 
 
@@ -65,7 +76,7 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 	 */
 	public synchronized void addData(HttpServletRequest request) throws IOException{
 		BufferedReader in = request.getReader();
-		InvertedIndexDBWrapper indexDB = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb");
+		//InvertedIndexDBWrapper indexDB = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb");
 		WordCountDBWrapper numWordsDB = WordCountDBWrapper.getInstance("/home/cis455/Index/numwordsdb");
 
 
@@ -81,7 +92,7 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 		numWordsDB.addWord(firstLine[0], num);
 		System.out.println("Size of num words" + numWordsDB.getSize());
 
-		numWordsDB.close();
+		//numWordsDB.close();
 
 		line = in.readLine();
 		while(line != null){
@@ -106,7 +117,7 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 		}
 		System.out.println("Index DB Size: " + indexDB.getSize());
 		System.out.println();
-		indexDB.close();
+		//indexDB.close();
 	}
 
 
