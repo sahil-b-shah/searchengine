@@ -1,6 +1,203 @@
-CIS 455 Final Project - TBD
+CIS 455 Final Project
 
-Aadithya Prakash
-Danny Salowe
-Sahil Shah
-Jeffrey Shih
+Aadithya Prakash - aadithya
+Danny Salowe - salowed
+Sahil Shah - shahs
+Jeffrey Shih - jeshih
+
+--------------------------------------Features Implemented--------------------------------------
+
+All basic features for a search engine, including a distributed, polite crawler, 
+indexing and page-rank map reduce jobs, and a frontend to display results. No extra credit features
+are being claimed
+
+--------------------------------------File Structure--------------------------------------
+FinalProj/
+├── bin
+│   ├── crawler
+│   │   ├── Crawler.class
+│   │   ├── CrawlerThread.class
+│   │   ├── RobotsTxtInfo.class
+│   │   ├── storage
+│   │   │   ├── DocumentData.class
+│   │   │   ├── DocumentDBWrapper.class
+│   │   │   ├── IndexDocumentDBWrapper.class
+│   │   │   ├── RobotsDBWrapper.class
+│   │   │   ├── RobotsTxtData.class
+│   │   │   ├── UnseenLinksData.class
+│   │   │   ├── UnseenLinksDBWrapper.class
+│   │   │   ├── URLFrontierData.class
+│   │   │   └── URLFrontierDBWrapper.class
+│   │   ├── ThreadPool.class
+│   │   ├── TimerThread.class
+│   │   └── URLRequest.class
+│   ├── edu
+│   │   └── upenn
+│   │       └── cis455
+│   ├── indexer
+│   │   ├── DocumentIndex.class
+│   │   ├── Indexer.class
+│   │   ├── IndexerThread.class
+│   │   ├── IndexTimerThread.class
+│   │   ├── storage
+│   │   │   ├── InvertedIndexData.class
+│   │   │   ├── InvertedIndexDBWrapper.class
+│   │   │   ├── URLMetrics.class
+│   │   │   ├── WordCountData.class
+│   │   │   └── WordCountDBWrapper.class
+│   │   ├── TFIDF.class
+│   │   └── TFIDFThread.class
+│   ├── mapreduce
+│   │   ├── Context.class
+│   │   ├── InvertedIndexJob.class
+│   │   ├── InvertedIndexMaster
+│   │   │   └── InvertedIndexMasterServlet.class
+│   │   ├── InvertedIndexWorker
+│   │   │   ├── InvertedIndexInputMapReader.class
+│   │   │   ├── InvertedIndexInputReduceReader.class
+│   │   │   ├── InvertedIndexMapContext.class
+│   │   │   ├── InvertedIndexReduceContext.class
+│   │   │   ├── InvertedIndexStatusThread.class
+│   │   │   ├── InvertedIndexWorkerMapThread.class
+│   │   │   ├── InvertedIndexWorkerReduceThread.class
+│   │   │   └── InvertedIndexWorkerServlet.class
+│   │   ├── Job.class
+│   │   ├── MyHttpClient.class
+│   │   ├── PageRankMaster
+│   │   │   └── PageRankMasterServlet.class
+│   │   ├── ShuffleURLJob.class
+│   │   ├── ShuffleURLMaster
+│   │   │   └── ShuffleURLMasterServlet.class
+│   │   └── ShuffleURLWorker
+│   │       ├── ShuffleURLInputMapReader.class
+│   │       ├── ShuffleURLInputReduceReader.class
+│   │       ├── ShuffleURLMapContext.class
+│   │       ├── ShuffleURLMapThread.class
+│   │       ├── ShuffleURLReduceContext.class
+│   │       ├── ShuffleURLReduceThread.class
+│   │       ├── ShuffleURLStatusThread.class
+│   │       └── ShuffleURLWorkerServlet.class
+│   ├── pagerank
+│   │   ├── PageRank.class
+│   │   ├── PageRankThread.class
+│   │   ├── PRCalc.class
+│   │   ├── PRCalcThread.class
+│   │   └── storage
+│   │       ├── PageInfo.class
+│   │       └── PageRankDBWrapper.class
+│   ├── search
+│   │   ├── SearchData.class
+│   │   ├── SearchServlet$1.class
+│   │   └── SearchServlet.class
+│   └── test
+│       ├── AllowedLinksTest.class
+│       ├── DecodeURLTest.class
+│       ├── DocumentDBTest.class
+│       ├── FrontierDBTest.class
+│       ├── IndexJobInputTest.class
+│       ├── InvertedIndexDBWrapperTest.class
+│       ├── PopulateUnseenLinks.class
+│       ├── RobotsDBWrapperTest.class
+│       ├── ShuffleJobTest.class
+│       └── URLExtractionTest.class
+├── build.xml
+├── src
+│   ├── crawler
+│   │   ├── Crawler.java
+│   │   ├── CrawlerThread.java
+│   │   ├── RobotsTxtInfo.java
+│   │   ├── storage
+│   │   │   ├── DocumentData.java
+│   │   │   ├── DocumentDBWrapper.java
+│   │   │   ├── IndexDocumentDBWrapper.java
+│   │   │   ├── RobotsDBWrapper.java
+│   │   │   ├── RobotsTxtData.java
+│   │   │   ├── UnseenLinksData.java
+│   │   │   ├── UnseenLinksDBWrapper.java
+│   │   │   ├── URLFrontierData.java
+│   │   │   └── URLFrontierDBWrapper.java
+│   │   ├── ThreadPool.java
+│   │   ├── TimerThread.java
+│   │   └── URLRequest.java
+│   ├── edu
+│   │   └── upenn
+│   │       └── cis455
+│   ├── indexer
+│   │   ├── DocumentIndex.java
+│   │   ├── Indexer.java
+│   │   ├── IndexerThread.java
+│   │   ├── IndexTimerThread.java
+│   │   ├── storage
+│   │   │   ├── InvertedIndexData.java
+│   │   │   ├── InvertedIndexDBWrapper.java
+│   │   │   ├── URLMetrics.java
+│   │   │   ├── WordCountData.java
+│   │   │   └── WordCountDBWrapper.java
+│   │   ├── TFIDF.java
+│   │   └── TFIDFThread.java
+│   ├── mapreduce
+│   │   ├── Context.java
+│   │   ├── InvertedIndexJob.java
+│   │   ├── InvertedIndexMaster
+│   │   │   └── InvertedIndexMasterServlet.java
+│   │   ├── InvertedIndexWorker
+│   │   │   ├── InvertedIndexInputMapReader.java
+│   │   │   ├── InvertedIndexInputReduceReader.java
+│   │   │   ├── InvertedIndexMapContext.java
+│   │   │   ├── InvertedIndexReduceContext.java
+│   │   │   ├── InvertedIndexStatusThread.java
+│   │   │   ├── InvertedIndexWorkerMapThread.java
+│   │   │   ├── InvertedIndexWorkerReduceThread.java
+│   │   │   └── InvertedIndexWorkerServlet.java
+│   │   ├── Job.java
+│   │   ├── MyHttpClient.java
+│   │   ├── PageRankMaster
+│   │   │   └── PageRankMasterServlet.java
+│   │   ├── ShuffleURLJob.java
+│   │   ├── ShuffleURLMaster
+│   │   │   └── ShuffleURLMasterServlet.java
+│   │   └── ShuffleURLWorker
+│   │       ├── ShuffleURLInputMapReader.java
+│   │       ├── ShuffleURLInputReduceReader.java
+│   │       ├── ShuffleURLMapContext.java
+│   │       ├── ShuffleURLMapThread.java
+│   │       ├── ShuffleURLReduceContext.java
+│   │       ├── ShuffleURLReduceThread.java
+│   │       ├── ShuffleURLStatusThread.java
+│   │       └── ShuffleURLWorkerServlet.java
+│   ├── pagerank
+│   │   ├── PageRank.java
+│   │   ├── PageRankThread.java
+│   │   ├── PRCalc.java
+│   │   ├── PRCalcThread.java
+│   │   └── storage
+│   │       ├── PageInfo.java
+│   │       └── PageRankDBWrapper.java
+│   ├── search
+│   │   ├── SearchData.java
+│   │   └── SearchServlet.java
+│   └── test
+│       ├── AllowedLinksTest.java
+│       ├── DecodeURLTest.java
+│       ├── DocumentDBTest.java
+│       ├── FrontierDBTest.java
+│       ├── IndexJobInputTest.java
+│       ├── InvertedIndexDBWrapperTest.java
+│       ├── PopulateUnseenLinks.java
+│       ├── RobotsDBWrapperTest.java
+│       ├── ShuffleJobTest.java
+│       └── URLExtractionTest.java
+
+--------------------------------------How to Run--------------------------------------
+To build the war file for the MapReduce jobs (ShuffleURL, Indexing, PageRank), run ant all from the FinalProj/ directory
+To build the jar files for the crawler and local indexer, run the ant command for the specific jar file you want to build
+
+Arguments
+	crawler.jar - 1: home directory of db, 2: maximum file size, 3(optional): max number of files to crawl
+	indexer.jar - 1: home directory of db
+	PageRank.jar - 1: home directory of db
+
+
+
+
+
