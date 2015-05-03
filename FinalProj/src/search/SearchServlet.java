@@ -51,13 +51,14 @@ public class SearchServlet extends HttpServlet {
 		try{
 			out = response.getWriter();
 			out.println("<html><body>");
-			out.println("<h1>You searched for: " + query +  "</h1>");
+			//out.println("<h1>You searched for: " + query +  "</h1>");
+			out.println("<h1 style=\"margin-top:10px;font-size:45px\"> AaduSearch </h1>");
 			out.println("<h2>Here are your results:</h2>");
 			out.println("<form action='searchResults' method='POST'>");
 	    	out.println("Try Another Search:<br>");
-	    	out.println("<input type='text' name='search' value=''>");
-	    	out.println("<br>");
-	    	out.print("<input type='submit' value='Return to Search!'>");
+	    	out.println("<input type='text' name='search' size='45' value='"+query+"'>");
+	    	//out.println("<br>");
+	    	out.print("<input type='submit' value='Search!'>");
 			for(String token : elements){
 				if(stopList.contains(token)){
 					//System.out.println("Ignoring:" + token);
@@ -132,8 +133,8 @@ public class SearchServlet extends HttpServlet {
 			    while (it.hasNext()) {
 			        Map.Entry pair = (Map.Entry)it.next();
 			        System.out.println("Printing url: " + pair.getKey());
-					out.println("<h3>Search Result " + numFound +  "</h3>");
-					out.println("<a href='" + pair.getKey()+ "'>"+pair.getKey()+"</a>");
+					//out.println("<h3>Search Result " + numFound +  "</h3>");
+					out.println("<a href='http://" + pair.getKey()+ "'>"+pair.getKey()+"</a>");
 			        numFound++;
 					//System.out.println(wordsInQuery + ":" + pair.getKey() + " = " + pair.getValue());
 			        //it.remove(); // avoids a ConcurrentModificationException
@@ -196,8 +197,8 @@ public class SearchServlet extends HttpServlet {
 			
 			out = response.getWriter();
 			out.println("<html><body><center>");
-			out.println("<h1> Welcome to AaduSearch! </h1>");
-			out.println("<h2> Find things you never thought you needed! </h2>");
+			out.println("<h1 style=\"margin-top:150px;font-size:65px\"> Welcome to AaduSearch! </h1>");
+			out.println("<h2 style=\"font-size:20px;font-family:\"Avant Garde\",Avantgarde,\"Century Gothic\",CenturyGothic,AppleGothic,sans-serif\"> Find things you never thought you needed! </h2>");
 	    	out.println("<form action='searchResults' method='POST'>");
 	    	out.println("Enter your Search!!!<br>");
 	    	out.println("<input type='text' name='search' size='40' value=''>");

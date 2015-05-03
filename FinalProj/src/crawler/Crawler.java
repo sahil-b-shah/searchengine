@@ -60,7 +60,7 @@ public class Crawler {
 		
 		currentHosts = new ConcurrentHashMap<String, String>();
 		
-		//urlString = "https://www.yahoo.com/";
+		//urlString = "http://en.wikipedia.org/wiki/Philosophy";
 		//urlString = args[0];
 		String homeDir = args[0];
 		//Directory for stores
