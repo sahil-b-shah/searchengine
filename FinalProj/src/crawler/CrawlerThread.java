@@ -85,13 +85,6 @@ public class CrawlerThread extends Thread {
 							try {
 								parseRequest(request.sendGetRequest());
 							} catch (IOException e) {
-								/*frontierDB.close();
-							docDB.close();
-							unseenLinksDB.close();
-							robotsDB.close();
-							System.err.println("Error sending GET request to server");
-							e.printStackTrace();
-							System.exit(-1);*/
 							}
 						}
 						Crawler.deleteCurrentHost(request.getHost());
@@ -101,7 +94,6 @@ public class CrawlerThread extends Thread {
 					}
 				} else {
 					try {
-						//Thread.sleep(300000);
 						Thread.sleep(3000);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
@@ -146,7 +138,6 @@ public class CrawlerThread extends Thread {
 			//System.out.println(allowedTestURL);
 			
 			if(!allowed(allowedTestURL, disallowed, allowed)) {
-				//System.out.println("This bitch be disallowed");
 				return false;
 			}
 		}
@@ -154,7 +145,6 @@ public class CrawlerThread extends Thread {
 		//System.out.println("filepath is not disallowed");
 
 		DocumentData ce = docDB.getContentById(request.getHost()+request.getFilePath());
-		//Date lastSeen = checkModifiedDate(ce.getLastSeen());
 
 		if (ce == null) {
 			makeRequest = true & makeRequest;
@@ -172,24 +162,8 @@ public class CrawlerThread extends Thread {
 			/*
 			//System.out.println("content is not null");
 			//Date lastSeen = new Date(Long.valueOf(ce.getLastSeen()));
-			boolean modified = false;
+			boolean modified = false;*/
 
-			try {
-				//System.out.println("Last seen "+new Date(Long.valueOf(ce.getLastSeen())));
-				modified = request.checkModified(Long.valueOf(ce.getLastSeen()));
-			} catch (NumberFormatException | IOException e) {
-				makeRequest = false;
-				e.printStackTrace();
-			}
-			//System.out.println(request.getHost()+request.getFilePath()+ " last modified"+lastModified);
-			//Check if last seen is less than last modified
-			if (!modified) {
-				//System.out.println(request.getFilePath()+" Last modified is before last seen");
-				return false;
-			} else {
-				//System.out.println(request.getFilePath()+" Last modified is after last seen");
-				makeRequest = true & makeRequest;
-			}*/
 		}
 		if(request.getContentLength() <= maxLength) {
 			makeRequest = true & makeRequest;
@@ -227,25 +201,6 @@ public class CrawlerThread extends Thread {
 			System.err.println("Error reading input stream from host");
 			e.printStackTrace();
 		}
-		
-		/*
-		byte[] buffer = new byte[request.getContentLength()];
-		int len;
-		try {
-			while ((len = is.read(buffer)) > -1 ) {
-				baos.write(buffer, 0, len);
-			}
-			baos.flush();
-		} catch (IOException e1) {
-			System.err.println("Error making new input stream");
-			e1.printStackTrace();
-			System.exit(-1);
-		}*/
-		
-		/*
-		InputStream is2 = new ByteArrayInputStream(baos.toByteArray()); 
-		InputStream is3 = new ByteArrayInputStream(baos.toByteArray());
-		*/
 		
 		//InputStream isCopy = new InputStream(is);
 		String contentType = request.getContentType();

@@ -1,13 +1,10 @@
 package pagerank;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map.Entry;
 
 import pagerank.storage.PageInfo;
 import pagerank.storage.PageRankDBWrapper;
-import crawler.storage.DocumentData;
 
 public class PRCalcThread extends Thread {
 

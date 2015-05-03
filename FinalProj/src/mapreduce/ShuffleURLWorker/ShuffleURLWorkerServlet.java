@@ -172,52 +172,7 @@ public class ShuffleURLWorkerServlet extends HttpServlet {
 
 		}
 		else if(request.getRequestURI().contains("/runreduce")){
-			/*
-			status = "reducing";
-			int numThreads = Integer.parseInt(request.getParameter("numThreads"));
-			String output = request.getParameter("output");
-
-			//Sort file
-			File spoolin = new File(storageDirectory,"spool-in");
-			File storeFile = new File(spoolin, "store.txt");
-
-			ShuffleURLInputReduceReader reader = new ShuffleURLInputReduceReader(storeFile);
-
-			File outputDir = new File(storageDirectory, output);
-
-			//Delete directory if there
-			if(outputDir.exists() && outputDir.isDirectory()){
-				//Delete directory and file
-				File files[] = outputDir.listFiles();
-				for(File file: files){
-					file.delete();
-				}
-				outputDir.delete();
-			}
-			outputDir.mkdir();
-
-			File outputFile = new File(outputDir, "output.txt");
-
-			//ShuffleURLReduceContext reduceContext = new ShuffleURLReduceContext(outputFile);
-
-			//Create numThread threads to run map
-			Thread threads[] = new Thread[numThreads];
-			for(int i = 0; i < numThreads; i++){
-				ShuffleURLReduceThread workerObj = new ShuffleURLReduceThread(reader, null);
-				threads[i] = new Thread(workerObj);
-				threads[i].start();
-			}
-
-			//Wait until all threads done
-			for(int i = 0; i < numThreads; i++){
-				try {
-					threads[i].join();
-				} catch (InterruptedException e) {
-					System.err.println("Map thread ended unnaturally");
-				}
-			}
-
-			*/
+			
 			System.out.println(IPPort + ": threads done reducing"); 
 
 			status = "idle";

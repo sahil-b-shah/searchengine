@@ -120,33 +120,6 @@ public class ShuffleURLMasterServlet extends HttpServlet {
 				}
 			}
 
-			/*if(allWaiting){
-				System.out.println("All workers waiting");
-				//Post to /runmap on every active worker
-				for(String worker: localStatusMap.keySet()){
-					MyHttpClient client = new MyHttpClient(worker, "/worker/runmap");
-					//client.addParams("input", inputDir);
-					client.addParams("numThreads", numMapThreads);
-					client.addParams("numWorkers", localStatusMap.size() + "");
-					int counter = 1;
-					for(String workerID: localStatusMap.keySet()){
-						client.addParams("worker"+counter, workerID);
-						counter++;
-					}
-					//System.out.println("Posting /runmap to "+ worker);
-					client.sendPost();
-				}
-
-				//Previous reduce code below
-				/*for(String iport: localStatusMap.keySet()){
-					if((System.currentTimeMillis() - Long.parseLong(params.get(4))) < 30000){
-						MyHttpClient client = new MyHttpClient(iport, "/worker/runreduce");
-						client.addParams("output", outputDir);
-						client.addParams("numThreads", numReduceThreads);						
-						client.sendPost();
-					}
-				}
-			}*/
 		}
 		else{
 
