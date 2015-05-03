@@ -36,7 +36,7 @@ public class PRCalcThread extends Thread {
 
 					incoming = entry.getKey();
 					System.out.println("INC: " + incoming);
-					double incPR = 1.0;
+					double incPR = .5;
 					try{
 						incPR = prDB.getRank(incoming);
 					}catch(NullPointerException e){
@@ -56,7 +56,7 @@ public class PRCalcThread extends Thread {
 			seen++;
 			System.out.println("PageRank is: " + prDB.getRank(url));
 			System.out.println("Seen: " + seen);
-			prDB.getNextWord();
+			document = prDB.getNextWord();
 		}
 	}
 

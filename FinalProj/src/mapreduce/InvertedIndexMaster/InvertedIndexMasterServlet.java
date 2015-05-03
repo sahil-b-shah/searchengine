@@ -65,20 +65,9 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 	 */
 	public synchronized void addData(HttpServletRequest request) throws IOException{
 		BufferedReader in = request.getReader();
-		
-		InvertedIndexDBWrapper indexDB1 = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb1");
-		InvertedIndexDBWrapper indexDB2 = InvertedIndexDBWrapper.getInstance2("/home/cis455/Index/indexdb2");
-		InvertedIndexDBWrapper indexDB3 = InvertedIndexDBWrapper.getInstance3("/home/cis455/Index/indexdb3");
-		InvertedIndexDBWrapper indexDB4 = InvertedIndexDBWrapper.getInstance4("/home/cis455/Index/indexdb4");
-		InvertedIndexDBWrapper indexDB5 = InvertedIndexDBWrapper.getInstance5("/home/cis455/Index/indexdb5");
-		InvertedIndexDBWrapper indexDB6 = InvertedIndexDBWrapper.getInstance6("/home/cis455/Index/indexdb6");
-		InvertedIndexDBWrapper indexDB7 = InvertedIndexDBWrapper.getInstance7("/home/cis455/Index/indexdb7");
-		InvertedIndexDBWrapper indexDB8 = InvertedIndexDBWrapper.getInstance8("/home/cis455/Index/indexdb8");
-		InvertedIndexDBWrapper indexDB9 = InvertedIndexDBWrapper.getInstance9("/home/cis455/Index/indexdb9");
-		InvertedIndexDBWrapper indexDB10 = InvertedIndexDBWrapper.getInstance10("/home/cis455/Index/indexdb10");
+		InvertedIndexDBWrapper indexDB = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb");
+		WordCountDBWrapper numWordsDB = WordCountDBWrapper.getInstance("/home/cis455/Index/numwordsdb");
 
-		//	WordCountDBWrapper numWordsDB = WordCountDBWrapper.getInstance("/home/cis455/Index/numwordsdb");
-		
 
 		String line = in.readLine();
 		if(line == null)
@@ -89,9 +78,6 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 		String url = firstLine[0];
 
 		System.out.println("url adding:" + firstLine[0] + " " + num);
-		WordCountDBWrapper numWordsDB = WordCountDBWrapper.getInstance("/home/cis455/Index/numwordsdb");
-
-		
 		numWordsDB.addWord(firstLine[0], num);
 		System.out.println("Size of num words" + numWordsDB.getSize());
 
@@ -103,82 +89,13 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 
 				String[] docData = line.split("\\s+");
 				System.out.println("docData: " + line);
-				
-				//Hash key using SHA-1
-				String hashedWord = DigestUtils.sha1Hex(docData[0]);			
-				int fileNumber = pickNumberBucket(10, hashedWord);
-				//System.out.println("Hashed value was: " + fileNumber);
-				
-				HashMap<String, URLMetrics> urlMap = null;
-				switch(fileNumber){
-				case 1:
-					urlMap= indexDB1.getUrls(docData[0]); //look up by word
-					break;
-				case 2:
-					urlMap= indexDB2.getUrls(docData[0]); //look up by word
-					break;
-				case 3:
-					urlMap= indexDB3.getUrls(docData[0]); //look up by word
-					break;
-				case 4:
-					urlMap= indexDB4.getUrls(docData[0]); //look up by word
-					break;
-				case 5:
-					urlMap= indexDB5.getUrls(docData[0]); //look up by word
-					break;
-				case 6:
-					urlMap= indexDB6.getUrls(docData[0]); //look up by word
-					break;
-				case 7:
-					urlMap= indexDB7.getUrls(docData[0]); //look up by word
-					break;
-				case 8:
-					urlMap= indexDB8.getUrls(docData[0]); //look up by word
-					break;
-				case 9:
-					urlMap= indexDB9.getUrls(docData[0]); //look up by word
-					break;
-				default:
-					urlMap= indexDB10.getUrls(docData[0]); //look up by word
-					break;
-				}
+				HashMap<String, URLMetrics> urlMap= indexDB.getUrls(docData[0]); //look up by word
 				if(urlMap == null){
 					urlMap = new HashMap<String, URLMetrics>();
 				}
 				urlMap.put(url, new URLMetrics(Integer.parseInt(docData[1]),0,0));
 
-				switch(fileNumber){
-				case 1:
-					indexDB1.addWord(docData[0], urlMap);
-					break;
-				case 2:
-					indexDB2.addWord(docData[0], urlMap);
-					break;
-				case 3:
-					indexDB3.addWord(docData[0], urlMap);
-					break;
-				case 4:
-					indexDB4.addWord(docData[0], urlMap);
-					break;
-				case 5:
-					indexDB5.addWord(docData[0], urlMap);
-					break;
-				case 6:
-					indexDB6.addWord(docData[0], urlMap);
-					break;
-				case 7:
-					indexDB7.addWord(docData[0], urlMap);
-					break;
-				case 8:
-					indexDB8.addWord(docData[0], urlMap);
-					break;
-				case 9:
-					indexDB9.addWord(docData[0], urlMap);
-					break;
-				default:
-					indexDB10.addWord(docData[0], urlMap);
-					break;
-				}
+				indexDB.addWord(docData[0], urlMap);
 			}catch(Exception e){
 				//Caught exception
 				System.out.println("<---Caught Exception--->: " + e);
@@ -187,29 +104,9 @@ public class InvertedIndexMasterServlet extends HttpServlet {
 
 			
 		}
-		System.out.println("Index DB Size: " + indexDB1.getSize());
-		System.out.println("Index DB Size: " + indexDB2.getSize());
-		System.out.println("Index DB Size: " + indexDB3.getSize());
-		System.out.println("Index DB Size: " + indexDB4.getSize());
-		System.out.println("Index DB Size: " + indexDB5.getSize());
-		System.out.println("Index DB Size: " + indexDB6.getSize());
-		System.out.println("Index DB Size: " + indexDB7.getSize());
-		System.out.println("Index DB Size: " + indexDB8.getSize());
-		System.out.println("Index DB Size: " + indexDB9.getSize());
-		System.out.println("Index DB Size: " + indexDB10.getSize());
-
-		
+		System.out.println("Index DB Size: " + indexDB.getSize());
 		System.out.println();
-		indexDB1.close();
-		indexDB2.close2();
-		indexDB3.close3();
-		indexDB4.close4();
-		indexDB5.close5();
-		indexDB6.close6();
-		indexDB7.close7();
-		indexDB8.close8();
-		indexDB9.close9();
-		indexDB10.close10();
+		indexDB.close();
 	}
 
 
