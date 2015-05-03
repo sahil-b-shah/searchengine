@@ -139,7 +139,7 @@ public class SearchServlet extends HttpServlet {
 			    }
 			}
 			if(numFound == 1){
-				out.println("<img src='http://i.imgur.com/mtEZOZk.jpg' >");
+				out.println("<img width='50%' height='50%' src='http://i.imgur.com/mtEZOZk.jpg' >");
 			}
 		//	out.println("<br>");
 			out.println("<br>");
