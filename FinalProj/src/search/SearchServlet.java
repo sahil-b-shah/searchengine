@@ -145,7 +145,7 @@ public class SearchServlet extends HttpServlet {
 			out.println("<br>");
 			out.println("<form action='searchResults' method='POST'>");
 	    	//out.println("Try Another Search:<br>");
-	    	out.println("<input type='text' name='search' value=''>");
+	    	out.println("<input type='text' size='45' name='search' value=''>");
 	    	out.println("<br>");
 	    	out.print("<input type='submit' value='Return to Search!'>");
 			out.println("</body></html>");

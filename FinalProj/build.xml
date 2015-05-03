@@ -17,6 +17,12 @@
     <mkdir dir="classes"/>
   	<mkdir dir="target/search/WEB-INF/classes"/>
   </target>
+	
+ <target name="pack" description="Create an archive for submission">
+      <zip destfile="submit-project.zip">
+        <zipfileset dir="." excludes="target/**,**/*.class,submit-projct.zip,*.war,*.jar"/>
+      </zip>
+    </target>
   
 	<target name ="build-dbprinter" depends="compile-dbprinter">
 		<jar destfile="db_printer.jar">
@@ -375,12 +381,6 @@
 		    </jar>
 		</target>
   
-  <target name="pack" description="Create an archive for submission">
-    <zip destfile="submit-hw3.zip">
-      <zipfileset dir="." excludes="target/**,**/*.class,submit-hw3.zip,ShuffleURLMaster.war,ShuffleURLWorker*.war"/>
-    </zip>
-  </target>
-  
   <target name="clean">
     <delete dir="target/ShuffleURLMaster/WEB-INF/classes"/>
     <delete dir="target/ShuffleURLWorker/WEB-INF/classes"/>
@@ -407,6 +407,7 @@
   	<delete file="db_printer.jar"/>
 	<delete dir="target/search/WEB-INF/classes"/>
     <delete file="search.war"/>
+  	<delete file="submit-project.zip"/>
 
   </target>
 </project>
