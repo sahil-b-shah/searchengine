@@ -38,23 +38,32 @@ public class SearchServlet extends HttpServlet {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) {
-		InvertedIndexDBWrapper database = InvertedIndexDBWrapper.getInstance(getServletContext().getInitParameter("InvertedIndexDBstore"));
-		PageRankDBWrapper pageDB = PageRankDBWrapper.getInstance(getServletContext().getInitParameter("PageRankDBstore"));
+		InvertedIndexDBWrapper database = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/indexdb/");
+		PageRankDBWrapper pageDB = PageRankDBWrapper.getInstance("/home/cis455/PageRank/pagerankdb/");
+		InvertedIndexDBWrapper database2 = InvertedIndexDBWrapper.getInstance("/home/cis455/Index/2indexdb/");
+		PageRankDBWrapper pageDB2 = PageRankDBWrapper.getInstance("/home/cis455/PageRank/2pagerankdb/");
 		String query = request.getParameter("search");
 		String[] elements = query.split("\\s+");
 		wordsInQuery = elements.length;
 		PrintWriter out;
+		searchMap.clear();
 		
 		try{
 			out = response.getWriter();
 			out.println("<html><body>");
 			out.println("<h1>You searched for: " + query +  "</h1>");
 			out.println("<h2>Here are your results:</h2>");
+			out.println("<form action='searchResults' method='POST'>");
+	    	out.println("Try Another Search:<br>");
+	    	out.println("<input type='text' name='search' value=''>");
+	    	out.println("<br>");
+	    	out.print("<input type='submit' value='Return to Search!'>");
 			for(String token : elements){
 				if(stopList.contains(token)){
 					//System.out.println("Ignoring:" + token);
 				}else{
 					InvertedIndexData data;
+					InvertedIndexData data2 =null;
 					if((data = database.getContentById(token)) != null){
 						HashMap<String, URLMetrics> hm = data.getUrls();
 						for(String url : hm.keySet()){
@@ -65,7 +74,36 @@ public class SearchServlet extends HttpServlet {
 								SearchData newData = new SearchData(0.0,1);
 								double tempTF = hm.get(url).getTF();
 								double tempIDF = hm.get(url).getIDF();
-								double pr = pageDB.getRank(url);
+								double pr = 0.5;
+								try{
+									pr = pageDB.getRank(url);
+								}
+								catch(Exception e){
+									System.out.println("Didn't have url: " + url);
+								}
+								// Some way to set PageRank as well
+								newData.setScore(tempTF * tempIDF * pr);
+								searchMap.put(url, newData);
+							}
+						}
+					}
+					else if ((data2 = database2.getContentById(token)) != null){
+						HashMap<String, URLMetrics> hm2 = data2.getUrls();
+						for(String url : hm2.keySet()){
+							if(searchMap.containsKey(url)){
+								//System.out.println("Document Found Again:" + url);
+								searchMap.get(url).incrementQueryHits();
+							}else{
+								SearchData newData = new SearchData(0.0,1);
+								double tempTF = hm2.get(url).getTF();
+								double tempIDF = hm2.get(url).getIDF();
+								double pr = 0.1;
+								/*try{
+									pr = pageDB2.getRank(url);
+								}
+								catch(Exception e){
+									System.out.println("Didn't have url: " + url);
+								}*/
 								// Some way to set PageRank as well
 								newData.setScore(tempTF * tempIDF * pr);
 								searchMap.put(url, newData);
@@ -81,7 +119,9 @@ public class SearchServlet extends HttpServlet {
 			while(wordsInQuery > 0 && numFound < 10){
 				HashMap<String,Double> tempMap = new HashMap<String,Double>();
 				for(String url : searchMap.keySet()){
+					System.out.println("Query hits: "+searchMap.get(url).getQueryHits() + " url: "+ url );
 					if(searchMap.get(url).getQueryHits() == wordsInQuery){
+						System.out.println("added to temp " + url);
 						tempMap.put(url, searchMap.get(url).getScore());
 					}
 				}
@@ -91,6 +131,7 @@ public class SearchServlet extends HttpServlet {
 				Iterator it = tempMap.entrySet().iterator();
 			    while (it.hasNext()) {
 			        Map.Entry pair = (Map.Entry)it.next();
+			        System.out.println("Printing url: " + pair.getKey());
 					out.println("<h3>Search Result " + numFound +  "</h3>");
 					out.println("<a href='" + pair.getKey()+ "'>"+pair.getKey()+"</a>");
 			        numFound++;
@@ -112,7 +153,8 @@ public class SearchServlet extends HttpServlet {
 			database.close();
 		}catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
+			System.out.println("Caught exception: " + e);
 		}
 	}
 	@Override
@@ -153,15 +195,15 @@ public class SearchServlet extends HttpServlet {
 			database.close();*/
 			
 			out = response.getWriter();
-			out.println("<html><body>");
+			out.println("<html><body><center>");
 			out.println("<h1> Welcome to AaduSearch! </h1>");
 			out.println("<h2> Find things you never thought you needed! </h2>");
 	    	out.println("<form action='searchResults' method='POST'>");
 	    	out.println("Enter your Search!!!<br>");
-	    	out.println("<input type='text' name='search' value=''>");
+	    	out.println("<input type='text' name='search' size='40' value=''>");
 	    	out.println("<br>");
 	    	out.print("<input type='submit' value='Search!'>");
-	    	out.println("</body></html>");
+	    	out.println("</center></body></html>");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

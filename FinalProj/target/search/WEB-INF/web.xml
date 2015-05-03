@@ -6,6 +6,14 @@
      <servlet>
          <servlet-name>SearchServlet</servlet-name>
          <servlet-class>search.SearchServlet</servlet-class>
+         <init-param>
+           <param-name>PageRankDBstore</param-name>
+           <param-value>/home/cis455/PageRank/pagerankdb/</param-value>
+         </init-param>
+         <init-param>
+           <param-name>InvertedIndexDBstore</param-name>
+           <param-value>/home/cis455/Index/indexdb/</param-value>
+         </init-param>
      </servlet>
 
      <servlet-mapping>
