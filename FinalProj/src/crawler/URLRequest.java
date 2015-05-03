@@ -213,12 +213,7 @@ public class URLRequest {
 
 
 	private void constructRobotsTxt(String hostName) throws IOException {
-		/*HttpURLConnection con = sendRequest(hostName, "/robots.txt");
-
-		if(con.getResponseCode() != 200) {
-			return;
-		}*/
-
+		
 		//Get reponse and read headers 
 		BufferedReader br = null;
 		RobotsTxtInfo robotsTxt = new RobotsTxtInfo();
@@ -404,22 +399,6 @@ public class URLRequest {
 		url = new URL(requestString);		
 		con = (HttpsURLConnection) url.openConnection();
 
-		/*if (this.protocol.equals("http")) {
-			//Connection
-			try {
-				con = (HttpsURLConnection) url.openConnection();
-			} catch (IOException e1) {
-				System.err.println("Error opening connection to master servlet: http");
-				e1.printStackTrace();
-			}
-		} else { 
-			try {
-				con = (HttpsURLConnection) url.openConnection();
-			} catch (IOException e1) {
-				System.err.println("Error opening connection to master servlet: http");
-				e1.printStackTrace();
-			}
-		}*/
 		con.setRequestMethod(method);
 		con.setConnectTimeout(3000);
 		con.addRequestProperty("Host", hostName);
